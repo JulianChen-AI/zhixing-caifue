@@ -33,15 +33,13 @@
 
 ## 快速运行（无需 API Key）
 
-需要 Node.js 22.13 或更新版本（建议 24）。
+需要 Node.js 22.13 或更新版本（建议 24）。一条命令启动（也可以把本目录交给 AI Agent，按 [AGENTS.md](AGENTS.md) 执行）：
 
 ```sh
-cd voice-bank
-npm ci
-npm run build
-npm run db:local        # 仅首次
-npm run preview:local
+./start.sh
 ```
+
+等价于在 `voice-bank/` 依次执行 `npm ci`、`npm run build`、首次 `npm run db:local`、`npm run preview:local`。
 
 打开 http://127.0.0.1:5173 。没有密钥时使用确定性中文解析的交互演示：点“给张三转五百元”，选“室友”，核对后在认证卡输入演示码 **123456**。
 
