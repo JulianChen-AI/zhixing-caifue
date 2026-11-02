@@ -47,6 +47,8 @@
 
 接入真实 Qwen 实时语音：复制 `voice-bank/.dev.vars.example` 为 `.dev.vars`，填写阿里云百炼 API Key 与业务空间 ID，详见 [应用说明](voice-bank/README.md)。密钥只保存在本地，`.gitignore` 已排除。
 
+> **模型配置（重要）**：意图理解按 `QWEN_PLANNER_MODEL=qwen-plus` 调优，评测数据也基于 qwen-plus。提交的压缩包里 `voice-bank/.dev.vars` 写的是 `qwen-flash`，请改为 `qwen-plus` 后重启。flash 下“你能办什么”等问能力的问题曾被反问“您想办理什么业务”，本仓库已在意图提示词中修正（见下方“提交后修正”）。
+
 ## 测试
 
 ```sh
@@ -79,3 +81,9 @@ npm run eval:tasks      # 任务完成率评测集（98 条，覆盖六场景与
 | 技术文档 | [系统架构](docs/technical/01-system-architecture.md)、[核心算法](docs/technical/02-core-algorithms.md)、[安全设计](docs/technical/03-security-design.md) |
 | 安全自评报告 | [安全自评](docs/technical/04-security-self-assessment.md) |
 | 部署说明 | [deploy/README.md](deploy/README.md) |
+
+## 提交后修正（2026-11-02）
+
+| 问题 | 原因 | 修正 | 验证 |
+|---|---|---|---|
+| 问“你能帮我办什么业务”时只回“请告诉我您想办理什么业务？” | 意图提示词没有区分“问能力”与“缺信息”；压缩包配置用了 qwen-flash，更容易判错 | `voice-bank/lib/voice/intent-json.ts` 增加一条规则：问能力按 chat 处理，直接列出六类业务；README 提示改用 qwen-plus | 真实模型：问能力 4 种说法在 flash、plus 上均列出业务；“能帮我查余额/转账吗”仍正常办理。qwen-plus 评测 97/98（99.0%），留出集 26/27，未通过的 BI-52 单独复跑 3/3 通过、CA-03 在修改前即有波动；误执行 0；`npm test` 589/589 |
