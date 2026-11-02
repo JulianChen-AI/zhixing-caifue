@@ -1,0 +1,1845 @@
+{
+  "version": "2.0.0",
+  "functions": [
+    {
+      "id": "TR01",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "查看账户列表",
+      "example": "我有哪些账户？",
+      "description": "读取当前身份 → 查询名下账户 → 按需要展示列表",
+      "scope": "基础",
+      "parameters": "accountType?",
+      "tools": [
+        "T01",
+        "S03"
+      ]
+    },
+    {
+      "id": "TR02",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "查询账户余额",
+      "example": "储蓄账户还有多少钱？",
+      "description": "复用明确账户；未明确则查询/选择 → 读取可用余额及时间 → 回答或展示",
+      "scope": "基础",
+      "parameters": "accountId?，currency?",
+      "tools": [
+        "T01",
+        "S02",
+        "T02",
+        "S03"
+      ]
+    },
+    {
+      "id": "TR03",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "发起转账",
+      "example": "给室友张三转五百，备注饭钱。",
+      "description": "补齐必要字段 → 按人名/号码解析与核验 → 有歧义才选择 → 更新草稿（note 未提供则跳过备注处理）→ 检查余额、风险及通道 → 按规则确认/认证 → 提交 → 核验结果；保存联系人和导出按请求追加",
+      "scope": "基础",
+      "parameters": "recipient?，accountId?，amount?，note?，saveRecipient?，receiptExport?",
+      "tools": [
+        "T01",
+        "T03",
+        "T04",
+        "S01",
+        "S02",
+        "T16",
+        "T05",
+        "T02",
+        "T06",
+        "S05",
+        "S06",
+        "T07",
+        "S08",
+        "S09",
+        "T14"
+      ]
+    },
+    {
+      "id": "TR04",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "管理定时转账",
+      "example": "每月五号给房东转一千二；先暂停。",
+      "description": "识别创建/查询/修改/暂停/恢复/删除 → 创建或修改先预览 → 明确持续授权 → 保存一条规则 → 到期复核余额及对象 → 执行或停止并记录；暂停/删除只影响未执行任务",
+      "scope": "完整",
+      "parameters": "action，ruleId?，recipient?，accountId?，amount?，schedule?，note?，endAt?",
+      "tools": [
+        "T10",
+        "T03",
+        "T16",
+        "T05",
+        "T02",
+        "T06",
+        "S04",
+        "S05",
+        "S06",
+        "S12",
+        "T07",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "id": "TR05",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "发起和管理 AA 收款",
+      "example": "六个人吃了二百八，帮我 AA；小李少付二十。",
+      "description": "创建/修改时计算总额与分摊 → 用户及参与者按路径确认 → 发出 → 查询实付或标来源人工核销；只有用户要求或既有授权才提醒",
+      "scope": "完整",
+      "parameters": "action，sessionId?，total?，participants?，adjustments?，reminder?",
+      "tools": [
+        "T11",
+        "T12",
+        "S02",
+        "S05",
+        "T13",
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "id": "TR06",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "查询转账记录与回执",
+      "example": "刚才那笔到账了吗？上个月给房东转了多少？",
+      "description": "定位交易或检索期间 → 多笔时选择 → 读取真实状态/汇总 → 展示；用户要求才导出回执",
+      "scope": "基础",
+      "parameters": "transferId?，period?，recipient?，status?，exportFormat?",
+      "tools": [
+        "T08",
+        "S02",
+        "S08",
+        "S09",
+        "S03"
+      ]
+    },
+    {
+      "id": "TR07",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "取消未执行的转账",
+      "example": "先别转了；撤销预约的那笔。",
+      "description": "定位草稿或指令 → 查询实际状态 → 校验是否可撤 → 按动作要求确认/认证 → 取消 → 核验；已结算或不支持撤销则解释实际状态",
+      "scope": "基础",
+      "parameters": "taskId?，transferId?，reason?",
+      "tools": [
+        "T08",
+        "S02",
+        "S07",
+        "S05",
+        "S06",
+        "T09",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "id": "TR08",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "管理收款联系人",
+      "example": "把这个人存成房东；删除旧号码。",
+      "description": "查询/新增/修改/删除 → 补齐涉及字段并核验 → 有影响的写操作确认 → 保存并返回结果",
+      "scope": "完整",
+      "parameters": "action，contactId?，name?，alias?，payeeDetails?",
+      "tools": [
+        "T14",
+        "T04",
+        "S01",
+        "S02",
+        "S05",
+        "S07"
+      ]
+    },
+    {
+      "id": "TR09",
+      "moduleId": "M1",
+      "moduleName": "智能转账与账户查询",
+      "title": "管理个人往来记录",
+      "example": "谁还没还我钱？把这笔标成已还。",
+      "description": "检索个人记录 → 选择对象 → 录入/核销/删除预览 → 确认 → 更新；仅作个人辅助记录",
+      "scope": "扩展",
+      "parameters": "action，recordId?，person?，amount?，relatedTransactionId?",
+      "tools": [
+        "T15",
+        "B01",
+        "S02",
+        "S05"
+      ]
+    },
+    {
+      "id": "BI01",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "查询账单明细",
+      "example": "这个月最大的三笔支出是什么？",
+      "description": "继承已明确筛选；缺关键口径再询问 → 检查数据权限 → 查询明细及覆盖范围 → 按需要展示；后续追问保留未改变的条件",
+      "scope": "基础",
+      "parameters": "period?，accountIds?，sources?，merchant?，category?，amountRange?，sort?",
+      "tools": [
+        "S04",
+        "B01",
+        "S03"
+      ]
+    },
+    {
+      "id": "BI02",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "统计和比较收支",
+      "example": "这个月奶茶花了多少？比上月呢？",
+      "description": "明确期间/类目/指标/比较基准 → 查询并分类 → 处理退款、AA 及自有账户互转口径 → 确定性统计 → 返回金额/笔数和依据",
+      "scope": "基础",
+      "parameters": "period?，accountId?，merchant?，category?，metric?，baseline?，cashOrNet?",
+      "tools": [
+        "B01",
+        "B02",
+        "B03",
+        "S01",
+        "S03"
+      ]
+    },
+    {
+      "id": "BI03",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "纠正账单分类",
+      "example": "这笔是送礼，不是餐饮。",
+      "description": "定位交易 → 默认仅本笔 → 若明确选择未来映射或历史批量则预览范围 → 确认影响 → 修改并记录",
+      "scope": "基础",
+      "parameters": "transactionIds?，category?，scope?，applyToHistory?",
+      "tools": [
+        "B01",
+        "S02",
+        "B04",
+        "S05"
+      ]
+    },
+    {
+      "id": "BI04",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "核对异常扣款和退款",
+      "example": "这笔钱为什么扣了两次？退款回来了吗？",
+      "description": "定位交易 → 关联扣款/退款及有效基线 → 返回依据和未知项 → 用户选择忽略/继续核对/卡片保护/材料整理后再移交",
+      "scope": "基础",
+      "parameters": "transactionId?，period?，issueType?，followup?",
+      "tools": [
+        "B01",
+        "B05",
+        "S02",
+        "S10",
+        "S16"
+      ]
+    },
+    {
+      "id": "BI05",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "查找周期扣费和闲置订阅",
+      "example": "我是不是一直在给不用的会员付钱？",
+      "description": "查询授权流水 → 识别周期候选 → 以事实询问是否仍使用 → 用户确认 → 展示；请求取消时移交订阅功能",
+      "scope": "基础",
+      "parameters": "period?，merchant?，unusedConfirmation?",
+      "tools": [
+        "B01",
+        "D01",
+        "D02",
+        "S01",
+        "S03",
+        "S10"
+      ]
+    },
+    {
+      "id": "BI06",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "查看月度或年度账单报告",
+      "example": "分析一下这个月支出；给我看看年度账单。",
+      "description": "汇总本期统计及覆盖范围 → 生成基础报告 → 仅请求且能力可用时加入叙事/群体参照 → 展示；分享需选择字段、脱敏预览和确认",
+      "scope": "基础；叙事/分位/分享为扩展",
+      "parameters": "period，reportType?，narrative?，peerComparison?，share?",
+      "tools": [
+        "B01",
+        "B02",
+        "B03",
+        "B08",
+        "S03",
+        "S15",
+        "S05"
+      ]
+    },
+    {
+      "id": "BI07",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "导入其他来源账单",
+      "example": "把微信账单导进来。",
+      "description": "用户主动选择文件 → 逐来源授权 → 解析标准化 → 去重 → 疑似重复和错误条目等待确认 → 入库并清理原文件 → 返回结果",
+      "scope": "完整",
+      "parameters": "source，file，accountMapping?，duplicateResolution?",
+      "tools": [
+        "S04",
+        "B06",
+        "B07",
+        "S01",
+        "S05"
+      ]
+    },
+    {
+      "id": "BI08",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "查看和设置预算",
+      "example": "这个月餐饮预算设五百；还剩多少？",
+      "description": "查询按现有预算及统计计算进度；创建/修改时补齐参数 → 预览并确认 → 保存新版本 → 返回结果",
+      "scope": "完整",
+      "parameters": "action，period?，category?，amount?",
+      "tools": [
+        "B09",
+        "B03",
+        "S01",
+        "S05",
+        "S03"
+      ]
+    },
+    {
+      "id": "BI09",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "做节省假设试算",
+      "example": "每周少喝两杯奶茶，年底能多攒多少？",
+      "description": "明确节省假设及期限 → 查询历史作参照 → 程序试算（默认本金）→ 展示假设与公式；用户选择后才移交建目标/转存",
+      "scope": "扩展",
+      "parameters": "category?，savePerPeriod?，periodCount?，deadline?，interestAssumption?",
+      "tools": [
+        "B01",
+        "B03",
+        "B10",
+        "S01",
+        "S03",
+        "S10"
+      ]
+    },
+    {
+      "id": "BI10",
+      "moduleId": "M2",
+      "moduleName": "账单分析",
+      "title": "管理宿舍公共账本",
+      "example": "建个四人宿舍公共账本，月底结清。",
+      "description": "逐人授权 → 建账/录入公开公共条目 → 按人数规则聚合，退出后重新检查 → 需要结清时移交 AA；不暴露私人流水",
+      "scope": "扩展",
+      "parameters": "action，ledgerId?，members?，publicEntries?",
+      "tools": [
+        "S04",
+        "B11",
+        "S05",
+        "S10"
+      ]
+    },
+    {
+      "id": "SU01",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "查看订阅清单和详情",
+      "example": "我有哪些自动续费？这个会员下次扣多少？",
+      "description": "查询已确认项目和候选 → 清单或单项详情 → 显示金额/周期/下次扣款及数据来源；未知不猜",
+      "scope": "基础",
+      "parameters": "subscriptionId?，channel?，status?，sort?",
+      "tools": [
+        "D02",
+        "S02",
+        "S03"
+      ]
+    },
+    {
+      "id": "SU02",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "登记或纠正订阅信息",
+      "example": "帮我记一下这个年费会员；这个不是订阅。",
+      "description": "手动输入或用户主动选文件 → 有文件才提取 → 必要时匹配候选 → 展示结构化字段和未知项 → 用户确认 → 保存或纠正",
+      "scope": "基础；OCR 为可选能力",
+      "parameters": "action，subscriptionId?，merchant?，channel?，amount?，cycle?，nextChargeAt?，file?",
+      "tools": [
+        "S01",
+        "S14",
+        "D01",
+        "D03",
+        "S05"
+      ]
+    },
+    {
+      "id": "SU03",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "设置和管理续费预警",
+      "example": "到期前提醒我；别再提醒这个会员了。",
+      "description": "查询日期/价格依据 → 缺日期则询问或标待补 → 明确提醒授权 → 创建/改/关规则 → 到期根据实际事件通知；用户可查规则",
+      "scope": "基础",
+      "parameters": "action，subscriptionId?，leadTimes?，notifyChannel?，includePriceChange?",
+      "tools": [
+        "D02",
+        "D10",
+        "S01",
+        "S04",
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "id": "SU04",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "取消订阅或代扣",
+      "example": "帮我取消这个会员。",
+      "description": "选择对象 → 核验通道能力与保护类型 → 说明解约/退订/退款及权益影响 → 用户确认/所需认证 → 银行协议执行或外部官方指引 → 查询结果；后续提醒和材料导出按参数追加",
+      "scope": "基础",
+      "parameters": "subscriptionId?，reason?，verifyReminder?，evidenceExport?",
+      "tools": [
+        "D02",
+        "S02",
+        "D04",
+        "D05",
+        "S05",
+        "S06",
+        "D06",
+        "D07",
+        "S08",
+        "D08",
+        "S09",
+        "D10",
+        "S16"
+      ]
+    },
+    {
+      "id": "SU05",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "查询取消结果并核对后续扣费",
+      "example": "上次取消成功了吗？怎么又扣钱了？",
+      "description": "定位取消任务 → 读取协议或外部反馈 → 查询观察期流水 → 区分已解除/用户报告/未见扣款/仍扣费/未知 → 需要时整理材料",
+      "scope": "基础",
+      "parameters": "cancellationId?，subscriptionId?，period?，prepareEvidence?",
+      "tools": [
+        "D08",
+        "B01",
+        "D02",
+        "S08",
+        "S03",
+        "S16"
+      ]
+    },
+    {
+      "id": "SU06",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "恢复误取消的协议或订阅",
+      "example": "刚才取消错了，能恢复吗？",
+      "description": "定位对象 → 查询实际状态及恢复能力 → 说明重新授权/开通后果 → 确认 → 支持则恢复并核验，不支持则官方重新开通指引",
+      "scope": "完整",
+      "parameters": "subscriptionId?，cancellationId?",
+      "tools": [
+        "D02",
+        "D04",
+        "D09",
+        "S04",
+        "S05",
+        "S06",
+        "D08",
+        "D07"
+      ]
+    },
+    {
+      "id": "SU07",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "查看订阅支出报告",
+      "example": "我每月会员费一共多少？取消后少支出多少？",
+      "description": "查询真实扣费及取消记录 → 分开汇总实支与预计未来少支出 → 展示口径 → 用户决定是否移交储蓄目标",
+      "scope": "完整",
+      "parameters": "period?，channel?，includeProjected?",
+      "tools": [
+        "D02",
+        "D12",
+        "B03",
+        "S03",
+        "S10"
+      ]
+    },
+    {
+      "id": "SU08",
+      "moduleId": "M3",
+      "moduleName": "订阅与代扣管理",
+      "title": "查看扣款日历和预留资金计划",
+      "example": "下个月哪几天扣费最集中？",
+      "description": "聚合已知扣款日和用户到账日 → 试算缺口 → 展示日历及假设 → 仅用户选择后创建预留提醒或移交资金规则",
+      "scope": "扩展",
+      "parameters": "period?，incomeDates?，reserveReminder?，fundingRule?",
+      "tools": [
+        "D02",
+        "D11",
+        "T02",
+        "S03",
+        "D10",
+        "S10"
+      ]
+    },
+    {
+      "id": "IN01",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "创建目标储蓄",
+      "example": "建一个明年六月存够三千的旅行目标。",
+      "description": "补齐目标金额和期限 → 程序计算计划 → 用户确认 → 建目标；未提供 autoSave 不建扣款规则，明确请求时单独授权自动转存",
+      "scope": "基础",
+      "parameters": "name?，target?，deadline?，autoSave?",
+      "tools": [
+        "S01",
+        "I01",
+        "S05",
+        "I02",
+        "T10",
+        "S04"
+      ]
+    },
+    {
+      "id": "IN02",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "向目标存钱或取出",
+      "example": "往旅行目标存二百；取五百急用。",
+      "description": "选择目标及账户 → 明确金额/方向 → 检查可用余额、费用或产品条件 → 当前摘要确认及所需认证 → 账户间转移 → 核验结果",
+      "scope": "基础",
+      "parameters": "direction，goalId?，accountId?，amount?，note?",
+      "tools": [
+        "I03",
+        "T01",
+        "S02",
+        "T02",
+        "S07",
+        "S05",
+        "S06",
+        "I04",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "id": "IN03",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "查询目标储蓄进度",
+      "example": "旅行目标攒了多少？按现在速度还差多久？",
+      "description": "选择目标 → 查询已入账金额及计划 → 算进度和差额 → 用户请求时按明确假设预测 → 展示",
+      "scope": "基础",
+      "parameters": "goalId?，includeProjection?",
+      "tools": [
+        "I03",
+        "I01",
+        "S02",
+        "S03"
+      ]
+    },
+    {
+      "id": "IN04",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "修改目标和自动储蓄安排",
+      "example": "目标改成五千；先停自动存钱。",
+      "description": "读取目标/规则 → 区分改目标、改自动存款、暂停或关闭 → 重算影响 → 必要确认/授权 → 更新；已入账资金不因关闭目标自动消失",
+      "scope": "基础",
+      "parameters": "action，goalId?，target?，deadline?，autoRuleId?",
+      "tools": [
+        "I03",
+        "I01",
+        "I02",
+        "T10",
+        "S05",
+        "S04"
+      ]
+    },
+    {
+      "id": "IN05",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "完成或更新风险测评",
+      "example": "我想做风险测评；接着上次那题。",
+      "description": "查询已有画像和问卷进度 → 从待答题继续 → 逐题接收明确答案 → 程序评分 → 保存新画像；若由购买流程转来则返回原草稿",
+      "scope": "基础",
+      "parameters": "assessmentId?，answers?，resumeFrom?",
+      "tools": [
+        "I06",
+        "I05",
+        "S01",
+        "S10"
+      ]
+    },
+    {
+      "id": "IN06",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "查询理财产品列表和详情",
+      "example": "有哪些低风险产品？这只基金费用多少？",
+      "description": "查询候选/单品 → 返回风险、费用、期限、流动性和数据时间 → 按需展示；用户选择才带入交易",
+      "scope": "基础",
+      "parameters": "productId?，filters?，fields?",
+      "tools": [
+        "I07",
+        "S02",
+        "S03"
+      ]
+    },
+    {
+      "id": "IN07",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "比较指定产品",
+      "example": "对比一下这两只基金。",
+      "description": "明确比较对象 → 同口径取数 → 计算并展示差异及缺项 → 用户自行决定是否进入购买",
+      "scope": "完整",
+      "parameters": "productIds?，dimensions?",
+      "tools": [
+        "I07",
+        "I08",
+        "S02",
+        "S03"
+      ]
+    },
+    {
+      "id": "IN08",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "购买理财产品",
+      "example": "用储蓄账户买五百这只基金。",
+      "description": "明确产品/账户/金额 → 读取有效画像 → 缺测评则暂停并移交后返回 → 适当性及余额检查 → 费用风险试算 → 当前摘要确认/认证 → 提交 → 查询受理/份额确认；recurring 明确时进入定投授权",
+      "scope": "基础",
+      "parameters": "productId?，accountId?，amount?，recurring?",
+      "tools": [
+        "I07",
+        "I06",
+        "S10",
+        "I09",
+        "T02",
+        "I10",
+        "I11",
+        "S05",
+        "S06",
+        "I12",
+        "I13",
+        "I16",
+        "S04"
+      ]
+    },
+    {
+      "id": "IN09",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "赎回持有产品",
+      "example": "把这只基金赎回一半。",
+      "description": "定位持仓 → 明确金额/份额/比例且不冲突 → 检查可赎状态 → 计算费用及预计到账 → 确认/所需认证 → 提交 → 分别查询申请、确认和资金到账",
+      "scope": "基础",
+      "parameters": "holdingId?，amount?，shares?，proportion?，destinationAccount?",
+      "tools": [
+        "I15",
+        "S02",
+        "I09",
+        "I10",
+        "I11",
+        "S05",
+        "S06",
+        "I12",
+        "I13",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "id": "IN10",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "查询持仓及收益",
+      "example": "我现在持有哪些基金？赚了还是亏了？",
+      "description": "查询持仓、成本、费用和估值时点 → 按一致口径计算 → 展示事实及数据时间",
+      "scope": "基础",
+      "parameters": "holdingId?，accountId?，period?，valuationBasis?",
+      "tools": [
+        "I15",
+        "S03"
+      ]
+    },
+    {
+      "id": "IN11",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "查询理财订单与交易记录",
+      "example": "刚才买进去了吗？这个月投了多少？",
+      "description": "定位订单或检索记录 → 读取实际状态及资金变化 → 展示；需要时导出对应回执",
+      "scope": "基础",
+      "parameters": "orderId?，period?，action?，status?，exportFormat?",
+      "tools": [
+        "I13",
+        "S02",
+        "S08",
+        "S09",
+        "S03"
+      ]
+    },
+    {
+      "id": "IN12",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "撤销可撤理财订单",
+      "example": "刚才买错了，帮我撤单。",
+      "description": "定位订单 → 查状态和截止窗口 → 明确后果并确认 → 可撤才提交 → 核验撤单及资金状态",
+      "scope": "基础",
+      "parameters": "orderId?",
+      "tools": [
+        "I13",
+        "S02",
+        "S07",
+        "S05",
+        "S06",
+        "I14",
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "id": "IN13",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "创建和管理定投",
+      "example": "每周投五十；改成八十；先停两个月。",
+      "description": "查询或明确计划 → 创建/改金额周期先进行资格及余额条件检查 → 明确持续授权 → 确认并保存；暂停/恢复/终止更新对应计划并返回下一执行状态",
+      "scope": "完整；启用定投即同时提供管理",
+      "parameters": "action，planId?，productId?，accountId?，amount?，schedule?，pauseUntil?",
+      "tools": [
+        "I16",
+        "I06",
+        "I09",
+        "I10",
+        "T02",
+        "S04",
+        "S05",
+        "S06",
+        "S12",
+        "I13"
+      ]
+    },
+    {
+      "id": "IN14",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "设置和管理理财提醒",
+      "example": "跌到这个程度提醒我；明天再提醒我看看。",
+      "description": "明确事件/时间 → 展示规则及数据范围 → 获得通知授权 → 建立/修改/关闭 → 到期通知；再次购买仍进入 IN08，不自动成交",
+      "scope": "完整；历史冲动叙事为可选增强",
+      "parameters": "action，holdingId?，productId?，threshold?，remindAt?，notifyChannel?",
+      "tools": [
+        "I17",
+        "S01",
+        "S04",
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "id": "IN15",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "学习理财知识",
+      "example": "给我讲讲基金；玩一段投教剧情。",
+      "description": "按主题提供基础解释；只有选择剧情时运行分支 → 记录学习进度 → 可回到原产品或测评功能",
+      "scope": "扩展",
+      "parameters": "topic?，contentId?，mode?",
+      "tools": [
+        "I18",
+        "S03",
+        "S10"
+      ]
+    },
+    {
+      "id": "CA01",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "查看卡片列表",
+      "example": "我名下有哪些卡？",
+      "description": "查询名下可见卡 → 脱敏列表 → 按需展示；他行台账与本行实时卡分别标识",
+      "scope": "基础",
+      "parameters": "cardType?，issuer?，status?",
+      "tools": [
+        "C01",
+        "C09",
+        "S03"
+      ]
+    },
+    {
+      "id": "CA02",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "查询某张卡的情况",
+      "example": "这张卡额度多少？现在能不能用？",
+      "description": "已有明确卡则直接查询；否则展示候选并选择 → 按身份范围读取详情、状态、额度、限制 → 展示；守护历史仅请求时附加",
+      "scope": "基础；守护报告为扩展",
+      "parameters": "cardId?，fields?，includeSafetyHistory?",
+      "tools": [
+        "C01",
+        "S02",
+        "C03",
+        "C04",
+        "C12",
+        "S03"
+      ]
+    },
+    {
+      "id": "CA03",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "申请卡片及管理申请",
+      "example": "我想办卡；申请到哪了？还缺什么材料？",
+      "description": "先识别实际用途和产品 → 预检 → 必要材料/授权 → 确认后收件 → 跟踪/补件/可撤申请；只解释机构返回的审批原因",
+      "scope": "基础路径；复杂远程授权可后接",
+      "parameters": "action，applicationId?，productId?，purpose?，materials?",
+      "tools": [
+        "C02",
+        "S01",
+        "S04",
+        "S05",
+        "S06",
+        "S08",
+        "S03"
+      ]
+    },
+    {
+      "id": "CA04",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "查询和调整额度",
+      "example": "为什么只有三千额度？把每日限额调到五百。",
+      "description": "先区分授信额度与交易限额 → 查询可公开因素；变更时检查规则、展示影响、确认/认证 → 提额提交申请或更新支付限额 → 查询结果",
+      "scope": "基础；成长曲线为可选展示",
+      "parameters": "action，cardId?，limitType?，amount?，reason?，includeHistory?",
+      "tools": [
+        "C01",
+        "C03",
+        "S01",
+        "S07",
+        "S05",
+        "S06",
+        "S08",
+        "S03"
+      ]
+    },
+    {
+      "id": "CA05",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "查询限制原因并申请解除",
+      "example": "这张卡为什么不能刷？能解开吗？",
+      "description": "选择卡 → 读取限制原因 → 按身份分级解释 → 司法/不可自助类型提供官方路径并停止；可处理类型完成所需认证及规则检查 → 申请解除 → 复查状态并引导重试",
+      "scope": "基础",
+      "parameters": "cardId?，restrictionId?，action?",
+      "tools": [
+        "C01",
+        "C04",
+        "S02",
+        "S06",
+        "S07",
+        "S08",
+        "S03",
+        "S16"
+      ]
+    },
+    {
+      "id": "CA06",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "临时冻结或解冻卡片",
+      "example": "卡找不到了，先冻住；找到了，解开。",
+      "description": "明确目标卡和动作 → 按方向执行身份/能力检查及必要确认 → 冻结或解冻 → 查询实际状态与保护范围 → 需要时建立补验/寻卡提醒",
+      "scope": "基础",
+      "parameters": "action，cardId?，reason?",
+      "tools": [
+        "C01",
+        "S02",
+        "S07",
+        "S05",
+        "S06",
+        "C05",
+        "S08",
+        "D10"
+      ]
+    },
+    {
+      "id": "CA07",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "正式挂失及查询挂失状态",
+      "example": "确认丢了，正式挂失；临时挂失什么时候到期？",
+      "description": "查询已有保护/挂失状态 → 正式挂失前说明后果 → 确认/强认证 → 提交并核验 → 回执；到期提醒在日期有据且用户授权时追加",
+      "scope": "基础",
+      "parameters": "action，cardId?，lossId?，expiryReminder?",
+      "tools": [
+        "C01",
+        "C06",
+        "S05",
+        "S06",
+        "S08",
+        "S09",
+        "D10",
+        "S10"
+      ]
+    },
+    {
+      "id": "CA08",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "申请补卡、跟踪及激活",
+      "example": "补一张卡；寄到哪了？新卡到了怎么激活？",
+      "description": "识别申请/进度/激活 → 查询关联挂失及卡状态 → 专门表单采集必要信息 → 确认认证 → 提交/查询 → 新卡激活后可移交换绑",
+      "scope": "基础路径",
+      "parameters": "action，cardId?，replacementId?，deliveryInfo?",
+      "tools": [
+        "C01",
+        "C07",
+        "S01",
+        "S05",
+        "S06",
+        "S08",
+        "S10"
+      ]
+    },
+    {
+      "id": "CA09",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "迁移卡片绑定关系",
+      "example": "旧卡绑定了哪些服务？新卡怎么换绑？",
+      "description": "查询已授权订阅及绑定 → 生成迁移清单 → 能操作的按规则确认办理，否则官方指引 → 逐项标注用户报告/已核验结果",
+      "scope": "完整",
+      "parameters": "oldCardId?，newCardId?，bindingIds?",
+      "tools": [
+        "C08",
+        "D02",
+        "S04",
+        "S02",
+        "S05",
+        "S06",
+        "S08",
+        "D07"
+      ]
+    },
+    {
+      "id": "CA10",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "管理多卡台账和官方操作指引",
+      "example": "把这张他行卡记下来；出国前哪些卡要设置？",
+      "description": "用户录入或主动端侧识别 → 确认台账字段 → 区分本行操作能力/他行记录或推断 → 展示逐卡官方操作清单；不虚构他行实时状态",
+      "scope": "完整；OCR 为可选能力",
+      "parameters": "action，cardId?，fields?，file?，tripDates?",
+      "tools": [
+        "C09",
+        "S14",
+        "S05",
+        "C01",
+        "S03"
+      ]
+    },
+    {
+      "id": "CA11",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "管理虚拟分卡",
+      "example": "给这个订阅开一张单独限额的虚拟卡。",
+      "description": "查询机构能力 → 说明用途及限制 → 确认/所需认证 → 签发/改限额/停用/关闭 → 核验；订阅阻断测试先检查合约类型",
+      "scope": "扩展",
+      "parameters": "action，virtualCardId?，merchant?，limit?，subscriptionId?",
+      "tools": [
+        "C10",
+        "D05",
+        "S07",
+        "S05",
+        "S06",
+        "S08"
+      ]
+    },
+    {
+      "id": "CA12",
+      "moduleId": "M5",
+      "moduleName": "卡片管理",
+      "title": "设置自律消费限额",
+      "example": "晚上游戏消费最多两百；这次急用申请豁免。",
+      "description": "明确用户规则 → 查询可执行能力 → 展示限额/恢复条件 → 确认设置 → 触发时按规则执行；修改、关闭及紧急豁免走对应身份和条件检查",
+      "scope": "扩展",
+      "parameters": "action，cardId?，rule?，expiresAt?，emergencyReason?",
+      "tools": [
+        "C11",
+        "S07",
+        "S05",
+        "S06",
+        "S12",
+        "C12"
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "id": "S01",
+      "title": "信息采集/编辑",
+      "alias": "ui.edit",
+      "group": "共享交互与执行工具",
+      "input": "缺少的字段、已有值、字段约束",
+      "output": "用户实际填写或明确表达的字段及来源",
+      "effect": "交互",
+      "when": "按缺项调用"
+    },
+    {
+      "id": "S02",
+      "title": "对象选择",
+      "alias": "ui.select",
+      "group": "共享交互与执行工具",
+      "input": "候选对象、当前选择、允许多选与否",
+      "output": "用户选择的对象 ID",
+      "effect": "交互",
+      "when": "有多个候选或用户主动更换时调用"
+    },
+    {
+      "id": "S03",
+      "title": "结果展示",
+      "alias": "ui.present",
+      "group": "共享交互与执行工具",
+      "input": "视图类型、已核实数据、状态",
+      "output": "已显示的卡片/列表",
+      "effect": "展示",
+      "when": "按终端及用户需要选择视图"
+    },
+    {
+      "id": "S04",
+      "title": "数据与持续操作授权",
+      "alias": "consent.ensure / revoke",
+      "group": "共享交互与执行工具",
+      "input": "用途、数据范围或持续动作、有效期",
+      "output": "用户明确授权/拒绝/撤回记录",
+      "effect": "授权",
+      "when": "已有同用途有效授权可复用；新增用途不能默认同意"
+    },
+    {
+      "id": "S05",
+      "title": "当前摘要确认",
+      "alias": "review.prepare / confirm",
+      "group": "共享交互与执行工具",
+      "input": "对象、动作、金额等关键字段及 revision",
+      "output": "绑定当前版本的确认结果/令牌",
+      "effect": "确认",
+      "when": "是否需要由动作规则决定；模型不能填 true 代替用户"
+    },
+    {
+      "id": "S06",
+      "title": "专门认证",
+      "alias": "auth.request / result",
+      "group": "共享交互与执行工具",
+      "input": "动作、目标、确认令牌、所需等级",
+      "output": "认证挑战状态及通过/失败；不含密码",
+      "effect": "认证",
+      "when": "按动作要求调用；只能由页面或受信身份流程完成"
+    },
+    {
+      "id": "S07",
+      "title": "规则与字段依据检查",
+      "alias": "policy.check",
+      "group": "共享交互与执行工具",
+      "input": "动作、后台事实、参数来源、当前状态",
+      "output": "通过/缺项/阻断/未支持及原因",
+      "effect": "内部检查",
+      "when": "涉及的规则必需满足；不要求每条规则都做独立远程调用"
+    },
+    {
+      "id": "S08",
+      "title": "业务结果查询",
+      "alias": "operation.status",
+      "group": "共享交互与执行工具",
+      "input": "对象/请求编号、预期业务类型",
+      "output": "未提交/受理/处理中/成功/失败/未知及证据",
+      "effect": "只读",
+      "when": "已有确定结果可复用；超时或重连后先查状态"
+    },
+    {
+      "id": "S09",
+      "title": "回执查看/导出",
+      "alias": "receipt.get / export",
+      "group": "共享交互与执行工具",
+      "input": "业务对象或回执编号、格式",
+      "output": "真实结果对应的脱敏回执/文件",
+      "effect": "只读/导出",
+      "when": "结果证据必需；PDF 导出可选"
+    },
+    {
+      "id": "S10",
+      "title": "移交其他功能",
+      "alias": "workflow.handoff",
+      "group": "共享交互与执行工具",
+      "input": "目标功能、明确字段及来源、返回位置",
+      "output": "新任务及返回锚点",
+      "effect": "草稿",
+      "when": "用户选择后续行动或缺条件需补办时调用"
+    },
+    {
+      "id": "S11",
+      "title": "办理记录",
+      "alias": "audit.record",
+      "group": "共享交互与执行工具",
+      "input": "规则版本、来源、状态变更、调用结果",
+      "output": "后台记录编号",
+      "effect": "内部记录",
+      "when": "有状态变化、执行或拒绝时自动记录"
+    },
+    {
+      "id": "S12",
+      "title": "持久化调度",
+      "alias": "task.schedule / cancel",
+      "group": "共享交互与执行工具",
+      "input": "任务类型、触发时间、关联规则及授权",
+      "output": "任务编号、到期及取消状态",
+      "effect": "写",
+      "when": "仅定时提醒/持续任务调用"
+    },
+    {
+      "id": "S13",
+      "title": "通知交付",
+      "alias": "notice.send",
+      "group": "共享交互与执行工具",
+      "input": "已授权通道、脱敏内容、去重键",
+      "output": "发送/交付状态或站内待查看卡片",
+      "effect": "内部发送",
+      "when": "只在已授权且到触发条件时调用"
+    },
+    {
+      "id": "S14",
+      "title": "文件/截图要素提取",
+      "alias": "ocr.extract",
+      "group": "共享交互与执行工具",
+      "input": "用户选择的文件、解析范围、端侧处理配置",
+      "output": "结构化候选及识别依据",
+      "effect": "本地处理",
+      "when": "用户主动导入时调用；原图处理方式须明确"
+    },
+    {
+      "id": "S15",
+      "title": "分享物料生成",
+      "alias": "report.share",
+      "group": "共享交互与执行工具",
+      "input": "报告、用户所选字段、脱敏方式",
+      "output": "预览/海报文件",
+      "effect": "草稿/导出",
+      "when": "用户要求分享才调用；生成不等于发布"
+    },
+    {
+      "id": "S16",
+      "title": "争议材料整理",
+      "alias": "dispute.prepare",
+      "group": "共享交互与执行工具",
+      "input": "交易、协议、回执、用户说明",
+      "output": "可核对的时间线和材料文件",
+      "effect": "草稿/导出",
+      "when": "用户要求申诉材料时调用，不自动投诉"
+    },
+    {
+      "id": "T01",
+      "title": "查询账户列表",
+      "alias": "account.list",
+      "group": "账户与转账工具",
+      "input": "当前登录身份、账户类型筛选",
+      "output": "账户 ID、名称、尾号、币种",
+      "effect": "只读",
+      "when": "查询列表或缺付款账户候选时调用"
+    },
+    {
+      "id": "T02",
+      "title": "查询账户余额",
+      "alias": "account.balance",
+      "group": "账户与转账工具",
+      "input": "账户 ID、请求的数据口径",
+      "output": "可用/账面余额、币种、时间、版本",
+      "effect": "只读",
+      "when": "执行资金操作须有满足时效规则的可信余额；可复用有效快照"
+    },
+    {
+      "id": "T03",
+      "title": "解析收款人",
+      "alias": "payee.resolve",
+      "group": "账户与转账工具",
+      "input": "姓名/别名/手机号及用户依据",
+      "output": "候选、匹配依据、脱敏信息",
+      "effect": "只读",
+      "when": "已有明确收款人 ID 时不重复搜索"
+    },
+    {
+      "id": "T04",
+      "title": "校验新收款信息",
+      "alias": "payee.verify",
+      "group": "账户与转账工具",
+      "input": "收款信息、通道、可选已知姓名",
+      "output": "格式/通道核验结果及实际支持范围",
+      "effect": "受限查询",
+      "when": "新对象或通道要求时调用；无核验能力不能伪造成功"
+    },
+    {
+      "id": "T05",
+      "title": "更新转账草稿（含备注）",
+      "alias": "transfer.draft",
+      "group": "账户与转账工具",
+      "input": "收款人、账户、金额、note?、草稿版本",
+      "output": "新草稿、字段来源、缺项及 revision",
+      "effect": "草稿",
+      "when": "note 未提供则不生成备注；支持局部修改与显式清空"
+    },
+    {
+      "id": "T06",
+      "title": "转账风险及结算检查",
+      "alias": "transfer.check",
+      "group": "账户与转账工具",
+      "input": "草稿、后台账户/对象/通道事实",
+      "output": "允许路径、检查依据、确认认证要求",
+      "effect": "内部检查",
+      "when": "转账必需；不能由模型传入 passed=true"
+    },
+    {
+      "id": "T07",
+      "title": "提交转账",
+      "alias": "transfer.submit",
+      "group": "账户与转账工具",
+      "input": "已通过检查的草稿、有效确认/认证引用、幂等键",
+      "output": "请求/交易编号、实际提交状态",
+      "effect": "受控写",
+      "when": "只在有效授权及前置条件满足后执行"
+    },
+    {
+      "id": "T08",
+      "title": "查询转账记录",
+      "alias": "transfer.query",
+      "group": "账户与转账工具",
+      "input": "交易编号或时间/对象筛选",
+      "output": "记录、真实状态、回执引用",
+      "effect": "只读",
+      "when": "查历史、选撤销对象或查询结果时调用"
+    },
+    {
+      "id": "T09",
+      "title": "撤销转账指令",
+      "alias": "transfer.cancel",
+      "group": "账户与转账工具",
+      "input": "交易/草稿编号、版本、所需授权",
+      "output": "取消/不可取消及实际原因",
+      "effect": "受控写",
+      "when": "仅草稿或通道支持的未执行指令"
+    },
+    {
+      "id": "T10",
+      "title": "管理周期资金规则",
+      "alias": "auto_rule.manage",
+      "group": "账户与转账工具",
+      "input": "action、对象、金额、周期、持续授权",
+      "output": "规则、下一执行日、状态",
+      "effect": "受控写",
+      "when": "定时转账/自动储蓄使用；创建与暂停恢复按 action 区分"
+    },
+    {
+      "id": "T11",
+      "title": "计算 AA 分摊",
+      "alias": "aa.calculate",
+      "group": "账户与转账工具",
+      "input": "总额、参与者、调整规则",
+      "output": "逐人金额、总额校验及差异",
+      "effect": "计算",
+      "when": "AA 创建或修改时调用"
+    },
+    {
+      "id": "T12",
+      "title": "管理及查询 AA",
+      "alias": "aa.manage / query",
+      "group": "账户与转账工具",
+      "input": "action、AA 编号、分摊版本、参与者确认",
+      "output": "收款卡、真实付款/人工核销状态",
+      "effect": "草稿/受控写/只读",
+      "when": "发出前需要规则确认；跨平台手动核销标注来源"
+    },
+    {
+      "id": "T13",
+      "title": "AA 提醒与提醒卡",
+      "alias": "aa.remind",
+      "group": "账户与转账工具",
+      "input": "AA 编号、对象、授权通道、级别",
+      "output": "提醒状态或供用户转发的卡片",
+      "effect": "通知/草稿",
+      "when": "用户要求或已有提醒授权时调用"
+    },
+    {
+      "id": "T14",
+      "title": "管理联系人",
+      "alias": "contact.manage",
+      "group": "账户与转账工具",
+      "input": "action、联系人 ID、用户确认的字段",
+      "output": "联系人及变更结果",
+      "effect": "只读/写",
+      "when": "保存联系人为可选动作，不随转账默认创建"
+    },
+    {
+      "id": "T15",
+      "title": "个人关系记录",
+      "alias": "relation.manage",
+      "group": "账户与转账工具",
+      "input": "action、关联交易、对象、金额和用户说明",
+      "output": "个人记录、核销或删除结果",
+      "effect": "只读/写",
+      "when": "仅用户管理个人辅助记录时调用"
+    },
+    {
+      "id": "T16",
+      "title": "整理可选备注",
+      "alias": "note.prepare",
+      "group": "账户与转账工具",
+      "input": "用户明确提供的 note、所需模板及当前草稿",
+      "output": "原文或有来源的整理建议及校验结果",
+      "effect": "草稿",
+      "when": "仅用户提供备注/要求整理时调用；空备注不追问、不生成；安全字段校验仍属后台规则"
+    },
+    {
+      "id": "B01",
+      "title": "查询统一流水",
+      "alias": "bill.query",
+      "group": "账单分析工具",
+      "input": "账户/来源、期间、商户、金额或交易 ID",
+      "output": "明细、来源覆盖范围、更新时间",
+      "effect": "只读",
+      "when": "所有分析使用获授权的数据范围"
+    },
+    {
+      "id": "B02",
+      "title": "交易分类与映射",
+      "alias": "bill.classify",
+      "group": "账单分析工具",
+      "input": "商户/备注/交易字段、共享类目字典",
+      "output": "类目候选、依据、待确认标记",
+      "effect": "计算/内部写",
+      "when": "未确认候选可保留未分类，不能硬猜"
+    },
+    {
+      "id": "B03",
+      "title": "统计及比较",
+      "alias": "bill.aggregate / compare",
+      "group": "账单分析工具",
+      "input": "流水筛选、统计指标、基准期、现金/净额口径",
+      "output": "金额、笔数、比较及口径",
+      "effect": "计算",
+      "when": "明确排除自有账户互转等重复统计"
+    },
+    {
+      "id": "B04",
+      "title": "更正分类",
+      "alias": "bill.correct",
+      "group": "账单分析工具",
+      "input": "交易 ID、类别、仅本笔/未来映射/历史批量范围",
+      "output": "影响预览、确认后的修改及撤销依据",
+      "effect": "受控写",
+      "when": "默认仅本笔；批量范围必须明确"
+    },
+    {
+      "id": "B05",
+      "title": "异常及退款核对",
+      "alias": "bill.anomaly",
+      "group": "账单分析工具",
+      "input": "交易/期间、有效基线和关联数据",
+      "output": "异常依据、退款/重复扣款状态及不确定性",
+      "effect": "只读计算",
+      "when": "不直接冻结账户或承诺退款"
+    },
+    {
+      "id": "B06",
+      "title": "导入标准化交易",
+      "alias": "bill.import",
+      "group": "账单分析工具",
+      "input": "主动上传文件、来源、逐来源授权",
+      "output": "解析候选、导入批次、错误条目",
+      "effect": "草稿/受控写",
+      "when": "导入是可选数据来源，不强制用户上传"
+    },
+    {
+      "id": "B07",
+      "title": "流水去重",
+      "alias": "bill.dedupe",
+      "group": "账单分析工具",
+      "input": "候选流水、商户和通道映射、时间范围",
+      "output": "确定重复、疑似项及合并预览",
+      "effect": "计算/受控写",
+      "when": "证据不足的重复项等待用户确认"
+    },
+    {
+      "id": "B08",
+      "title": "生成账单报告",
+      "alias": "bill.report",
+      "group": "账单分析工具",
+      "input": "期间、已有统计、可选叙事/群体参照配置",
+      "output": "报告、数据覆盖及素材来源",
+      "effect": "计算/草稿",
+      "when": "基础统计默认；年度叙事及匿名分位为可选能力"
+    },
+    {
+      "id": "B09",
+      "title": "管理预算",
+      "alias": "budget.manage",
+      "group": "账单分析工具",
+      "input": "action、期间/类别、预算金额",
+      "output": "预算版本及执行进度",
+      "effect": "只读/受控写",
+      "when": "查进度不自动创建或调整预算"
+    },
+    {
+      "id": "B10",
+      "title": "假设节省试算",
+      "alias": "whatif.calculate",
+      "group": "账单分析工具",
+      "input": "历史口径、节省假设、期限、interestAssumption?",
+      "output": "公式、本金及显式假设下的结果",
+      "effect": "计算",
+      "when": "利息参数不传默认只算本金"
+    },
+    {
+      "id": "B11",
+      "title": "管理宿舍公共账本",
+      "alias": "dorm.manage",
+      "group": "账单分析工具",
+      "input": "action、账本、逐人授权、公开公共条目",
+      "output": "成员、聚合或人数不足暂停状态",
+      "effect": "只读/受控写",
+      "when": "可选扩展；聚合演示不等于已实现联邦学习"
+    },
+    {
+      "id": "D01",
+      "title": "识别周期订阅候选",
+      "alias": "subscription.detect",
+      "group": "订阅代扣工具",
+      "input": "授权流水、商户映射、周期假设",
+      "output": "候选、置信依据、待确认项",
+      "effect": "计算",
+      "when": "无数据时允许用户手动登记；账单与订阅共享此工具"
+    },
+    {
+      "id": "D02",
+      "title": "查询订阅及协议",
+      "alias": "subscription.query",
+      "group": "订阅代扣工具",
+      "input": "订阅编号或通道/状态筛选",
+      "output": "清单、金额周期、下一扣款、权益期限、来源",
+      "effect": "只读",
+      "when": "未知字段明确未知"
+    },
+    {
+      "id": "D03",
+      "title": "登记及纠正订阅",
+      "alias": "subscription.manage",
+      "group": "订阅代扣工具",
+      "input": "action、商户、通道、金额、周期、日期?",
+      "output": "确认后的订阅及字段来源",
+      "effect": "受控写",
+      "when": "无法自动识别时的基础补充路径"
+    },
+    {
+      "id": "D04",
+      "title": "查询取消通道能力",
+      "alias": "subscription.route",
+      "group": "订阅代扣工具",
+      "input": "订阅、机构/平台、终端",
+      "output": "银行可执行/官方指引/暂不支持及能力依据",
+      "effect": "只读",
+      "when": "解约前必需确认适用路径"
+    },
+    {
+      "id": "D05",
+      "title": "检查解约对象及后果",
+      "alias": "subscription.protect",
+      "group": "订阅代扣工具",
+      "input": "协议、合约类型、可用权益信息",
+      "output": "允许/保护类阻断、权益与义务提示",
+      "effect": "内部检查",
+      "when": "不能以模型的一句安全判断越过"
+    },
+    {
+      "id": "D06",
+      "title": "解除银行代扣协议",
+      "alias": "subscription.cancel",
+      "group": "订阅代扣工具",
+      "input": "协议编号、有效确认/认证、幂等键",
+      "output": "解约请求及真实协议状态",
+      "effect": "受控写",
+      "when": "只处理支持的银行协议；不等于商户退订或退款"
+    },
+    {
+      "id": "D07",
+      "title": "展示外部退订指引",
+      "alias": "subscription.guide",
+      "group": "订阅代扣工具",
+      "input": "平台、已验证入口、终端能力",
+      "output": "跳转或分步指引、待回访任务",
+      "effect": "交互",
+      "when": "深链不可用时提供官方步骤"
+    },
+    {
+      "id": "D08",
+      "title": "核验取消/停扣结果",
+      "alias": "subscription.verify",
+      "group": "订阅代扣工具",
+      "input": "取消任务、观察期间、协议及流水覆盖",
+      "output": "已解除/用户报告/未见扣款/未知/仍扣费",
+      "effect": "只读/内部更新",
+      "when": "外部页面返回不能直接算取消成功"
+    },
+    {
+      "id": "D09",
+      "title": "恢复支持的协议",
+      "alias": "subscription.restore",
+      "group": "订阅代扣工具",
+      "input": "协议、通道恢复能力、重新授权",
+      "output": "恢复请求及核验状态",
+      "effect": "受控写",
+      "when": "通道不支持时返回重新开通指引"
+    },
+    {
+      "id": "D10",
+      "title": "管理提醒规则",
+      "alias": "reminder.manage",
+      "group": "订阅代扣工具",
+      "input": "action、对象、已知日期/事件、渠道与授权",
+      "output": "规则、下一提醒及关闭结果",
+      "effect": "只读/受控写",
+      "when": "提醒是可选开关；用户主动请求时执行该功能"
+    },
+    {
+      "id": "D11",
+      "title": "现金流及扣款日历试算",
+      "alias": "cashflow.project",
+      "group": "订阅代扣工具",
+      "input": "已知扣款日、到账日、可用余额假设",
+      "output": "日历、缺口、估算依据",
+      "effect": "计算",
+      "when": "只模拟排期，不擅自移动商户扣款日"
+    },
+    {
+      "id": "D12",
+      "title": "订阅支出汇总",
+      "alias": "subscription.report",
+      "group": "订阅代扣工具",
+      "input": "期间、实际扣费及已核验取消记录",
+      "output": "实支、预计未来少支出、数据范围",
+      "effect": "计算",
+      "when": "实际节省与预估分开"
+    },
+    {
+      "id": "I01",
+      "title": "目标储蓄计划计算",
+      "alias": "goal.calculate",
+      "group": "理财工具",
+      "input": "目标金额、期限、当前余额、可选存款频率",
+      "output": "每期所需金额、可达性及假设",
+      "effect": "计算",
+      "when": "默认不加入未明确收益假设"
+    },
+    {
+      "id": "I02",
+      "title": "管理目标储蓄",
+      "alias": "goal.manage",
+      "group": "理财工具",
+      "input": "action、目标 ID、名称/目标/期限等字段",
+      "output": "创建/修改/关闭状态及版本",
+      "effect": "受控写",
+      "when": "自动转存不随目标创建默认开启"
+    },
+    {
+      "id": "I03",
+      "title": "查询目标进度",
+      "alias": "goal.query",
+      "group": "理财工具",
+      "input": "目标 ID 或目标筛选",
+      "output": "已入账余额、差额、进度和关联规则",
+      "effect": "只读",
+      "when": "待执行资金不算已存入"
+    },
+    {
+      "id": "I04",
+      "title": "账户间存入/取出",
+      "alias": "account.move",
+      "group": "理财工具",
+      "input": "来源/目标账户、金额、当前确认及所需认证",
+      "output": "交易编号及实际结果",
+      "effect": "受控写",
+      "when": "目标存取复用同一资金移动底座"
+    },
+    {
+      "id": "I05",
+      "title": "执行风险问卷",
+      "alias": "risk.questionnaire",
+      "group": "理财工具",
+      "input": "action、问卷版本、已确认答案、进度",
+      "output": "可续做题目、评分结果和历史版本",
+      "effect": "交互/受控写",
+      "when": "投教剧本不能替代正式问卷"
+    },
+    {
+      "id": "I06",
+      "title": "查询有效风险画像",
+      "alias": "risk.profile",
+      "group": "理财工具",
+      "input": "当前身份、评估时间",
+      "output": "资格画像、有效期及来源",
+      "effect": "只读",
+      "when": "资格字段由后台提供"
+    },
+    {
+      "id": "I07",
+      "title": "查询产品信息",
+      "alias": "product.query",
+      "group": "理财工具",
+      "input": "筛选或产品 ID、所需字段",
+      "output": "产品列表/详情、费用、风险、数据时间",
+      "effect": "只读",
+      "when": "不自动替用户选定产品"
+    },
+    {
+      "id": "I08",
+      "title": "产品同口径对比",
+      "alias": "product.compare",
+      "group": "理财工具",
+      "input": "用户指定产品 ID、比较维度",
+      "output": "同口径对照及缺失项",
+      "effect": "计算",
+      "when": "不输出未经授权的自动配置指令"
+    },
+    {
+      "id": "I09",
+      "title": "适当性和交易资格检查",
+      "alias": "investment.check",
+      "group": "理财工具",
+      "input": "用户后台画像、产品、动作、金额等",
+      "output": "通过/补测/不匹配/未支持及原因",
+      "effect": "内部检查",
+      "when": "申购必需；查询与正常赎回按相应规则分别检查"
+    },
+    {
+      "id": "I10",
+      "title": "费用及到账试算",
+      "alias": "investment.quote",
+      "group": "理财工具",
+      "input": "产品、动作、金额/份额、时点",
+      "output": "费用、预计份额/到账、假设及有效期",
+      "effect": "计算",
+      "when": "下单前以可用正式/合成数据计算，不能由模型编造"
+    },
+    {
+      "id": "I11",
+      "title": "理财订单草稿",
+      "alias": "investment.draft",
+      "group": "理财工具",
+      "input": "动作、产品/持仓、金额或份额、版本",
+      "output": "草稿、缺项及当前摘要",
+      "effect": "草稿",
+      "when": "金额/份额必须明确，变更使旧确认失效"
+    },
+    {
+      "id": "I12",
+      "title": "提交申购或赎回",
+      "alias": "investment.submit",
+      "group": "理财工具",
+      "input": "通过检查的草稿、有效确认/认证、幂等键",
+      "output": "订单编号及受理状态",
+      "effect": "受控写",
+      "when": "申购受理/份额确认/赎回到账分开解释"
+    },
+    {
+      "id": "I13",
+      "title": "查询理财订单",
+      "alias": "investment.query",
+      "group": "理财工具",
+      "input": "订单 ID 或期间/动作筛选",
+      "output": "状态、交易记录、资金及回执引用",
+      "effect": "只读",
+      "when": "重连或超时先查结果"
+    },
+    {
+      "id": "I14",
+      "title": "撤销可撤理财订单",
+      "alias": "investment.cancel",
+      "group": "理财工具",
+      "input": "订单、窗口检查、当前授权",
+      "output": "撤单结果、后续资金状态",
+      "effect": "受控写",
+      "when": "状态及截止时间以适配器为准"
+    },
+    {
+      "id": "I15",
+      "title": "查询持仓收益",
+      "alias": "portfolio.query",
+      "group": "理财工具",
+      "input": "账户或持仓 ID、估值口径",
+      "output": "持仓、市值、成本、费用、收益及时间",
+      "effect": "只读",
+      "when": "合成行情须标识"
+    },
+    {
+      "id": "I16",
+      "title": "管理定投计划",
+      "alias": "investment_plan.manage",
+      "group": "理财工具",
+      "input": "action、产品、金额、周期、持续授权",
+      "output": "计划状态、下一扣款及变更结果",
+      "effect": "受控写",
+      "when": "创建需同时具备暂停/恢复/终止路径"
+    },
+    {
+      "id": "I17",
+      "title": "管理理财提醒",
+      "alias": "investment_alert.manage",
+      "group": "理财工具",
+      "input": "action、订单/持仓、日期/阈值、通知授权",
+      "output": "提醒规则、触发与取消状态",
+      "effect": "只读/受控写",
+      "when": "到期提醒不自动申购；不自动调仓"
+    },
+    {
+      "id": "I18",
+      "title": "运行投教内容",
+      "alias": "education.run",
+      "group": "理财工具",
+      "input": "内容 ID、用户选择、课程进度",
+      "output": "分支、学习记录及可选展示事件",
+      "effect": "交互",
+      "when": "可选内容，不写正式风险画像"
+    },
+    {
+      "id": "C01",
+      "title": "查询卡片",
+      "alias": "card.query",
+      "group": "卡片工具",
+      "input": "list/detail/status/limit 等白名单 action、卡片 ID、身份等级",
+      "output": "脱敏列表、详情、状态、额度及可执行能力",
+      "effect": "只读",
+      "when": "卡片列表与详情功能共用；权限决定披露范围"
+    },
+    {
+      "id": "C02",
+      "title": "管理申卡申请",
+      "alias": "card_application.manage",
+      "group": "卡片工具",
+      "input": "action、产品、资质材料、必要授权",
+      "output": "产品/预检/草稿/申请/补件/进度/撤回状态",
+      "effect": "草稿/受控写/只读",
+      "when": "银行审批决定结果；远程邀请需用户明确授权"
+    },
+    {
+      "id": "C03",
+      "title": "额度查询解释及变更",
+      "alias": "card_limit.manage",
+      "group": "卡片工具",
+      "input": "action、卡片、授信额度或交易限额类型、申请值",
+      "output": "可公开因素、申请/设置结果、历史",
+      "effect": "只读/受控写",
+      "when": "申请提额不等于已获批准"
+    },
+    {
+      "id": "C04",
+      "title": "限制分类与分级处理",
+      "alias": "card_restriction.manage",
+      "group": "卡片工具",
+      "input": "action、卡片、限制原因码、认证结果",
+      "output": "公开解释、可解/需人工/司法恒停、处理结果",
+      "effect": "只读/受控写",
+      "when": "司法类型不开放自助解锁，风控有最终结果"
+    },
+    {
+      "id": "C05",
+      "title": "临时冻结/解冻",
+      "alias": "card_protection.manage",
+      "group": "卡片工具",
+      "input": "freeze/unfreeze、卡片、明确动作及所需身份凭据",
+      "output": "实际保护范围、状态及后续补验",
+      "effect": "受控写",
+      "when": "不同方向可有不同认证；模型不能推测用户授权"
+    },
+    {
+      "id": "C06",
+      "title": "挂失及状态查询",
+      "alias": "card_loss.manage",
+      "group": "卡片工具",
+      "input": "prepare/report/status、卡片、确认/认证",
+      "output": "后果摘要、挂失状态、到期时间和回执",
+      "effect": "草稿/受控写/只读",
+      "when": "正式挂失与临时冻结分开"
+    },
+    {
+      "id": "C07",
+      "title": "补卡及激活",
+      "alias": "card_replacement.manage",
+      "group": "卡片工具",
+      "input": "request/status/activate、卡片、必要信息和认证",
+      "output": "补卡申请、办理/配送、激活状态",
+      "effect": "受控写/只读",
+      "when": "收件地址由专门表单处理；不承诺未经证明的接续能力"
+    },
+    {
+      "id": "C08",
+      "title": "绑定清单与迁移",
+      "alias": "card_binding.manage",
+      "group": "卡片工具",
+      "input": "list/plan/mark_done、旧新卡、已授权绑定信息",
+      "output": "清单、可执行换绑/官方步骤、完成证据",
+      "effect": "只读/草稿/受控写",
+      "when": "勾选完成与外部核验状态标明来源"
+    },
+    {
+      "id": "C09",
+      "title": "他行卡台账",
+      "alias": "external_card.manage",
+      "group": "卡片工具",
+      "input": "action、用户录入/端侧识别字段、来源",
+      "output": "台账、推断标记、官方操作路径",
+      "effect": "只读/受控写",
+      "when": "台账不产生他行实时余额与冻结权限"
+    },
+    {
+      "id": "C10",
+      "title": "管理虚拟分卡",
+      "alias": "virtual_card.manage",
+      "group": "卡片工具",
+      "input": "action、支持的卡产品、商户、限额、确认/认证",
+      "output": "沙箱分卡、限额、开关及实际状态",
+      "effect": "只读/受控写",
+      "when": "可选能力；停扣不等于商户合约解除"
+    },
+    {
+      "id": "C11",
+      "title": "管理自律限额",
+      "alias": "self_control.manage",
+      "group": "卡片工具",
+      "input": "action、规则、时段、限额、恢复/紧急豁免",
+      "output": "规则、实际限制能力、豁免及日志",
+      "effect": "受控写",
+      "when": "可选能力；恢复及紧急路径随创建同时提供"
+    },
+    {
+      "id": "C12",
+      "title": "查询守护事件",
+      "alias": "card_safety_log.query",
+      "group": "卡片工具",
+      "input": "卡片、期间、允许披露范围",
+      "output": "真实事件及模板报告",
+      "effect": "只读/草稿",
+      "when": "可选展示，不编造 IP/地点等日志没有的字段"
+    }
+  ]
+}

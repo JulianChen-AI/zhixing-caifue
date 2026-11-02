@@ -1,0 +1,1891 @@
+{
+  "scenario": "smoke",
+  "classification": {
+    "realQwenWebRTCProvider": true,
+    "syntheticBankOnly": true,
+    "humanMicrophoneTested": false,
+    "textTurnsValidateASR": false
+  },
+  "serverConfigPresence": {
+    ".env": false,
+    ".env.local": false,
+    ".dev.vars": true
+  },
+  "sessions": [
+    {
+      "name": "aa",
+      "provider": {
+        "liveConfigured": true,
+        "sessionStatus": 201,
+        "sessionUpdated": true,
+        "errors": [],
+        "connectedLiveUi": true,
+        "unexpectedErrorCount": 0
+      },
+      "initialState": {
+        "status": 200,
+        "state": {
+          "revision": 0,
+          "view": "home",
+          "currentWorkflow": null,
+          "workflowTaskCount": 0,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "finalState": {
+        "status": 200,
+        "state": {
+          "revision": 7,
+          "view": "workflow",
+          "currentWorkflow": {
+            "id": "d02f9701-b857-4a0e-b860-81ee88b715a6",
+            "functionId": "TR05",
+            "title": "发起和管理 AA 收款",
+            "status": "collecting",
+            "params": {
+              "action": "status"
+            },
+            "missing": [
+              "sessionId"
+            ],
+            "resultPresent": false,
+            "resultKeys": [],
+            "result": null
+          },
+          "workflowTaskCount": 3,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 1,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": [
+            {
+              "id": "aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231",
+              "total": 12000,
+              "status": "awaiting_participants",
+              "participants": [
+                {
+                  "name": "我",
+                  "amount": 4000,
+                  "status": "unpaid"
+                },
+                {
+                  "name": "室友张三",
+                  "amount": 4000,
+                  "status": "unpaid"
+                },
+                {
+                  "name": "房东张三",
+                  "amount": 4000,
+                  "status": "unpaid"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "turns": [
+        {
+          "index": 0,
+          "input": "三个人总共100元做AA，先把卡片给我看",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:36:51.145Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 14147,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "TR05",
+                "params": {
+                  "action": "create",
+                  "total": 100
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "TR05"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 1,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "collecting",
+                "params": {
+                  "action": "create",
+                  "total": 100
+                },
+                "missing": [
+                  "participants"
+                ],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "等待补充",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:37:05.387Z",
+          "assistantTranscripts": [
+            "卡片已经建好了，总额是一百元。现在还需要你告诉我具体是哪三个人参与分摊，我好把名字补上去。"
+          ]
+        },
+        {
+          "index": 1,
+          "input": "参与者是我、室友张三和房东张三，总额120元，每人40元",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "amend",
+          "startedAt": "2026-10-26T10:37:05.389Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 7790,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "amend",
+                "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+                "params": {
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ],
+                  "total": 120
+                }
+              }
+            }
+          ],
+          "actualFunctions": [],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 2,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "review",
+                "params": {
+                  "action": "create",
+                  "total": 120,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "等待确认",
+              "reviewEntries": [
+                {
+                  "label": "操作",
+                  "value": "创建"
+                },
+                {
+                  "label": "AA 总额（元）",
+                  "value": "¥120.00"
+                },
+                {
+                  "label": "参与者",
+                  "value": "我、室友张三、房东张三"
+                }
+              ]
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:37:13.231Z",
+          "assistantTranscripts": [
+            "我这就把参与者名单和金额更新到卡片上。\n\n",
+            "卡片已更新，总额一百二十元，参与者是你、室友张三和房东张三。信息没错就按这份办理吧？"
+          ]
+        },
+        {
+          "index": 2,
+          "input": "改口把总额改成150元，还是我、室友张三和房东张三三个人平分",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "amend",
+          "startedAt": "2026-10-26T10:37:13.232Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 14156,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "amend",
+                "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+                "params": {
+                  "total": 150
+                }
+              }
+            }
+          ],
+          "actualFunctions": [],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 3,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "review",
+                "params": {
+                  "action": "create",
+                  "total": 150,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "等待确认",
+              "reviewEntries": [
+                {
+                  "label": "操作",
+                  "value": "创建"
+                },
+                {
+                  "label": "AA 总额（元）",
+                  "value": "¥150.00"
+                },
+                {
+                  "label": "参与者",
+                  "value": "我、室友张三、房东张三"
+                }
+              ]
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:37:27.459Z",
+          "assistantTranscripts": [
+            "行，我这就把总额改成一百五十元。",
+            "卡片已更新，总额改为一百五十元，参与者还是你、室友张三和房东张三。信息没错就按这份办理吧？"
+          ]
+        },
+        {
+          "index": 3,
+          "input": "取消当前这份还未确认的AA草稿",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "cancel",
+          "startedAt": "2026-10-26T10:37:27.461Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 19468,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "cancel",
+                "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537"
+              }
+            }
+          ],
+          "actualFunctions": [],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 4,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "cancelled",
+                "params": {
+                  "action": "create",
+                  "total": 150,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "已取消",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:37:47.005Z",
+          "assistantTranscripts": [
+            "这份AA收款草稿已经取消，没有提交任何业务。需要重新发起的话随时告诉我。"
+          ]
+        },
+        {
+          "index": 4,
+          "input": "我、室友张三和房东张三共120元AA，创建一张需要我核对的卡片",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:37:47.006Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 6720,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "TR05",
+                "params": {
+                  "action": "create",
+                  "total": 120,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "TR05"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 5,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "dd821dd6-e40a-41ad-93d2-517af68563ca",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "review",
+                "params": {
+                  "action": "create",
+                  "total": 120,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 2,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "等待确认",
+              "reviewEntries": [
+                {
+                  "label": "操作",
+                  "value": "创建"
+                },
+                {
+                  "label": "AA 总额（元）",
+                  "value": "¥120.00"
+                },
+                {
+                  "label": "参与者",
+                  "value": "我、室友张三、房东张三"
+                }
+              ]
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:37:53.776Z",
+          "assistantTranscripts": [
+            "这就为您创建这张待核对的卡片。\n\n",
+            "卡片已经建好，总额一百二十元，参与者是你、室友张三和房东张三。信息没错就按这份办理吧？"
+          ]
+        },
+        {
+          "index": 5,
+          "input": "确认当前信息",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "confirm",
+          "startedAt": "2026-10-26T10:37:53.777Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 10616,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [],
+          "actualFunctions": [],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 6,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "dd821dd6-e40a-41ad-93d2-517af68563ca",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "complete",
+                "params": {
+                  "action": "create",
+                  "total": 120,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "id",
+                  "total",
+                  "participants",
+                  "status",
+                  "createdAt"
+                ],
+                "result": {
+                  "kind": "object",
+                  "keys": [
+                    "id",
+                    "total",
+                    "participants",
+                    "status",
+                    "createdAt"
+                  ],
+                  "status": "awaiting_participants"
+                }
+              },
+              "workflowTaskCount": 2,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 1,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": [
+                {
+                  "id": "aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231",
+                  "total": 12000,
+                  "status": "awaiting_participants",
+                  "participants": [
+                    {
+                      "name": "我",
+                      "amount": 4000,
+                      "status": "unpaid"
+                    },
+                    {
+                      "name": "室友张三",
+                      "amount": 4000,
+                      "status": "unpaid"
+                    },
+                    {
+                      "name": "房东张三",
+                      "amount": 4000,
+                      "status": "unpaid"
+                    }
+                  ]
+                }
+              ]
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "b0a97b7d6fdd55f4a77d4db8f5fa2d4e44081941d321076675497bafdfece198"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:38:04.467Z",
+          "assistantTranscripts": []
+        },
+        {
+          "index": 6,
+          "input": "查一下AA收款记录和每位参与者的状态",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:38:04.468Z",
+          "assertions": [],
+          "wait": {
+            "elapsedMs": 8842,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "TR05",
+                "params": {
+                  "action": "status"
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "TR05"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 7,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "d02f9701-b857-4a0e-b860-81ee88b715a6",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "collecting",
+                "params": {
+                  "action": "status"
+                },
+                "missing": [
+                  "sessionId"
+                ],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 3,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 1,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": [
+                {
+                  "id": "aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231",
+                  "total": 12000,
+                  "status": "awaiting_participants",
+                  "participants": [
+                    {
+                      "name": "我",
+                      "amount": 4000,
+                      "status": "unpaid"
+                    },
+                    {
+                      "name": "室友张三",
+                      "amount": 4000,
+                      "status": "unpaid"
+                    },
+                    {
+                      "name": "房东张三",
+                      "amount": 4000,
+                      "status": "unpaid"
+                    }
+                  ]
+                }
+              ]
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "等待补充",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "b0a97b7d6fdd55f4a77d4db8f5fa2d4e44081941d321076675497bafdfece198",
+            "businessHashAfter": "b0a97b7d6fdd55f4a77d4db8f5fa2d4e44081941d321076675497bafdfece198"
+          },
+          "passed": false,
+          "assertionError": "Tool parameters did not satisfy the requested field contract",
+          "completedAt": "2026-10-26T10:38:13.377Z",
+          "assistantTranscripts": [
+            "我这就去查一下AA收款的记录和大家的状态。\n\n",
+            "查状态需要指定是哪一笔AA收款。系统里目前有一笔记录，编号是aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231，你要查这一笔吗？"
+          ]
+        }
+      ],
+      "eventTypes": [
+        "session.created",
+        "session.updated",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "session.updated",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta"
+      ],
+      "functionCalls": [
+        {
+          "id": "call_bef6312d82804828a0299c2e",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "create",
+              "total": 100
+            }
+          }
+        },
+        {
+          "id": "call_8685ae03d7364a12bf225b87",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "amend",
+            "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+            "params": {
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ],
+              "total": 120
+            }
+          }
+        },
+        {
+          "id": "call_253530f0e31e49c5b1c8820e",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "amend",
+            "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+            "params": {
+              "total": 150
+            }
+          }
+        },
+        {
+          "id": "call_b8963209045c42369d1d547b",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "cancel",
+            "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537"
+          }
+        },
+        {
+          "id": "call_fdfdb14135024a1096550841",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "create",
+              "total": 120,
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ]
+            }
+          }
+        },
+        {
+          "id": "call_22e3b8b91ccd4c90b58ba7e2",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "status"
+            }
+          }
+        }
+      ],
+      "bankRequests": [
+        {
+          "turnIndex": 0,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "create",
+              "total": 100
+            }
+          },
+          "utterance": "三个人总共100元做AA，先把卡片给我看",
+          "historyCount": 1,
+          "revision": 0
+        },
+        {
+          "turnIndex": 1,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "amend",
+            "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+            "params": {
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ],
+              "total": 120
+            }
+          },
+          "utterance": "参与者是我、室友张三和房东张三，总额120元，每人40元",
+          "historyCount": 2,
+          "revision": 1
+        },
+        {
+          "turnIndex": 2,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "amend",
+            "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+            "params": {
+              "total": 150
+            }
+          },
+          "utterance": "改口把总额改成150元，还是我、室友张三和房东张三三个人平分",
+          "historyCount": 3,
+          "revision": 2
+        },
+        {
+          "turnIndex": 3,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "cancel",
+            "taskId": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537"
+          },
+          "utterance": "取消当前这份还未确认的AA草稿",
+          "historyCount": 4,
+          "revision": 3
+        },
+        {
+          "turnIndex": 4,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "create",
+              "total": 120,
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ]
+            }
+          },
+          "utterance": "我、室友张三和房东张三共120元AA，创建一张需要我核对的卡片",
+          "historyCount": 5,
+          "revision": 4
+        },
+        {
+          "turnIndex": 5,
+          "origin": "literal-confirmation",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "confirm",
+            "taskId": "dd821dd6-e40a-41ad-93d2-517af68563ca"
+          },
+          "utterance": "确认当前信息",
+          "historyCount": 6,
+          "revision": 5
+        },
+        {
+          "turnIndex": 6,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "status"
+            }
+          },
+          "utterance": "查一下AA收款记录和每位参与者的状态",
+          "historyCount": 7,
+          "revision": 6
+        }
+      ],
+      "bankResponses": [
+        {
+          "turnIndex": 0,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 1,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "collecting",
+              "params": {
+                "action": "create",
+                "total": 100
+              },
+              "missing": [
+                "participants"
+              ],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 1
+        },
+        {
+          "turnIndex": 1,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 2,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "review",
+              "params": {
+                "action": "create",
+                "total": 120,
+                "participants": [
+                  "我",
+                  "室友张三",
+                  "房东张三"
+                ]
+              },
+              "missing": [],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 2
+        },
+        {
+          "turnIndex": 2,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 3,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "review",
+              "params": {
+                "action": "create",
+                "total": 150,
+                "participants": [
+                  "我",
+                  "室友张三",
+                  "房东张三"
+                ]
+              },
+              "missing": [],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 4
+        },
+        {
+          "turnIndex": 3,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 4,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "1ed7c6aa-a0a1-4be5-822d-4f30e8482537",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "cancelled",
+              "params": {
+                "action": "create",
+                "total": 150,
+                "participants": [
+                  "我",
+                  "室友张三",
+                  "房东张三"
+                ]
+              },
+              "missing": [],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 7
+        },
+        {
+          "turnIndex": 4,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 5,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "dd821dd6-e40a-41ad-93d2-517af68563ca",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "review",
+              "params": {
+                "action": "create",
+                "total": 120,
+                "participants": [
+                  "我",
+                  "室友张三",
+                  "房东张三"
+                ]
+              },
+              "missing": [],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 2,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 8
+        },
+        {
+          "turnIndex": 5,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 6,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "dd821dd6-e40a-41ad-93d2-517af68563ca",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "complete",
+              "params": {
+                "action": "create",
+                "total": 120,
+                "participants": [
+                  "我",
+                  "室友张三",
+                  "房东张三"
+                ]
+              },
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "id",
+                "total",
+                "participants",
+                "status",
+                "createdAt"
+              ],
+              "result": {
+                "kind": "object",
+                "keys": [
+                  "id",
+                  "total",
+                  "participants",
+                  "status",
+                  "createdAt"
+                ],
+                "status": "awaiting_participants"
+              }
+            },
+            "workflowTaskCount": 2,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 1,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": [
+              {
+                "id": "aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231",
+                "total": 12000,
+                "status": "awaiting_participants",
+                "participants": [
+                  {
+                    "name": "我",
+                    "amount": 4000,
+                    "status": "unpaid"
+                  },
+                  {
+                    "name": "室友张三",
+                    "amount": 4000,
+                    "status": "unpaid"
+                  },
+                  {
+                    "name": "房东张三",
+                    "amount": 4000,
+                    "status": "unpaid"
+                  }
+                ]
+              }
+            ]
+          },
+          "responseDoneCountAtReturn": 9
+        },
+        {
+          "turnIndex": 6,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 7,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "d02f9701-b857-4a0e-b860-81ee88b715a6",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "collecting",
+              "params": {
+                "action": "status"
+              },
+              "missing": [
+                "sessionId"
+              ],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 3,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 1,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": [
+              {
+                "id": "aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231",
+                "total": 12000,
+                "status": "awaiting_participants",
+                "participants": [
+                  {
+                    "name": "我",
+                    "amount": 4000,
+                    "status": "unpaid"
+                  },
+                  {
+                    "name": "室友张三",
+                    "amount": 4000,
+                    "status": "unpaid"
+                  },
+                  {
+                    "name": "房东张三",
+                    "amount": 4000,
+                    "status": "unpaid"
+                  }
+                ]
+              }
+            ]
+          },
+          "responseDoneCountAtReturn": 10
+        }
+      ],
+      "browserErrorCount": 0,
+      "cleanup": {
+        "rtcStates": [
+          "closed"
+        ],
+        "syntheticTracks": [
+          "ended"
+        ]
+      },
+      "failure": "Tool parameters did not satisfy the requested field contract",
+      "transcripts": {
+        "user": [],
+        "assistant": [
+          "卡片已经建好了，总额是一百元。现在还需要你告诉我具体是哪三个人参与分摊，我好把名字补上去。",
+          "我这就把参与者名单和金额更新到卡片上。\n\n",
+          "卡片已更新，总额一百二十元，参与者是你、室友张三和房东张三。信息没错就按这份办理吧？",
+          "行，我这就把总额改成一百五十元。",
+          "卡片已更新，总额改为一百五十元，参与者还是你、室友张三和房东张三。信息没错就按这份办理吧？",
+          "这份AA收款草稿已经取消，没有提交任何业务。需要重新发起的话随时告诉我。",
+          "这就为您创建这张待核对的卡片。\n\n",
+          "卡片已经建好，总额一百二十元，参与者是你、室友张三和房东张三。信息没错就按这份办理吧？",
+          "我这就去查一下AA收款的记录和大家的状态。\n\n",
+          "查状态需要指定是哪一笔AA收款。系统里目前有一笔记录，编号是aa-1693f638-3aa1-4ab9-ba19-c6edd5c86231，你要查这一笔吗？"
+        ]
+      }
+    }
+  ],
+  "status": "failed",
+  "failures": [
+    "Tool parameters did not satisfy the requested field contract",
+    "Tool parameters did not satisfy the requested field contract"
+  ]
+}

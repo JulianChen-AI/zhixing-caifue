@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1010" width="1280" height="1010" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Source Han Sans SC, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1D4ED8"/>
+    </marker>
+    <style>
+      .band { stroke-width: 1.2; }
+      .bandTitle { font-size: 15px; font-weight: 700; fill: #0F172A; }
+      .box { fill: #FFFFFF; stroke: #94A3B8; stroke-width: 1.2; }
+      .t { font-size: 14px; font-weight: 700; fill: #0F172A; }
+      .s { font-size: 12px; fill: #475569; }
+      .flow { stroke: #334155; stroke-width: 1.6; fill: none; }
+      .flowBlue { stroke: #1D4ED8; stroke-width: 1.8; fill: none; }
+      .dash { stroke-dasharray: 6 4; }
+      .badge { fill: #1D4ED8; }
+      .badgeText { font-size: 12px; font-weight: 700; fill: #FFFFFF; }
+      .legend { font-size: 13px; fill: #1E293B; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1280" height="1010" fill="#FFFFFF"/>
+  <text x="30" y="46" font-size="22" font-weight="700" fill="#0F172A">知行银行 · 财富鹅 AI 银行智能体：系统架构</text>
+  <text x="1250" y="46" font-size="12" fill="#64748B" text-anchor="end">依据 main 提交 52f2da9 · 2026-10-31</text>
+
+  <!-- Band 1: presentation -->
+  <rect class="band" x="30" y="70" width="860" height="170" rx="10" fill="#EEF4FF" stroke="#93C5FD"/>
+  <text class="bandTitle" x="46" y="96">① 呈现层 · 浏览器（React 19 / Next App Router 客户端）</text>
+  <rect class="box" x="50" y="112" width="152" height="108" rx="8"/>
+  <text class="t" x="62" y="138">财富鹅播放器</text>
+  <text class="s" x="62" y="160">Canvas 2D · WebP</text>
+  <text class="s" x="62" y="178">序列帧 15 个动作</text>
+  <text class="s" x="62" y="196">由业务事实选动作</text>
+
+  <rect class="box" x="214" y="112" width="152" height="108" rx="8"/>
+  <text class="t" x="226" y="138">文字输入</text>
+  <text class="s" x="226" y="160">实时模式下进入</text>
+  <text class="s" x="226" y="178">同一 Omni 会话</text>
+  <text class="s" x="226" y="196">无麦克风也可用</text>
+
+  <rect class="box" x="378" y="112" width="152" height="108" rx="8"/>
+  <text class="t" x="390" y="138">业务卡片·任务清单</text>
+  <text class="s" x="390" y="160">选择 / 修改 / 确认</text>
+  <text class="s" x="390" y="178">页面演示认证</text>
+  <text class="s" x="390" y="196">显示检查单进度</text>
+
+  <rect class="box" x="542" y="112" width="152" height="108" rx="8"/>
+  <text class="t" x="554" y="138">后台监督</text>
+  <text class="s" x="554" y="160">语音直接流式播放</text>
+  <text class="s" x="554" y="178">整句时异步观察</text>
+  <text class="s" x="554" y="196">有疑点即停并核对</text>
+
+  <rect class="box" x="706" y="112" width="152" height="108" rx="8"/>
+  <text class="t" x="718" y="138">实时语音会话</text>
+  <text class="s" x="718" y="160">WebRTC · 麦克风</text>
+  <text class="s" x="718" y="178">call_id 去重</text>
+  <text class="s" x="718" y="196">插话取消旧回复</text>
+
+  <!-- Band 2: API -->
+  <rect class="band" x="30" y="268" width="860" height="152" rx="10" fill="#F5F3FF" stroke="#C4B5FD"/>
+  <text class="bandTitle" x="46" y="292">② 服务端接口层（Cloudflare Worker）</text>
+  <rect class="box" x="50" y="310" width="197" height="96" rx="8"/>
+  <text class="t" x="62" y="334">/api/live/context</text>
+  <text class="s" x="62" y="354">上下文轮换（只读）</text>
+  <text class="s" x="62" y="372">事实从后台快照恢复</text>
+  <text class="s" x="62" y="390">Flash 摘要不含业务参数</text>
+
+  <rect class="box" x="259" y="310" width="197" height="96" rx="8" stroke="#1D4ED8" stroke-width="2"/>
+  <text class="t" x="271" y="334">/api/bank 唯一业务入口</text>
+  <text class="s" x="271" y="354">Origin · 身份 · 体积上限</text>
+  <text class="s" x="271" y="372">Zod 严格白名单</text>
+  <text class="s" x="271" y="390">revision · requestId</text>
+
+  <rect class="box" x="468" y="310" width="197" height="96" rx="8"/>
+  <text class="t" x="480" y="334">监督与核对</text>
+  <text class="s" x="480" y="354">supervise：只读观察</text>
+  <text class="s" x="480" y="372">review：暂停后核对修正</text>
+  <text class="s" x="480" y="390">修正仍走护栏校验</text>
+
+  <rect class="box" x="677" y="310" width="197" height="96" rx="8"/>
+  <text class="t" x="689" y="334">/api/live/session</text>
+  <text class="s" x="689" y="354">WebRTC SDP 代理</text>
+  <text class="s" x="689" y="372">API Key 不出服务端</text>
+  <text class="s" x="689" y="390">25 秒超时</text>
+
+  <!-- Band 3: guardrails -->
+  <rect class="band" x="30" y="448" width="860" height="206" rx="10" fill="#FFF7ED" stroke="#F59E0B" stroke-width="2"/>
+  <text class="bandTitle" x="46" y="472">③ 确定性护栏层</text>
+  <rect class="box" x="50" y="488" width="197" height="118" rx="8"/>
+  <text class="t" x="62" y="512">外层 Plan 引擎</text>
+  <text class="s" x="62" y="534">子句拆解 · 依赖链</text>
+  <text class="s" x="62" y="552">比例金额后台计算</text>
+  <text class="s" x="62" y="570">单队列逐项激活</text>
+  <text class="s" x="62" y="588">事实变化即重算</text>
+
+  <rect class="box" x="259" y="488" width="197" height="118" rx="8"/>
+  <text class="t" x="271" y="512">内层 Checklist 引擎</text>
+  <text class="s" x="271" y="534">54 项用户功能</text>
+  <text class="s" x="271" y="552">字段依据核验</text>
+  <text class="s" x="271" y="570">摘要令牌 · 认证门</text>
+  <text class="s" x="271" y="588">预检 preflight</text>
+
+  <rect class="box" x="468" y="488" width="197" height="118" rx="8"/>
+  <text class="t" x="480" y="512">转账状态机</text>
+  <text class="s" x="480" y="534">TF-T01 九步检查单</text>
+  <text class="s" x="480" y="552">重名追问 · 风险阻断</text>
+  <text class="s" x="480" y="570">认证后才扣余额</text>
+  <text class="s" x="480" y="588">生成回执与流水</text>
+
+  <rect class="box" x="677" y="488" width="197" height="118" rx="8"/>
+  <text class="t" x="689" y="512">规则目录</text>
+  <text class="s" x="689" y="534">policyVersion 版本化</text>
+  <text class="s" x="689" y="552">62 份检查单</text>
+  <text class="s" x="689" y="570">规则来源行号可追溯</text>
+  <text class="s" x="689" y="588">版本变更撤销转账确认</text>
+  <text x="378" y="636" font-size="13" font-weight="700" fill="#B45309">金融放行只在这一层：模型只提议参数，字段成立、能否确认、是否执行由代码判断</text>
+
+  <!-- Band 4: tools & data -->
+  <rect class="band" x="30" y="682" width="860" height="150" rx="10" fill="#ECFDF3" stroke="#86EFAC"/>
+  <text class="bandTitle" x="46" y="706">④ 工具与数据层</text>
+  <rect class="box" x="50" y="720" width="260" height="96" rx="8"/>
+  <text class="t" x="62" y="744">沙箱业务适配器</text>
+  <text class="s" x="62" y="764">85 个逻辑工具：只读 / 计算 / 受控写</text>
+  <text class="s" x="62" y="782">合成账户、流水、产品、卡片</text>
+  <text class="s" x="62" y="800">5 项未接入功能明确阻断</text>
+
+  <rect class="box" x="330" y="720" width="260" height="96" rx="8"/>
+  <text class="t" x="342" y="744">会话状态 BankState</text>
+  <text class="s" x="342" y="764">账户 · 任务 · 回执 · 流水 · Plan</text>
+  <text class="s" x="342" y="782">审计保留 100 条，任务日志 200 条</text>
+  <text class="s" x="342" y="800">最近 64 个 requestId</text>
+
+  <rect class="box" x="610" y="720" width="260" height="96" rx="8"/>
+  <text class="t" x="622" y="744">D1（Wrangler 本地持久化）</text>
+  <text class="s" x="622" y="764">SQLite · demo_sessions 表</text>
+  <text class="s" x="622" y="782">按 owner 隔离会话行</text>
+  <text class="s" x="622" y="800">UPDATE … WHERE revision=? 乐观锁</text>
+
+  <!-- External column -->
+  <rect x="922" y="70" width="330" height="364" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-dasharray="6 4"/>
+  <text class="bandTitle" x="938" y="96">外部模型服务（阿里云百炼）</text>
+  <rect class="box" x="944" y="112" width="290" height="118" rx="8"/>
+  <text class="t" x="958" y="138">Qwen Omni Realtime</text>
+  <text class="s" x="958" y="160">连续语音理解 · 自然对话 · 原生语音</text>
+  <text class="s" x="958" y="180">提议工具调用：</text>
+  <text class="s" x="958" y="198">bank_plan / bank_function</text>
+  <text class="s" x="958" y="216">bank_request</text>
+
+  <rect class="box" x="944" y="292" width="290" height="126" rx="8"/>
+  <text class="t" x="958" y="316">Qwen Flash</text>
+  <text class="s" x="958" y="338">后台观察 · 核对 · 一次受约束修正</text>
+  <text class="s" x="958" y="357">上下文摘要（只含话题与偏好）</text>
+  <text class="s" x="958" y="376">文字指令解析 · 漏调用后的草稿修复</text>
+  <text class="s" x="958" y="395">调用：supervise、review、context、bank</text>
+  <text class="s" x="958" y="412">均不能确认、认证或执行</text>
+
+  <!-- Invariants -->
+  <rect x="922" y="448" width="330" height="206" rx="10" fill="#FEF2F2" stroke="#FCA5A5"/>
+  <text class="bandTitle" x="938" y="474">关键不变量</text>
+  <text class="legend" x="938" y="502">· 模型不能代替用户确认，也不能认证</text>
+  <text class="legend" x="938" y="528">· 验证码只在页面卡片输入，不进模型</text>
+  <text class="legend" x="938" y="554">· 任一字段变化 → 旧摘要与确认作废</text>
+  <text class="legend" x="938" y="580">· 同一 requestId 只执行一次</text>
+  <text class="legend" x="938" y="606">· 受理 / 草稿 / 指引 ≠ 完成</text>
+  <text class="legend" x="938" y="632">· 只有已完成的业务结果才触发成功动画</text>
+
+  <!-- Flows -->
+  <!-- ② WebRTC between live session and Omni -->
+  <line class="flowBlue" x1="860" y1="160" x2="942" y2="160" marker-start="url(#arrowBlue)" marker-end="url(#arrowBlue)"/>
+  <circle class="badge" cx="901" cy="146" r="10"/><text class="badgeText" x="901" y="150" text-anchor="middle">2</text>
+  <!-- ① SDP via session proxy -->
+  <line class="flow" x1="790" y1="222" x2="790" y2="308" marker-end="url(#arrow)"/>
+  <polyline class="flow" points="876,330 910,330 910,214 942,214" marker-end="url(#arrow)"/>
+  <circle class="badge" cx="804" cy="266" r="10"/><text class="badgeText" x="804" y="270" text-anchor="middle">1</text>
+  <!-- ③⑤ tool call to /api/bank -->
+  <line class="flowBlue" x1="728" y1="222" x2="448" y2="308" marker-start="url(#arrowBlue)" marker-end="url(#arrowBlue)"/>
+  <circle class="badge" cx="688" cy="234" r="10"/><text class="badgeText" x="688" y="238" text-anchor="middle">3</text>
+  <circle class="badge" cx="510" cy="289" r="10"/><text class="badgeText" x="510" y="293" text-anchor="middle">5</text>
+  <!-- ⑦ cards to /api/bank -->
+  <line class="flow" x1="420" y1="222" x2="420" y2="308" marker-end="url(#arrow)"/>
+  <circle class="badge" cx="420" cy="262" r="10"/><text class="badgeText" x="420" y="266" text-anchor="middle">7</text>
+  <!-- ⑥ audio cache to review, review to Flash -->
+  <line class="flow" x1="618" y1="222" x2="600" y2="308" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <polyline class="flow" points="600,408 600,440 1090,440 1090,420" marker-end="url(#arrow)"/>
+  <circle class="badge" cx="640" cy="440" r="10"/><text class="badgeText" x="640" y="444" text-anchor="middle">6</text>
+  <!-- ④ /api/bank into guardrails into data -->
+  <line class="flowBlue" x1="290" y1="408" x2="215" y2="486" marker-end="url(#arrowBlue)"/>
+  <circle class="badge" cx="268" cy="431" r="10"/><text class="badgeText" x="268" y="435" text-anchor="middle">4</text>
+  <line class="flow" x1="247" y1="547" x2="257" y2="547" marker-end="url(#arrow)"/>
+  <line class="flow" x1="456" y1="547" x2="466" y2="547" marker-end="url(#arrow)"/>
+  <line class="flowBlue" x1="357" y1="608" x2="357" y2="718" marker-end="url(#arrowBlue)"/>
+  <line class="flow" x1="312" y1="768" x2="328" y2="768" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line class="flowBlue" x1="592" y1="768" x2="608" y2="768" marker-end="url(#arrowBlue)"/>
+  <!-- ⑧ facts drive the mascot -->
+  <polyline class="flow dash" points="460,818 460,846 40,846 40,166 48,166" marker-end="url(#arrow)"/>
+  <circle class="badge" cx="250" cy="846" r="10"/><text class="badgeText" x="250" y="850" text-anchor="middle">8</text>
+
+  <!-- Legend -->
+  <text x="30" y="886" font-size="14" font-weight="700" fill="#0F172A">数据流</text>
+  <text class="legend" x="30" y="912">1  浏览器经 /api/live/session 交换 SDP，API Key 只在服务端</text>
+  <text class="legend" x="30" y="936">2  语音与事件经 WebRTC 直连 Omni，Omni 提议工具调用</text>
+  <text class="legend" x="30" y="960">3  浏览器把工具调用连同用户原话提交 /api/bank</text>
+  <text class="legend" x="30" y="984">4  护栏校验通过后执行，并以 revision 乐观锁原子写入 D1</text>
+  <text class="legend" x="650" y="912">5  只回传紧凑事实，Omni 依实际结果续答</text>
+  <text class="legend" x="650" y="936">6  语音流式播放，Flash 后台观察；有据疑点即停播、核对、更正</text>
+  <text class="legend" x="650" y="960">7  卡片操作直达 /api/bank；演示认证只能在页面卡片完成</text>
+  <text class="legend" x="650" y="984">8  财富鹅动作由已保存的业务事实决定，不反向触发业务</text>
+</svg>

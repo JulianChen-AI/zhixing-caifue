@@ -1,0 +1,122 @@
+[
+  {
+    "title": "理财操作",
+    "version": "v1.8",
+    "file": "wealth-v1.8.md",
+    "original_filename": "理财操作场景·从需求到实现总报告(6).md",
+    "sha256": "c55791c59d915f5076aa8e2714650663b94ee3b682648f350e95a8c17e8dcd34",
+    "bytes": 71510,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "replacement",
+    "supersedes": "../wealth-v1.5.md",
+    "superseded_sha256": "86e680d8578f5c58ff314b3ddcc8809f580914d4a38bd11ad47602ad77468a65"
+  },
+  {
+    "title": "智能转账",
+    "version": "v2.5",
+    "file": "transfer-v2.5.md",
+    "original_filename": "智能转账场景·设计文档(2).md",
+    "sha256": "0a64120bedd0ab9cb70fbbad2e93598de329ce9eeab5e9f8fc2c1ba268e5106d",
+    "bytes": 55848,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "replacement",
+    "supersedes": "../transfer-v2.1.md",
+    "superseded_sha256": "4900ac1b9ae602957e192d368715af8cec139ff966a210dcd5acd3740e2acfd9"
+  },
+  {
+    "title": "账单分析",
+    "version": "v1.7",
+    "file": "bills-v1.7.md",
+    "original_filename": "账单分析场景·设计文档(4).md",
+    "sha256": "f9c8d3855b8747a5a70db9933a3a5288a9fe3c28717b9ef2045d94b4d3931d06",
+    "bytes": 75547,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "replacement",
+    "supersedes": "../bills-v1.4.md",
+    "superseded_sha256": "ad8e6462772d40b6adb620c14357f97f78fa1c3a1b050ba31ee859c6482bde7e"
+  },
+  {
+    "title": "订阅/代扣管理",
+    "version": "v1.5",
+    "file": "subscriptions-v1.5.md",
+    "original_filename": "订阅代扣管理场景设计文档(2).md",
+    "sha256": "fa20fdcb9d9e887c09520192e53581f2971a0be93b3a50c0ae59b1247cf50510",
+    "bytes": 54137,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "replacement",
+    "supersedes": "../subscriptions-v1.2.md",
+    "superseded_sha256": "248c14b16e4cd681993e4f864cc64a620fe162a52f71c0e62351364f3ea58493"
+  },
+  {
+    "title": "卡片管理",
+    "version": "v1.5",
+    "file": "cards-v1.5.md",
+    "original_filename": "卡片管理场景设计文档(2).md",
+    "sha256": "7d7fe522d6f6daf6d5baca2666b2494e4e2786a2ccdf860806d13a0ff84b38d6",
+    "bytes": 55374,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "replacement",
+    "supersedes": "../cards-v1.2.md",
+    "superseded_sha256": "9aa7a6609a307ee29810ae676442b9a22633dfcadf9f03bbb9de4bd837509179"
+  },
+  {
+    "title": "跨场景联动",
+    "version": "v1.3",
+    "file": "cross-scenario-v1.3.md",
+    "original_filename": "跨场景联动场景设计文档(1).md",
+    "sha256": "236739c29c8315ea66a092b7651f61c2755c710f0c167ea4c48bacdb28270b74",
+    "bytes": 43471,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "addition"
+  },
+  {
+    "title": "竞品实操流程详查",
+    "version": "未标独立版本",
+    "file": "competitor-workflows.md",
+    "original_filename": "竞品实操流程详查·微众银行vs中国银行.md",
+    "sha256": "563620d7e1c710ee845c6dcb41b7d021eb47c1c6a821b0a5f5dae56ae250a0fd",
+    "bytes": 36685,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "addition"
+  },
+  {
+    "title": "安全攻防实施方案",
+    "version": "v2.0",
+    "file": "security-v2.0.md",
+    "original_filename": "安全攻防实施方案·技术组执行版(1).md",
+    "sha256": "ab9760840c5eba773c2cf7eacfbefc78c645629b9d3a6772c93821f2f1f5d363",
+    "bytes": 13315,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "addition"
+  },
+  {
+    "title": "联邦学习与多Agent辩论",
+    "version": "2026-10-24",
+    "file": "federated-learning-agent-debate.md",
+    "original_filename": "两项核心技术应用研究·联邦学习与多Agent辩论(1).md",
+    "sha256": "025f750cf1d31edc34bf2fcb25ab287ca2e852d09a761036a2435fc3ca6ab2c0",
+    "bytes": 29559,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "addition"
+  },
+  {
+    "title": "行为设计学理论层",
+    "version": "v1.0",
+    "file": "behavioral-design-v1.0.md",
+    "original_filename": "行为设计学理论层·有限注意力与过度自信.md",
+    "sha256": "c8439fa6b8a6b388999514ef50bd24984dcbe3b8426ddf22c9a4a80e9d709414",
+    "bytes": 5933,
+    "adopted_on": "2026-10-26",
+    "status": "current; user-confirmed final",
+    "action": "addition"
+  }
+]

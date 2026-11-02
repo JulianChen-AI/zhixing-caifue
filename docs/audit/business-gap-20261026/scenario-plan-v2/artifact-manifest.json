@@ -1,0 +1,72 @@
+{
+  "scope": "文档发布副本；原本机证据哈希与发布副本区分",
+  "files": [
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/README.md",
+      "bytes": 36438,
+      "sha256": "b4114a79f5347256a3159232977f17f47f2f99470d639a93e4851d6825c268e8"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/REVIEW.md",
+      "bytes": 4280,
+      "sha256": "f2e91a38e03faf3fb898aacfcef72d9835e6fb36e4a4cf480a83afe870881872"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/VERIFICATION.txt",
+      "bytes": 9023,
+      "sha256": "61a99efab3ce37ce81aa4a3036b6c26d310a0054856f6705b48e54329cb928a0"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/coverage-matrix.md",
+      "bytes": 497709,
+      "sha256": "1a84b6ea257d999d2df298e97647089570c3bcd88afe7e6c0243b3fa944cc468"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/implementation-plan.md",
+      "bytes": 298179,
+      "sha256": "9544c576d0a981ebc880a860a1c7871aeae9ce2659b5b71465d0550477ed77f4"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/plan.json",
+      "bytes": 980707,
+      "sha256": "4ffe0a5f2f7c8b036a3f5ec425a72d1556a4f8acbc8488218362d79b9f7be038"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/quick-review.md",
+      "bytes": 9396,
+      "sha256": "174e9dbd920ba8c047bbd3222da1d353a7c89c22a13c11e908d787efa6e41f66"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/review-evidence.json",
+      "bytes": 13782,
+      "sha256": "17f91bbb724e4c0ed03d2949bba1ef2acc55349234612b0900a73cfdb561fb99"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/scenario-walkthroughs.md",
+      "bytes": 35985,
+      "sha256": "70e896c0d4425f6fa39c3b39298b8a115e935683127b34d19f223b9f67b33fd0"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/shared-and-dependencies.md",
+      "bytes": 12045,
+      "sha256": "024baf2290413085af07813853f2bb39bb5cdde32acfb837ba9bc3d73db3c79d"
+    },
+    {
+      "path": "docs/audit/business-gap-20261026/scenario-plan-v2/validation.json",
+      "bytes": 219198,
+      "sha256": "001a6172e2a28f1800a6c9625be7cc640aa5d2f1efdcab4e0e9df26218b61aca"
+    }
+  ],
+  "adoption_behaviors": {
+    "BASELINE": "LEGACY_5",
+    "MODIFIED": "FINAL_10",
+    "ROLLBACK": "LEGACY_5",
+    "restored_hash_equals_original": true,
+    "project_index_unchanged": true
+  },
+  "pointer_behaviors": [
+    "BEFORE_PLAN_V2",
+    "SCENARIO_V2",
+    "BEFORE_PLAN_V2"
+  ]
+}

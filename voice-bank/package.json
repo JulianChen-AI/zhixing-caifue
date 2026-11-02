@@ -1,0 +1,82 @@
+{
+  "name": "zhixing-live-bank",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --experimental-transform-types --test tests/card-options.test.ts tests/engine.test.ts tests/qwen.test.ts tests/checklists.test.ts tests/workflows.test.ts tests/billing-query.test.ts tests/tailscale.test.ts tests/plans.test.ts tests/lite.test.ts tests/voice-functions.test.ts tests/task-checklist.test.ts tests/reply-review.test.ts tests/supervision.test.ts tests/session-context.test.ts tests/mascot.test.ts tests/ui-presentation.test.ts tests/serial-ui.test.ts tests/microphone.test.ts tests/recipient-choice.test.ts tests/demo-scenes.test.ts tests/demo-contacts.test.ts tests/demo-controls.test.ts tests/roadshow-transfer.test.ts tests/roadshow-aa.test.ts tests/roadshow-invest.test.ts tests/roadshow-bills.test.ts tests/roadshow-schedule.test.ts tests/roadshow-monthly.test.ts tests/roadshow-budget-utterance.test.ts tests/roadshow-recovery.test.ts tests/roadshow-acceptance.test.ts tests/desk-ui.test.ts tests/demo-sandbox.test.ts tests/demo-script.test.ts tests/delegation.test.ts tests/eval-cases.test.ts tests/intent-json.test.ts",
+    "eval:tasks": "node --experimental-transform-types evals/task-completion/run.ts",
+    "preview:local": "node scripts/preview-local.mjs",
+    "db:local": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_magical_ultron.sql",
+    "install:ci": "node scripts/install-ci.mjs",
+    "dev": "node scripts/run-framework.mjs dev",
+    "build": "node scripts/run-framework.mjs build",
+    "start": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "db:generate": "drizzle-kit generate",
+    "verify:lite": "node --experimental-transform-types tests/quick-1-20.ts",
+    "verify:lite:browser": "node tests/browser/lite-review.cjs",
+    "verify:ui:browser": "node tests/browser/focused-ui.cjs",
+    "verify:voice:tools": "node --experimental-transform-types --test tests/voice-functions.test.ts tests/task-checklist.test.ts",
+    "verify:risk:live": "node tests/browser/risk-assessment-live.cjs",
+    "verify:voice:live": "node tests/browser/voice-functions-live.cjs",
+    "verify:cancel:live": "node tests/browser/cancellation-live.cjs"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.7.0",
+    "@hookform/resolvers": "^5.7.1",
+    "@shadcn/react": "^0.3.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.4.0",
+    "drizzle-orm": "0.45.2",
+    "embla-carousel-react": "^8.6.0",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^1.31.0",
+    "next": "16.3.4",
+    "next-themes": "^0.4.6",
+    "radix-ui": "^1.6.7",
+    "react": "19.2.6",
+    "react-day-picker": "^10.0.1",
+    "react-dom": "19.2.6",
+    "react-hook-form": "^7.85.0",
+    "react-resizable-panels": "^4.12.2",
+    "recharts": "^3.8.0",
+    "sonner": "^2.0.8",
+    "tailwind-merge": "3.6.0",
+    "vaul": "^1.1.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@cloudflare/workers-types": "4.20260515.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.4",
+    "json-rpc-2.0": "1.7.1",
+    "raw-body": "3.0.2",
+    "react-server-dom-webpack": "19.2.6",
+    "tailwindcss": "4.2.1",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "5.9.3",
+    "vinext": "1.0.0-beta.5",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  },
+  "type": "module",
+  "overrides": {
+    "miniflare": {
+      "sharp": "0.35.4"
+    }
+  }
+}

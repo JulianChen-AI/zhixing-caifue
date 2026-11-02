@@ -1,0 +1,8033 @@
+{
+  "rows": 191,
+  "source_quote_count": 455,
+  "source_documents": 10,
+  "headings": 467,
+  "coverage_records": 1080,
+  "scenarios": 37,
+  "counts_by_tier": {
+    "1": 140,
+    "2": 29,
+    "3": 12,
+    "4": 10
+  },
+  "candidates": [
+    "B25",
+    "B26",
+    "B27",
+    "B28",
+    "B29",
+    "S21",
+    "S22",
+    "W31",
+    "W32",
+    "W33",
+    "W34",
+    "C28",
+    "X30",
+    "X31",
+    "X32",
+    "X33",
+    "X34",
+    "X35",
+    "X36",
+    "X37"
+  ],
+  "cycles": [],
+  "deferred_final_links": [],
+  "checks_passed": 1598,
+  "checks_total": 1598,
+  "issues": [],
+  "checks": [
+    {
+      "check": "连续编号唯一",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "稳定key唯一",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "每项完整字段",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "引文 B01 bills-v1.7.md:227",
+      "pass": true,
+      "detail": "**语音查账**（对话效率展示位）：\"我这个月奶茶花了多少\"→ 类目+时段解析 → 聚合 → \"213 元，12 笔，相当于 9 "
+    },
+    {
+      "check": "引文 B01 bills-v1.7.md:363",
+      "pass": true,
+      "detail": "追问接续（上下文验收，纲领二）:"
+    },
+    {
+      "check": "引文 B01 bills-v1.7.md:364",
+      "pass": true,
+      "detail": "用户: \"那咖啡呢\" → 同口径换类目，无需重复时段"
+    },
+    {
+      "check": "引文 B02 bills-v1.7.md:647",
+      "pass": true,
+      "detail": "| BA-R1 | 账单=敏感个人信息，处理须明确目的+单独同意+最小必要 | 个保法、数据安全法、银行保险机构数据安全管理办法 "
+    },
+    {
+      "check": "引文 B02 bills-v1.7.md:657",
+      "pass": true,
+      "detail": "| **BA-R11** | **未成年人保护（v1.2 新增，B3；v1.6 补 14 岁以下分级，3-F3）** | 个保法（"
+    },
+    {
+      "check": "引文 B03 bills-v1.7.md:218",
+      "pass": true,
+      "detail": "- **`memo_template`（备注模板层，转账侧）**：聚餐AA/房租/押金/借款/还款/随礼/班费/公费——是\"这笔钱"
+    },
+    {
+      "check": "引文 B03 bills-v1.7.md:219",
+      "pass": true,
+      "detail": "- **`category`（消费类目层，账单侧）**：餐饮/饮品/兴趣爱好（盲盒/游戏/演出/打赏）/学习提升（考证/课程/报名"
+    },
+    {
+      "check": "引文 B03 bills-v1.7.md:220",
+      "pass": true,
+      "detail": "- 两层经**映射表**关联（备注\"房租\"→类目\"居住\"；备注\"聚餐AA\"→类目\"餐饮\"）；`category_dict` 为一级"
+    },
+    {
+      "check": "引文 B03 bills-v1.7.md:633",
+      "pass": true,
+      "detail": "| W1 | 分类引擎 + 共享字典表 + 沙箱 API | category_dict+memo_category_map 建表"
+    },
+    {
+      "check": "引文 B04 bills-v1.7.md:372",
+      "pass": true,
+      "detail": "  ├─ Step1 [硬规则] merchant_map 商户映射库 → 命中 → category + confidence="
+    },
+    {
+      "check": "引文 B04 bills-v1.7.md:375",
+      "pass": true,
+      "detail": "  │         ├─ ≥0.9 直接采用"
+    },
+    {
+      "check": "引文 B04 bills-v1.7.md:376",
+      "pass": true,
+      "detail": "  │         ├─ 0.7-0.9 采用但标记\"待确认\"（月报中邀请用户一键确认）"
+    },
+    {
+      "check": "引文 B04 bills-v1.7.md:377",
+      "pass": true,
+      "detail": "  │         └─ <0.7 标\"未分类\"（红线③：敢标未分类，不硬猜）"
+    },
+    {
+      "check": "引文 B05 bills-v1.7.md:389",
+      "pass": true,
+      "detail": "用户: \"那笔星巴克的是送人礼物，不是餐饮\""
+    },
+    {
+      "check": "引文 B05 bills-v1.7.md:391",
+      "pass": true,
+      "detail": "  │    （默认仅这笔——防\"送礼一次、以后全算人情\"的纠错污染）"
+    },
+    {
+      "check": "引文 B05 bills-v1.7.md:394",
+      "pass": true,
+      "detail": "  │         → [工具] transaction.reclassify_batch(merchant_key) 历史全"
+    },
+    {
+      "check": "引文 B05 bills-v1.7.md:396",
+      "pass": true,
+      "detail": "  └─ [留痕] user_corrections 记录（纠错数据入训练池须单独授权且可 opt-out，BA-R10）"
+    },
+    {
+      "check": "引文 B06 bills-v1.7.md:223",
+      "pass": true,
+      "detail": "- **AA 双口径**：**默认现金口径**——垫付 288 如实记餐饮支出 + 应收款挂账（资产项），每收回一笔冲减支出；**"
+    },
+    {
+      "check": "引文 B06 bills-v1.7.md:403",
+      "pass": true,
+      "detail": "  ├─ 默认【现金口径】: 垫付 288 如实记\"餐饮\"支出 + 应收款 240 挂账（资产项）"
+    },
+    {
+      "check": "引文 B06 bills-v1.7.md:404",
+      "pass": true,
+      "detail": "  ├─ 收回核销: aa_items.paid → 逐笔冲减支出（收 52 → 餐饮支出 -52）"
+    },
+    {
+      "check": "引文 B06 bills-v1.7.md:405",
+      "pass": true,
+      "detail": "  ├─ 可切换【净额口径】: \"这顿饭我实际花了 28\"（仅展示视角，不改底层记录）"
+    },
+    {
+      "check": "引文 B06 bills-v1.7.md:406",
+      "pass": true,
+      "detail": "  └─ 未收齐: 7 天后转\"借出\"提醒（联动关系账本 relation_ledger），"
+    },
+    {
+      "check": "引文 B07 bills-v1.7.md:145",
+      "pass": true,
+      "detail": "- 账单日常：生活费+实习工资两路收入；毕业季支出集中；垫付报销与借款混在一起"
+    },
+    {
+      "check": "引文 B07 bills-v1.7.md:146",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：报销款到账自动核销垫付标记；\"培训贷\"骚扰转账后收到疑似诈骗警示+报案指引；毕业旅行前收到\"半年攒了多少\"专题报"
+    },
+    {
+      "check": "引文 B07 bills-v1.7.md:224",
+      "pass": true,
+      "detail": "- **人情账本**：借款/还款/随礼单列，独立于日常消费统计（联动转账关系账本，仅本人可见）"
+    },
+    {
+      "check": "引文 B07 bills-v1.7.md:225",
+      "pass": true,
+      "detail": "- **退款冲正**：退款自动匹配原交易，不重复计支出"
+    },
+    {
+      "check": "引文 B07 bills-v1.7.md:408",
+      "pass": true,
+      "detail": "人情往来: 借款/还款/随礼 → 挂 relation_ledger（仅本人可见），独立统计不进日常消费"
+    },
+    {
+      "check": "引文 B07 bills-v1.7.md:409",
+      "pass": true,
+      "detail": "退款: 匹配原交易 txn → 冲正，支出净额自动修正"
+    },
+    {
+      "check": "引文 B08 bills-v1.7.md:232",
+      "pass": true,
+      "detail": "- **冷启动期（v1.4 拆两层，2-B1）**：异动类信号入账前 60 天只观察、不主动告警（学生流水样本小，开学季万元级波动"
+    },
+    {
+      "check": "引文 B08 bills-v1.7.md:233",
+      "pass": true,
+      "detail": "- **确定异常（主动推送）**：深夜(23-6)+新商户+连续小额 三连命中；金额偏离 P99 且排除节律白名单（开学季/双 1"
+    },
+    {
+      "check": "引文 B08 bills-v1.7.md:426",
+      "pass": true,
+      "detail": "  硬信号（规则代码）: 深夜(23-6) / 新商户 / 连续小额(≥3笔/10分钟) /"
+    },
+    {
+      "check": "引文 B08 bills-v1.7.md:433",
+      "pass": true,
+      "detail": "  确定异常（硬信号三连 或 偏离度>70+硬信号）→ 主动推送:"
+    },
+    {
+      "check": "引文 B08 bills-v1.7.md:434",
+      "pass": true,
+      "detail": "       ① 依据句（纲领四）: \"23:47 在'XX商户'支出 89 元——这是你半年来第 1 次深夜消费，"
+    },
+    {
+      "check": "引文 B09 bills-v1.7.md:114",
+      "pass": true,
+      "detail": "| 研一–研二（半收入期） | 助学金 600/月+助研津贴+奖学金，月入 600-2000 波动 | 收入来源最杂（4 种以上）"
+    },
+    {
+      "check": "引文 B09 bills-v1.7.md:232",
+      "pass": true,
+      "detail": "- **冷启动期（v1.4 拆两层，2-B1）**：异动类信号入账前 60 天只观察、不主动告警（学生流水样本小，开学季万元级波动"
+    },
+    {
+      "check": "引文 B09 bills-v1.7.md:234",
+      "pass": true,
+      "detail": "- **疑似异常（月报提及）**：分类支出环比突增（\"本周娱乐是上周 2.3 倍\"）——温和提示，不打扰"
+    },
+    {
+      "check": "引文 B09 bills-v1.7.md:251",
+      "pass": true,
+      "detail": "- **学生节律解释**：\"这个月支出高是正常的——开学季\"（识别开学/考试/假期模式）；职场版按\"发薪日-房租-还款日-结余\"组"
+    },
+    {
+      "check": "引文 B09 bills-v1.7.md:418",
+      "pass": true,
+      "detail": "冷启动期（入账前 60 天，F3；v1.4 拆两层，2-B1）:"
+    },
+    {
+      "check": "引文 B09 bills-v1.7.md:472",
+      "pass": true,
+      "detail": "  ├─ [工具] calendar.detect_rhythm → 学生节律识别（开学/考试/假期）或职场节律（发薪/房租/还款"
+    },
+    {
+      "check": "引文 B10 bills-v1.7.md:437",
+      "pass": true,
+      "detail": "       ③ 处置选项: [是我消费的] [不是我，帮我挂失] [我要申诉] [别提醒这类了]"
+    },
+    {
+      "check": "引文 B10 bills-v1.7.md:438",
+      "pass": true,
+      "detail": "       ④ 疑似诈骗特征 → 附国家反诈中心 App 与报案指引、证据保全建议"
+    },
+    {
+      "check": "引文 B10 bills-v1.7.md:439",
+      "pass": true,
+      "detail": "  [红线 BA-R4] 全程只提示不定性；冻结/上报等处置属持牌机构流程，产品不碰"
+    },
+    {
+      "check": "引文 B10 bills-v1.7.md:673",
+      "pass": true,
+      "detail": "> 小知：\"是我买的，给室友的生日礼物。\" → 鹅豆：\"好嘞。这笔要改成'人情往来'吗？只改这一笔，还是以后这家店都算？\"（纠错双"
+    },
+    {
+      "check": "引文 B10 bills-v1.7.md:674",
+      "pass": true,
+      "detail": "> 小知：\"就这一笔。\""
+    },
+    {
+      "check": "引文 B10 cross-scenario-v1.3.md:103",
+      "pass": true,
+      "detail": "冻结为弱认证即时+本机秒解护栏"
+    },
+    {
+      "check": "引文 B11 bills-v1.7.md:82",
+      "pass": true,
+      "detail": "| 自动对账 | BA-B05b | 重复扣款/退款未到账/金额异常校验 |"
+    },
+    {
+      "check": "引文 B11 bills-v1.7.md:244",
+      "pass": true,
+      "detail": "**自动对账**：重复扣款、退款未到账、金额异常（小数点错位）校验，月报中汇总。"
+    },
+    {
+      "check": "引文 B11 bills-v1.7.md:428",
+      "pass": true,
+      "detail": "                     向陌生个人账户大额 / 重复扣款 / 退款超时未到账"
+    },
+    {
+      "check": "引文 B12 bills-v1.7.md:239",
+      "pass": true,
+      "detail": "1. 周期扣费自动识别（v1.2 修订 F4：**金额容差 ±20%**——首月优惠后涨价 12→28 也能持续追踪 + **订阅"
+    },
+    {
+      "check": "引文 B12 bills-v1.7.md:445",
+      "pass": true,
+      "detail": "周期识别（F4）: [工具] subscription.detect → 同商户+金额容差±20%+周期稳定 → 订阅清单"
+    },
+    {
+      "check": "引文 B12 bills-v1.7.md:447",
+      "pass": true,
+      "detail": "  + 订阅特征库（爱奇艺/iCloud/网盘等已知订阅型商户直接进候选，首扣即提示\"这是订阅型服务\"）"
+    },
+    {
+      "check": "引文 B13 bills-v1.7.md:241",
+      "pass": true,
+      "detail": "3. **僵尸订阅猎手（v1.2 修订 D1——合规判定路径）**：**不使用任何 App 使用行为/登录活跃度数据**（BA-R"
+    },
+    {
+      "check": "引文 B13 bills-v1.7.md:453",
+      "pass": true,
+      "detail": "         \"腾讯视频连续扣了 3 个月了，你最近还在看吗？\""
+    },
+    {
+      "check": "引文 B13 bills-v1.7.md:454",
+      "pass": true,
+      "detail": "         → 用户: \"早不看了\" → \"那要我帮你取消吗？\""
+    },
+    {
+      "check": "引文 B13 bills-v1.7.md:457",
+      "pass": true,
+      "detail": "  → 用户确认 → 跳转订阅/代扣管理场景执行（本场景不执行解约）"
+    },
+    {
+      "check": "引文 B13 bills-v1.7.md:514",
+      "pass": true,
+      "detail": "  ├─ \"要我帮你取消吗\" → 用户确认 → 跳订阅/代扣场景（按其确认闸门执行）"
+    },
+    {
+      "check": "引文 B13 bills-v1.7.md:670",
+      "pass": true,
+      "detail": "> 鹅豆：\"这两个会员每月扣 56。已找到取消入口，**确认一下我就帮你解约**。\" → 小知确认 →（跳转订阅场景执行）\"搞定。"
+    },
+    {
+      "check": "引文 B13 cross-scenario-v1.3.md:98",
+      "pass": true,
+      "detail": "商户名/扣款金额/周期判定依据"
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:141",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：语音问\"我这个月奶茶花了多少\"→\"213 元，相当于 9 顿食堂\"；鹅豆问\"爱奇艺连续扣了 3 个月，你最近还看"
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:146",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：报销款到账自动核销垫付标记；\"培训贷\"骚扰转账后收到疑似诈骗警示+报案指引；毕业旅行前收到\"半年攒了多少\"专题报"
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:151",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：发薪日第三天收到\"本月可用结余 2100\"提示→\"要不要把 500 转进定投？\"；信用账单守护（她主动导入花呗账"
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:248",
+      "pass": true,
+      "detail": "**月度报告**（留存点 + 路演第一幕）："
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:251",
+      "pass": true,
+      "detail": "- **学生节律解释**：\"这个月支出高是正常的——开学季\"（识别开学/考试/假期模式）；职场版按\"发薪日-房租-还款日-结余\"组"
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:476",
+      "pass": true,
+      "detail": "  ├─ [组装] 一页报告: 统计 + 参照系 + 节律解释 + 离谱洞察 + 一句话行动"
+    },
+    {
+      "check": "引文 B14 bills-v1.7.md:679",
+      "pass": true,
+      "detail": "> **【月度报告推送】**\"你 10 月的钱的日记出炉了：餐饮支出占比 38%，娱乐预算还剩 60；深夜外卖 11 次，最晚一单"
+    },
+    {
+      "check": "引文 B15 bills-v1.7.md:250",
+      "pass": true,
+      "detail": "- **有参照系（v1.2 修订 D2）**：自身环比 + 同龄匿名分位——粒度为\"同城市/同身份段\"（**不用\"同校\"**，小样"
+    },
+    {
+      "check": "引文 B15 bills-v1.7.md:470",
+      "pass": true,
+      "detail": "  │    粒度=同城市/同身份段（不用\"同校\"，小样本可回溯）；"
+    },
+    {
+      "check": "引文 B15 bills-v1.7.md:471",
+      "pass": true,
+      "detail": "  │    cohort < 50 不出分位（k-匿名下限）；差分隐私处理；可关闭；演示为合成聚合数据"
+    },
+    {
+      "check": "引文 B15 bills-v1.7.md:652",
+      "pass": true,
+      "detail": "| BA-R6 | 自动化决策透明公平+禁差别待遇 | 个保法第 24 条 | 分位参照匿名聚合、**k≥50 下限**、温和表述"
+    },
+    {
+      "check": "引文 B16 bills-v1.7.md:252",
+      "pass": true,
+      "detail": "- **离谱洞察**（1-3 条）：细节场景化（\"深夜外卖 11 次，最晚一单 2:47\"）+ 换算表达（\"=9 顿食堂\"\"=一张"
+    },
+    {
+      "check": "引文 B16 bills-v1.7.md:624",
+      "pass": true,
+      "detail": "- **依据句规范·话术三分层（纲领四，原生内置）**：**事实**（流水数据：\"23:47 支出 89 元\"）/ **推断**（"
+    },
+    {
+      "check": "引文 B16 bills-v1.7.md:625",
+      "pass": true,
+      "detail": "- **离谱洞察生成约束**（防翻车）：① 只从当月真实交易细节取素材，禁止编造；② 换算表达用生活化等价物（食堂/奶茶/演唱会门"
+    },
+    {
+      "check": "引文 B16 bills-v1.7.md:654",
+      "pass": true,
+      "detail": "| BA-R8 | 语言边界：中性词纪律（v1.4 双向化，2-F1） | 白皮书 §6 | \"环比上升 180%，若非本人操作请"
+    },
+    {
+      "check": "引文 B16 bills-v1.7.md:679",
+      "pass": true,
+      "detail": "> **【月度报告推送】**\"你 10 月的钱的日记出炉了：餐饮支出占比 38%，娱乐预算还剩 60；深夜外卖 11 次，最晚一单"
+    },
+    {
+      "check": "引文 B17 bills-v1.7.md:261",
+      "pass": true,
+      "detail": "**账单×攒钱联动**：从账单识别可压缩项 → \"少点 6 次外卖≈省下一张演唱会门票，要不要把每周 50 自动转进小金库？\"→ "
+    },
+    {
+      "check": "引文 B17 bills-v1.7.md:515",
+      "pass": true,
+      "detail": "  ├─ \"省下的 56 转进小金库？\" → 用户确认 → 跳转账 TF-T04 建定时规则"
+    },
+    {
+      "check": "引文 B17 bills-v1.7.md:516",
+      "pass": true,
+      "detail": "  ├─ \"结余 380，要不要每周定投 50？\" → 用户确认 → 跳理财 TF-09 完整护栏链"
+    },
+    {
+      "check": "引文 B17 bills-v1.7.md:670",
+      "pass": true,
+      "detail": "> 鹅豆：\"这两个会员每月扣 56。已找到取消入口，**确认一下我就帮你解约**。\" → 小知确认 →（跳转订阅场景执行）\"搞定。"
+    },
+    {
+      "check": "引文 B17 cross-scenario-v1.3.md:100",
+      "pass": true,
+      "detail": "月度结余数据"
+    },
+    {
+      "check": "引文 B17 cross-scenario-v1.3.md:104",
+      "pass": true,
+      "detail": "逐行动确认"
+    },
+    {
+      "check": "引文 B18 bills-v1.7.md:291",
+      "pass": true,
+      "detail": "**概念**：全行业账单都只有\"回头看\"，没人做\"往前推演\"——\"如果我每天少喝一杯奶茶，毕业时多攒多少？\"→ Agent 从真实"
+    },
+    {
+      "check": "引文 B18 bills-v1.7.md:534",
+      "pass": true,
+      "detail": "  ├─ ② [工具] bill.aggregate(category=\"饮品-奶茶\", period=近3月) → 月均 180"
+    },
+    {
+      "check": "引文 B18 bills-v1.7.md:535",
+      "pass": true,
+      "detail": "  ├─ ③ [工具] whatif.simulate(monthly_save=180, months=14) → 2520"
+    },
+    {
+      "check": "引文 B18 bills-v1.7.md:536",
+      "pass": true,
+      "detail": "  │         【v1.4，2-D1 利率纪律】默认只推演本金累计；用户主动要求\"算上利息\"才展示，"
+    },
+    {
+      "check": "引文 B18 bills-v1.7.md:542",
+      "pass": true,
+      "detail": "  └─ ⑤ 后续行动: \"要不要现在就把'每周 45 转进小金库'的规则建起来？\""
+    },
+    {
+      "check": "引文 B18 cross-scenario-v1.3.md:99",
+      "pass": true,
+      "detail": "推演参数（频次/单价/目标）"
+    },
+    {
+      "check": "引文 B19 bills-v1.7.md:255",
+      "pass": true,
+      "detail": "**年度账单**（传播引擎，社交货币版）："
+    },
+    {
+      "check": "引文 B19 bills-v1.7.md:257",
+      "pass": true,
+      "detail": "- **分享前二次确认 + 脱敏预览**（金额默认打码可选展示）——2018 支付宝教训（BA-R9）"
+    },
+    {
+      "check": "引文 B19 bills-v1.7.md:258",
+      "pass": true,
+      "detail": "- **敏感类目保护（v1.2 新增，D3）**：医疗/信贷/成人等敏感类目默认不出现在分享物料与\"年度之最\"；商户名展示为可选开"
+    },
+    {
+      "check": "引文 B19 bills-v1.7.md:259",
+      "pass": true,
+      "detail": "- 人生节点特辑：**毕业特辑**（\"大学四年，你的钱都去了哪里\"）、**入职周年特辑**（\"工作第一年攒下 X\"）——全生命周期"
+    },
+    {
+      "check": "引文 B19 bills-v1.7.md:483",
+      "pass": true,
+      "detail": "年度聚合: 12 份月报 + 年度之最（最贵一餐/最晚一笔/最常光顾/最大一笔节省）"
+    },
+    {
+      "check": "引文 B19 bills-v1.7.md:487",
+      "pass": true,
+      "detail": "海报生成: 可分享卡片 → [硬护栏] 分享前二次确认 + 脱敏预览（金额默认打码，可选展示）"
+    },
+    {
+      "check": "引文 B20 bills-v1.7.md:299",
+      "pass": true,
+      "detail": "**概念**：年度账单不止图表海报——鹅豆以第一人称写一篇 300 字散文：\"1 月 18 日你第一次往小金库存钱，那天你说想去看"
+    },
+    {
+      "check": "引文 B20 bills-v1.7.md:301",
+      "pass": true,
+      "detail": "**为什么**：支付宝年度账单是\"数据+标签\"，**没人把账单写成\"我们共同的回忆\"**——成长陪伴叙事的年度高潮，即路演第五幕\""
+    },
+    {
+      "check": "引文 B20 bills-v1.7.md:303",
+      "pass": true,
+      "detail": "**合规**：AI 生成标识（理财 R11）；分享前脱敏确认+敏感类目排除（BA-R9/D3）；素材只从真实交易取，禁止编造（6."
+    },
+    {
+      "check": "引文 B20 bills-v1.7.md:748",
+      "pass": true,
+      "detail": "6. **路演第五幕接入《你这一年的钱的故事》**：年度叙事散文台词撰写与 AI 生成标识设计"
+    },
+    {
+      "check": "引文 B21 bills-v1.7.md:90",
+      "pass": true,
+      "detail": "| 人生阶段迁移 | （系统） | v1.4（2-F3）改为**用户确认制**：迁移以用户主动告知/手动切换为唯一触发；系统只建议"
+    },
+    {
+      "check": "引文 B21 bills-v1.7.md:113",
+      "pass": true,
+      "detail": "| 大三–大四（升学求职期） | 生活费+实习收入；考研报名费/求职交通/毕业季集中支出 | 收入变杂对不上账；求职期\"培训贷\"骚"
+    },
+    {
+      "check": "引文 B21 bills-v1.7.md:114",
+      "pass": true,
+      "detail": "| 研一–研二（半收入期） | 助学金 600/月+助研津贴+奖学金，月入 600-2000 波动 | 收入来源最杂（4 种以上）"
+    },
+    {
+      "check": "引文 B21 bills-v1.7.md:115",
+      "pass": true,
+      "detail": "| 职场新人 0-3 年（经济独立初期） | 起薪 7850（本）/12300（硕），房租 1501-2500 占 29%（v1."
+    },
+    {
+      "check": "引文 B21 bills-v1.7.md:151",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：发薪日第三天收到\"本月可用结余 2100\"提示→\"要不要把 500 转进定投？\"；信用账单守护（她主动导入花呗账"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:242",
+      "pass": true,
+      "detail": "4. **信用账单守护（v1.2 修订 D4——四不边界）**：仅解析**用户主动导入**的花呗/白条/信用卡账单文件；**不实时"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:496",
+      "pass": true,
+      "detail": "  ├─ [授权] 逐账号单独授权（BA-R1），告知处理范围/保存期限/可删除"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:497",
+      "pass": true,
+      "detail": "  ├─ [工具] bill.import(file=CSV/PDF, source=wechat) → 解析 → 字段标准化"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:499",
+      "pass": true,
+      "detail": "  │    [留存策略] 原始导入文件解析后即删，只留标准化交易记录（BA-R2）"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:501",
+      "pass": true,
+      "detail": "  │    【v1.4，2-D4 去重键】金额精确相等 + 商户归一化 key + 时间窗 ±10 分钟 +"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:502",
+      "pass": true,
+      "detail": "  │    渠道映射规则（微信/支付宝扣款 ↔ 银行卡出账）；四要素不全命中 →"
+    },
+    {
+      "check": "引文 B22 bills-v1.7.md:503",
+      "pass": true,
+      "detail": "  │    进\"疑似重复·待确认\"队列，月报邀请一键确认，不静默合并"
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:281",
+      "pass": true,
+      "detail": "**概念**：宿舍公共基金（桶装水/电费/公共采购）多人共同账本——成员各自授权记账，公共支出条目全员可见（性质同群收款，本就需公"
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:283",
+      "pass": true,
+      "detail": "**定位诚实化（v1.6，3-A3）**：本功能**不需要、也不宣称使用联邦学习/隐私计算技术**——公共条目天然公开、私人流水本"
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:549",
+      "pass": true,
+      "detail": "创建: 小知: \"建个宿舍公共账本，我们四个人\""
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:550",
+      "pass": true,
+      "detail": "  ├─ [授权] 发起人创建 → 邀请 3 人，每人单独授权（可退出，退出即停止聚合）"
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:554",
+      "pass": true,
+      "detail": "  ├─ 记账: 成员各自记公共支出/关联本行交易（原始流水不出端，仅上传公共条目）"
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:557",
+      "pass": true,
+      "detail": "  │    · 公共支出条目 = 成员主动录入、自愿对宿舍公开（性质同群收款，本就需公示才能 AA）"
+    },
+    {
+      "check": "引文 B23 bills-v1.7.md:558",
+      "pass": true,
+      "detail": "  │    · 隐私保护的对象 = 成员私人流水：任何人（含平台展示层）看不到"
+    },
+    {
+      "check": "引文 B24 bills-v1.7.md:285",
+      "pass": true,
+      "detail": "**护栏**：任何成员可退出，退出即停止聚合；最小聚合人数 ≥3（2 人账本聚合结果可反推对方，禁止；运行中退出致人数 <3 自动"
+    },
+    {
+      "check": "引文 B24 bills-v1.7.md:551",
+      "pass": true,
+      "detail": "  ├─ [硬护栏] 最小聚合人数 ≥3（2 人账本聚合结果可反推对方，禁止创建）"
+    },
+    {
+      "check": "引文 B24 bills-v1.7.md:552",
+      "pass": true,
+      "detail": "  │    【v1.4，2-D2 运行时护栏】运行中成员退出致人数 <3 → 自动暂停聚合输出"
+    },
+    {
+      "check": "引文 B24 bills-v1.7.md:553",
+      "pass": true,
+      "detail": "  │    （账本与历史保留，提示\"人数不足，聚合已暂停\"），补充新成员后恢复"
+    },
+    {
+      "check": "引文 B24 bills-v1.7.md:555",
+      "pass": true,
+      "detail": "  ├─ 聚合: 仅输出聚合结果: \"本月公共支出 210，人均 52.5\""
+    },
+    {
+      "check": "引文 B24 bills-v1.7.md:561",
+      "pass": true,
+      "detail": "  ├─ 结算: 月底差额 → 联动 AA 收款（TF-T05 规则前置流程）结清"
+    },
+    {
+      "check": "引文 B24 cross-scenario-v1.3.md:102",
+      "pass": true,
+      "detail": "公共支出聚合结果/差额"
+    },
+    {
+      "check": "引文 B25 bills-v1.7.md:305",
+      "pass": true,
+      "detail": "### 储备池（答辩弹药库，不做 Demo）"
+    },
+    {
+      "check": "引文 B25 bills-v1.7.md:309",
+      "pass": true,
+      "detail": "| 情绪记账·后悔数据 | \"刚花了 50，有点后悔\"语音随手记 → 月度\"情绪消费地图\" | 把后悔变成数据，反哺理财冷静档案；"
+    },
+    {
+      "check": "引文 B26 bills-v1.7.md:310",
+      "pass": true,
+      "detail": "| 账单时光机 | 用户主动给交易标注事件（\"这顿 288 是给小雨庆生\"）→ \"我最开心的一笔钱花在哪\"可答 | 账单从流水变记"
+    },
+    {
+      "check": "引文 B27 bills-v1.7.md:311",
+      "pass": true,
+      "detail": "| 预算作战模式 | 节律识别从事后解释升级为事前备战：\"距双 11 十天，先把娱乐钱包充到 500\" | Decision La"
+    },
+    {
+      "check": "引文 B28 bills-v1.7.md:312",
+      "pass": true,
+      "detail": "| 反诈疫苗 | 每月推一个画像匹配的真实诈骗案例（\"爱抢演唱会票的同学这样被骗 3500\"） | 与 TF-T08 事前拦截、B"
+    },
+    {
+      "check": "引文 B29 bills-v1.7.md:313",
+      "pass": true,
+      "detail": "| 人情温度计 | \"你和小雨这学期：你请 3 次她请 2 次——快到你回请啦\" | 关系优先红线的账单侧延伸；仅本人可见 |"
+    },
+    {
+      "check": "引文 S01 subscriptions-v1.5.md:71",
+      "pass": true,
+      "detail": "| F1 | **协议全景图** | 一张图看全：你名下所有订阅/代扣协议——金额、周期、下次扣款日、扣款通道、取消入口，跨微信/"
+    },
+    {
+      "check": "引文 S01 subscriptions-v1.5.md:223",
+      "pass": true,
+      "detail": "📋 你的订阅全景（本月合计 ¥126，共 7 项）"
+    },
+    {
+      "check": "引文 S01 subscriptions-v1.5.md:237",
+      "pass": true,
+      "detail": "- **通道标签化**：每笔订阅标注扣款通道（微信/支付宝/银行卡直连/苹果/安卓），取消时按通道路由——这是解决 P4（取消入口"
+    },
+    {
+      "check": "引文 S01 subscriptions-v1.5.md:238",
+      "pass": true,
+      "detail": "- **置信度分层**：绿色（多期规律扣款+商户已确认）/ 黄色（疑似，待用户确认）/ 红色（僵尸/陷阱预警）——对应纲领第四节\""
+    },
+    {
+      "check": "引文 S01 subscriptions-v1.5.md:541",
+      "pass": true,
+      "detail": "| 0:15 | 鹅豆展示订阅全景图 | \"你名下 7 个订阅，每月合计 126。这笔 40 是一个 PDF 工具，7 天试用后转"
+    },
+    {
+      "check": "引文 S02 subscriptions-v1.5.md:106",
+      "pass": true,
+      "detail": "| ① 自动识别 | 交易流水（已授权）/ 短信（单独授权）/ 用户截图 OCR（主动导入） | 周期性检测 + 商户名归一化 +"
+    },
+    {
+      "check": "引文 S02 subscriptions-v1.5.md:117",
+      "pass": true,
+      "detail": "| ④ 在哪些节点必须停下来等用户确认？ | **节点 A**：低置信度订阅条目入库前（\"我猜这是月度订阅，对吗？\"）；**节点 "
+    },
+    {
+      "check": "引文 S02 subscriptions-v1.5.md:228",
+      "pass": true,
+      "detail": "         （我猜这是月度订阅，对吗？[对] [不是]）"
+    },
+    {
+      "check": "引文 S02 subscriptions-v1.5.md:411",
+      "pass": true,
+      "detail": "| SD-S01 | 订阅识别入库 | 交易流水更新 / 截图导入 | 周期检测→商户归一化→置信度打分→（低置信度→节点A用户确"
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:167",
+      "pass": true,
+      "detail": "### 小知（大二）——\"陷阱易感期\""
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:171",
+      "pass": true,
+      "detail": "- 关键设计：首月陷阱识别（\"首月 1 元，次月起 25 元/月\"字样 OCR/协议识别 → 开通即建 T-5 提醒）；未成年保护"
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:174",
+      "pass": true,
+      "detail": "### 阿澈（大四）——\"工具焦虑期\""
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:178",
+      "pass": true,
+      "detail": "- 关键设计：试用到期 T-1 强提醒（\"明天扣 588，今天取消还来得及\"——多邻国案例的直接解法）；毕业清理模式（6 月推送\""
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:249",
+      "pass": true,
+      "detail": "| 试用到期 | T-1（试用≤7 天时 T-0 当天早） | 强提醒（横幅级） | \"明天扣 ¥588 年费，今天取消还来得及\""
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:250",
+      "pass": true,
+      "detail": "| 首月陷阱 | 开通即触发 | 即时推送 | \"首月 ¥1，次月起 ¥25/月，已为你建好 11-08 的提醒\" |"
+    },
+    {
+      "check": "引文 S03 subscriptions-v1.5.md:414",
+      "pass": true,
+      "detail": "| SD-S04 | 试用/陷阱预警 | SD-S01 识别到试用特征 | 即时推送→一键建提醒 | — |"
+    },
+    {
+      "check": "引文 S04 subscriptions-v1.5.md:248",
+      "pass": true,
+      "detail": "| 常规续费 | T-5 + T-1 双档 | 推送 + App 内卡片 | 金额/商户/取消直达，T-5 对齐工信部要求 |"
+    },
+    {
+      "check": "引文 S04 subscriptions-v1.5.md:254",
+      "pass": true,
+      "detail": "| 推送脱敏（v1.2 新增，S-F2） | 所有提醒推送 | 系统通知层 | 锁屏/横幅默认模糊显示（\"你有 1 笔订阅即将续费"
+    },
+    {
+      "check": "引文 S04 subscriptions-v1.5.md:256",
+      "pass": true,
+      "detail": "**合规要点**：提醒内容必须真实完整（商户全称、金额、周期、下次扣款日），不得模糊提示（附件3 消保法映射第 1 条）；提醒服务"
+    },
+    {
+      "check": "引文 S04 subscriptions-v1.5.md:413",
+      "pass": true,
+      "detail": "| SD-S03 | 续费提醒调度 | T-5/T-1 定时器 | 查扣款日历→生成提醒卡→推送→未读则 App 内升级 | — "
+    },
+    {
+      "check": "引文 S05 subscriptions-v1.5.md:251",
+      "pass": true,
+      "detail": "| 涨价预警 | 检测到扣款金额环比上升 | 当期推送 | \"网盘会员从 ¥18 涨到 ¥25，涨幅 39%，要看看吗？\" |"
+    },
+    {
+      "check": "引文 S05 subscriptions-v1.5.md:252",
+      "pass": true,
+      "detail": "| 学生价到期 | 教育优惠类订阅到期前 30 天 | 推送 | \"Apple Music 学生价明年 1 月到期，届时恢复 ¥1"
+    },
+    {
+      "check": "引文 S05 subscriptions-v1.5.md:399",
+      "pass": true,
+      "detail": "**概念**：检测到毕业季（6 月），鹅豆发起\"订阅葬礼\"：\"你要离开学校了。这四年你一共开过 23 个订阅，现在还活着 7 个。"
+    },
+    {
+      "check": "引文 S06 subscriptions-v1.5.md:180",
+      "pass": true,
+      "detail": "### 栗子（职场第一年）——\"膨胀失控期\""
+    },
+    {
+      "check": "引文 S06 subscriptions-v1.5.md:183",
+      "pass": true,
+      "detail": "- 订阅画像：月合计 300-600 元，含外币扣款，iCloud/Adobe/健身/流媒体"
+    },
+    {
+      "check": "引文 S06 subscriptions-v1.5.md:240",
+      "pass": true,
+      "detail": "- **扣款日历视图**：月视图标注每笔扣款日，与生活费到账日（用户可设）叠加，提前预警\"扣款撞车\""
+    },
+    {
+      "check": "引文 S06 subscriptions-v1.5.md:381",
+      "pass": true,
+      "detail": "**概念**：把订阅扣款日历和**生活费/工资到账日**（用户可设定）叠加成月度热力图：\"每月 12 日你有 4 笔扣款共 ¥98"
+    },
+    {
+      "check": "引文 S06 subscriptions-v1.5.md:422",
+      "pass": true,
+      "detail": "| SD-S12 | 扣费地震仪（v1.2 修订，S-D3） | 扣款日历更新 / 到账日设定变更 | 扣款日×到账日叠加→震中识"
+    },
+    {
+      "check": "引文 S07 subscriptions-v1.5.md:389",
+      "pass": true,
+      "detail": "**合规边界**：改扣款日只提供商户协商指引与话术模板，**不代办**（S-R15 平台对抗红线）；震中分析结果标注\"按现有订阅排"
+    },
+    {
+      "check": "引文 S07 subscriptions-v1.5.md:422",
+      "pass": true,
+      "detail": "| SD-S12 | 扣费地震仪（v1.2 修订，S-D3） | 扣款日历更新 / 到账日设定变更 | 扣款日×到账日叠加→震中识"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:275",
+      "pass": true,
+      "detail": "│ 路径 A：银行侧协议解约（直连代扣）★核心差异化     │"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:277",
+      "pass": true,
+      "detail": "│   → 后果告知 + 用户二次确认                     │"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:278",
+      "pass": true,
+      "detail": "│   → 秒级生效，生成电子回执                      │"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:312",
+      "pass": true,
+      "detail": "> **① 解约**（我现在能做的）：解除银行代扣协议，它下期扣不到你的钱；"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:313",
+      "pass": true,
+      "detail": "> **② 退订**（你需要在商户 App 里做的）：取消服务合约，你已付费的权益可以用到 X 月 X 日；"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:314",
+      "pass": true,
+      "detail": "> **③ 退款**（如果它乱扣钱）：走争议流程，我帮你准备材料和 12315 指引。"
+    },
+    {
+      "check": "引文 S08 subscriptions-v1.5.md:415",
+      "pass": true,
+      "detail": "| SD-S05 | 一键解约·银行侧 | \"帮我取消XX\"（直连代扣） | 路由判定→后果告知→**节点B用户确认**→解约AP"
+    },
+    {
+      "check": "引文 S09 subscriptions-v1.5.md:281",
+      "pass": true,
+      "detail": "│ 路径 B：分通道直达指引（微信/支付宝/商店通道）    │"
+    },
+    {
+      "check": "引文 S09 subscriptions-v1.5.md:283",
+      "pass": true,
+      "detail": "│   → 系统支持的快捷跳转用深链（如 App Store 订阅    │"
+    },
+    {
+      "check": "引文 S09 subscriptions-v1.5.md:285",
+      "pass": true,
+      "detail": "│   → 不承诺\"跳到具体商户那一页\"（微信/支付宝自动    │"
+    },
+    {
+      "check": "引文 S09 subscriptions-v1.5.md:288",
+      "pass": true,
+      "detail": "│   → 分步指引浮层，每步配截图说明+当前步高亮        │"
+    },
+    {
+      "check": "引文 S09 subscriptions-v1.5.md:289",
+      "pass": true,
+      "detail": "│   → 最后一步用户亲手确认                          │"
+    },
+    {
+      "check": "引文 S09 subscriptions-v1.5.md:416",
+      "pass": true,
+      "detail": "| SD-S06 | 一键解约·通道直达 | \"帮我取消XX\"（微信/支付宝/商店） | 路由判定→深链+分步浮层→用户手动完成→"
+    },
+    {
+      "check": "引文 S10 subscriptions-v1.5.md:296",
+      "pass": true,
+      "detail": "│   · 银行侧解约：协议状态即时可查，回执即闭环      │"
+    },
+    {
+      "check": "引文 S10 subscriptions-v1.5.md:327",
+      "pass": true,
+      "detail": "- 解约后 7 天内提供\"恢复协议\"入口（若商户侧协议仍存在）"
+    },
+    {
+      "check": "引文 S10 subscriptions-v1.5.md:328",
+      "pass": true,
+      "detail": "- 每次解约生成电子回执（时间、协议号、操作人、确认记录），支持导出"
+    },
+    {
+      "check": "引文 S10 subscriptions-v1.5.md:417",
+      "pass": true,
+      "detail": "| SD-S07 | 停扣闭环验证（v1.4 分级定稿，3-A1） | 解约完成 / 预期停扣日到达 | ①银行侧解约：协议状态即"
+    },
+    {
+      "check": "引文 S11 subscriptions-v1.5.md:299",
+      "pass": true,
+      "detail": "│     闭环=扣款日事后确认（月付快、年付慢）        │"
+    },
+    {
+      "check": "引文 S11 subscriptions-v1.5.md:300",
+      "pass": true,
+      "detail": "│     + 到期前 T-30 复核提醒（弱确认，如实告知）   │"
+    },
+    {
+      "check": "引文 S11 subscriptions-v1.5.md:301",
+      "pass": true,
+      "detail": "│   → 解约后记录\"预期停扣日\"                      │"
+    },
+    {
+      "check": "引文 S11 subscriptions-v1.5.md:302",
+      "pass": true,
+      "detail": "│   → 下周期自动验证：扣款未发生 ✅ → 报告用户      │"
+    },
+    {
+      "check": "引文 S11 subscriptions-v1.5.md:417",
+      "pass": true,
+      "detail": "| SD-S07 | 停扣闭环验证（v1.4 分级定稿，3-A1） | 解约完成 / 预期停扣日到达 | ①银行侧解约：协议状态即"
+    },
+    {
+      "check": "引文 S11 subscriptions-v1.5.md:546",
+      "pass": true,
+      "detail": "| 1:30 | 鹅豆展示闭环任务卡（**真正高潮**，v1.2 升级） | \"解约状态我已确认。多邻国是年付，到期前 30 天我"
+    },
+    {
+      "check": "引文 S12 subscriptions-v1.5.md:303",
+      "pass": true,
+      "detail": "│   → 若仍被扣款 🚨 → 异常告警 + 一键生成          │"
+    },
+    {
+      "check": "引文 S12 subscriptions-v1.5.md:304",
+      "pass": true,
+      "detail": "│     申诉材料（协议解约回执 + 扣款记录 +          │"
+    },
+    {
+      "check": "引文 S12 subscriptions-v1.5.md:305",
+      "pass": true,
+      "detail": "│     12315 投诉模板）                            │"
+    },
+    {
+      "check": "引文 S12 subscriptions-v1.5.md:108",
+      "pass": true,
+      "detail": "| ③ 一键取消 | 用户指令（\"帮我取消 XX\"） | 通道路由判定 → 银行侧协议解约 或 分通道直达步骤 → 确认闭环跟踪 "
+    },
+    {
+      "check": "引文 S13 subscriptions-v1.5.md:79",
+      "pass": true,
+      "detail": "- ❌ 不服务贷款/分期/助贷类代扣（监管敏感，识别模型主动排除）"
+    },
+    {
+      "check": "引文 S13 subscriptions-v1.5.md:321",
+      "pass": true,
+      "detail": "- 助学贷款还款、社保/医保代扣、学费代扣、房租（长租公寓备案合同）、物业费"
+    },
+    {
+      "check": "引文 S13 subscriptions-v1.5.md:322",
+      "pass": true,
+      "detail": "- **合约期/分期型订阅（v1.2 新增，S-D4）**：健身房年卡合约期、课程分期、\"先学后付\"等——识别特征命中时不给一键解"
+    },
+    {
+      "check": "引文 S13 subscriptions-v1.5.md:323",
+      "pass": true,
+      "detail": "- 话术：\"这笔是你的助学贷款还款代扣，解除协议不会免除还款义务，还可能影响征信。如果你是想调整还款方式，建议先联系学校资助中心。"
+    },
+    {
+      "check": "引文 S13 subscriptions-v1.5.md:418",
+      "pass": true,
+      "detail": "| SD-S08 | 防御性解约拦截 | 解约请求命中保护名单 | 不执行→警示话术→替代建议 | C（恒停） |"
+    },
+    {
+      "check": "引文 S13 subscriptions-v1.5.md:524",
+      "pass": true,
+      "detail": "| S-R14 | **防御性解约** | 团队伦理设计（超越合规底线） | 助学贷款/社保/房租/物业类代扣只警示不解约（SD-"
+    },
+    {
+      "check": "引文 S14 subscriptions-v1.5.md:135",
+      "pass": true,
+      "detail": "沉淀期   月度订阅报告：\"这个月你省下了 ¥58，相当于 4 杯奶茶\""
+    },
+    {
+      "check": "引文 S14 subscriptions-v1.5.md:136",
+      "pass": true,
+      "detail": "            ↓ （联动）\"要不要把这 58 设成每月自动转进小金库？\" → 跳转转账场景定时规则"
+    },
+    {
+      "check": "引文 S14 subscriptions-v1.5.md:184",
+      "pass": true,
+      "detail": "- 关键设计：外区订阅归一化（商户乱码 → 友好名 + 币种换算 + 换算汇率标注为\"参考值\"）；年度订阅报告（联动账单场景《你这"
+    },
+    {
+      "check": "引文 S14 subscriptions-v1.5.md:419",
+      "pass": true,
+      "detail": "| SD-S09 | 月度订阅报告 | 每月 1 日 | 汇总支出/省钱额/僵尸清单→（联动）跳转转账定时储蓄建议 | — |"
+    },
+    {
+      "check": "引文 S14 subscriptions-v1.5.md:547",
+      "pass": true,
+      "detail": "| 1:45 | 收尾联动 | \"这两个月你能省 65 块，要不要设成自动转进小金库？\" → 跳转转账场景 | 跨场景联动叙事 |"
+    },
+    {
+      "check": "引文 S14 subscriptions-v1.5.md:617",
+      "pass": true,
+      "detail": "5. 年度订阅报告并入账单场景《你这一年的钱的故事》的叙事分工"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:344",
+      "pass": true,
+      "detail": "**概念**：每次成功管理订阅，鹅豆获得\"免疫力\"成长值——取消一个僵尸订阅 +10，识破一个首月陷阱 +20，完成一次闭环验证 "
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:350",
+      "pass": true,
+      "detail": "| 理财操作 | 成长等级 L1-L3 | 投资认知（仅界面呈现，业务开通看标准风险测评） | 各自独立、互不叠加 |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:351",
+      "pass": true,
+      "detail": "| 订阅管理 | 订阅免疫力 Lv.1-Lv.5 | 消费防御行为质量 | 各自独立、互不叠加 |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:352",
+      "pass": true,
+      "detail": "| 卡片管理 | 守护日志 | 安全操作记录（非等级制） | 各自独立、互不叠加 |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:353",
+      "pass": true,
+      "detail": "| 账单分析 | 行为里程碑 | \"第一次看懂账单\"等事件徽章 | 各自独立、互不叠加 |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:355",
+      "pass": true,
+      "detail": "统一原则：**各场景成长值相互独立、不跨场景叠加、不兑换资金权益**，全部由鹅豆形象统一汇总呈现（用户看到的是\"一只鹅在长大\"，不"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:361",
+      "pass": true,
+      "detail": "| 首次完成订阅全景图盘点 | +5 | \"看清自己的钱\" |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:362",
+      "pass": true,
+      "detail": "| 取消僵尸订阅（每个） | +10 | \"断舍离\" |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:363",
+      "pass": true,
+      "detail": "| 识破首月陷阱（开通前预警确认） | +20 | \"没被套路\" |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:364",
+      "pass": true,
+      "detail": "| 闭环验证停扣成功（每笔） | +15 | \"说到做到\" |"
+    },
+    {
+      "check": "引文 S15 subscriptions-v1.5.md:365",
+      "pass": true,
+      "detail": "| 连续 3 个月无新增冲动订阅 | +30 | \"消费免疫力成型\" |"
+    },
+    {
+      "check": "引文 S16 subscriptions-v1.5.md:377",
+      "pass": true,
+      "detail": "**防刷规则（v1.2 新增，S-D2）**：以真实扣款发生为计分前提（未扣过款的取消不给闭环分）；同一商户 90 天内重复\"开通"
+    },
+    {
+      "check": "引文 S16 subscriptions-v1.5.md:421",
+      "pass": true,
+      "detail": "| SD-S11 | 订阅免疫力结算（v1.2 增防刷，S-D2） | SD-S05/S07/S04 成功事件 | 行为判定→**"
+    },
+    {
+      "check": "引文 S17 subscriptions-v1.5.md:397",
+      "pass": true,
+      "detail": "### ④ 「订阅葬礼」· 毕业清理仪式（情感层，路演素材）"
+    },
+    {
+      "check": "引文 S17 subscriptions-v1.5.md:399",
+      "pass": true,
+      "detail": "**概念**：检测到毕业季（6 月），鹅豆发起\"订阅葬礼\"：\"你要离开学校了。这四年你一共开过 23 个订阅，现在还活着 7 个。"
+    },
+    {
+      "check": "引文 S17 subscriptions-v1.5.md:401",
+      "pass": true,
+      "detail": "**定位说明**：学生价到期提醒（Should 级功能）被包装成情感节点，功能与叙事二合一；传播属性强（毕业生自发晒证书）。不占用"
+    },
+    {
+      "check": "引文 S17 subscriptions-v1.5.md:614",
+      "pass": true,
+      "detail": "2. **订阅葬礼 · 毕业清理仪式**（5.5④）：执行细节归路演文档第五幕统筹，触发器复用 SD-S09 改造"
+    },
+    {
+      "check": "引文 S18 subscriptions-v1.5.md:420",
+      "pass": true,
+      "detail": "| SD-S10 | 截图 OCR 导入（v1.2 修订，S-F1） | 用户上传扣款截图 | OCR **端侧完成**→要素抽取"
+    },
+    {
+      "check": "引文 S18 subscriptions-v1.5.md:516",
+      "pass": true,
+      "detail": "| S-R6 | **端侧优先、脱敏上传** | 附件3 个保法映射 | 原始账单/短信原文不落服务器；卡号、流水号脱敏展示；**"
+    },
+    {
+      "check": "引文 S19 subscriptions-v1.5.md:63",
+      "pass": true,
+      "detail": "| ① | 自动识别订阅扣费 | **读**：从交易流水/短信/截图识别周期性扣费，聚合成订阅清单 | 敏感个人信息，单独同意，端"
+    },
+    {
+      "check": "引文 S19 subscriptions-v1.5.md:86",
+      "pass": true,
+      "detail": "3. **识别靠授权，不上传原文**：读取短信/账单是敏感个人信息，逐项单独同意；原始账单端侧处理，脱敏后才可上传。"
+    },
+    {
+      "check": "引文 S19 subscriptions-v1.5.md:115",
+      "pass": true,
+      "detail": "| ② 完成它需要哪些信息和授权？ | 交易流水读取（基础授权）；短信读取（**单独同意**，可拒绝，拒绝后仅损失短信通道识别能力"
+    },
+    {
+      "check": "引文 S19 subscriptions-v1.5.md:515",
+      "pass": true,
+      "detail": "| S-R5 | **敏感信息单独同意** | 个保法；《常见类型移动互联网应用程序必要个人信息范围规定》 | 短信读取逐项单独授"
+    },
+    {
+      "check": "引文 S19 subscriptions-v1.5.md:580",
+      "pass": true,
+      "detail": "> A：三条合规冷启动路径：已授权的交易流水（主源）、短信读取（单独同意，可拒绝）、截图 OCR 导入（用户主动行为）。我们不碰任"
+    },
+    {
+      "check": "引文 S20 subscriptions-v1.5.md:57",
+      "pass": true,
+      "detail": "- **栗子**（职场第一年，24 岁，月薪 7500 税后到手，v1.5 对齐全局画像口径，原\"8000\"不一致）：订阅膨胀期—"
+    },
+    {
+      "check": "引文 S20 subscriptions-v1.5.md:182",
+      "pass": true,
+      "detail": "- 核心痛点：P3/P7/P8（低估 2.5 倍 + 五通道碎片 + 外区订阅）"
+    },
+    {
+      "check": "引文 S20 subscriptions-v1.5.md:183",
+      "pass": true,
+      "detail": "- 订阅画像：月合计 300-600 元，含外币扣款，iCloud/Adobe/健身/流媒体"
+    },
+    {
+      "check": "引文 S20 subscriptions-v1.5.md:184",
+      "pass": true,
+      "detail": "- 关键设计：外区订阅归一化（商户乱码 → 友好名 + 币种换算 + 换算汇率标注为\"参考值\"）；年度订阅报告（联动账单场景《你这"
+    },
+    {
+      "check": "引文 S20 subscriptions-v1.5.md:239",
+      "pass": true,
+      "detail": "- **商户归一化**：\"APPLE.COM/BILL 866-712-7753\" → \"苹果应用商店订阅\"，外区乱码商户 → 友"
+    },
+    {
+      "check": "引文 S20 subscriptions-v1.5.md:616",
+      "pass": true,
+      "detail": "4. 外区订阅汇率参考值的免责话术细化"
+    },
+    {
+      "check": "引文 S21 subscriptions-v1.5.md:172",
+      "pass": true,
+      "detail": "- 传播点：宿舍场景——\"我们宿舍 4 个人拼一个会员\"的拼车分账（Could 级，联动转账）"
+    },
+    {
+      "check": "引文 S21 subscriptions-v1.5.md:391",
+      "pass": true,
+      "detail": "### ③ 「宿舍团购哨兵」· 隐私保护拼会员（P1 候选）"
+    },
+    {
+      "check": "引文 S21 subscriptions-v1.5.md:393",
+      "pass": true,
+      "detail": "**概念**：宿舍 4 人拼一个视频会员，各自授权后鹅豆只输出聚合结果：\"本月拼车 3/4 已到账，人均 ¥6.25\"——**谁也"
+    },
+    {
+      "check": "引文 S21 subscriptions-v1.5.md:395",
+      "pass": true,
+      "detail": "**定位说明（v1.3 修订，董小峰会议结论）**：~~联邦学习第二战场~~ **技术口径与账单场景扩展 1 同步降级**——董小"
+    },
+    {
+      "check": "引文 S21 subscriptions-v1.5.md:613",
+      "pass": true,
+      "detail": "1. **宿舍团购哨兵 · 隐私保护拼会员**（5.5③，P1 候选）：需与转账场景 AA 收款联调；技术口径 v1.3 已降级为"
+    },
+    {
+      "check": "引文 S22 subscriptions-v1.5.md:615",
+      "pass": true,
+      "detail": "3. 学生价资格提醒与学信网认证联动的可行性评估"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:84",
+      "pass": true,
+      "detail": "1. **解约 ≠ 退订 ≠ 退款**：三段式话术必须讲清——解除代扣协议（银行侧，下期扣不到钱）≠ 取消服务合约（商户侧，已购周"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:85",
+      "pass": true,
+      "detail": "2. **每次解约都必须用户本人确认**：AI 可以找入口、列后果、给步骤，但\"确认解除协议\"的按钮只能用户亲手点——纲领第三节\""
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:86",
+      "pass": true,
+      "detail": "3. **识别靠授权，不上传原文**：读取短信/账单是敏感个人信息，逐项单独同意；原始账单端侧处理，脱敏后才可上传。"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:87",
+      "pass": true,
+      "detail": "4. **防御性解约**：物业费、助学贷款、社保代扣识别为\"不建议解约\"，给出后果警示而非一键按钮。"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:88",
+      "pass": true,
+      "detail": "5. **不默认勾选、不诱导**：对齐《网络交易监督管理办法》第十条与 2026-04-10 施行的《互联网平台价格行为规则》。"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:521",
+      "pass": true,
+      "detail": "| S-R11 | **未成年保护** | 个保法未成年条款 | 18 岁以下用户：防沉迷式提醒、不做个性化推送诱导；未满 14 "
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:522",
+      "pass": true,
+      "detail": "| S-R12 | **不推荐开启免密支付** | 中消协\"非必要不开启免密支付\"建议 | 产品内无任何免密支付引导 |"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:523",
+      "pass": true,
+      "detail": "| S-R13 | **宣传不夸大** | 附件3 | 不承诺\"帮你省 XX 元\"具体数字；不虚构与平台合作关系 |"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:525",
+      "pass": true,
+      "detail": "| S-R15 | **平台对抗法务声明** | Rocket Money 代办模式的法律风险教训 | 本方案只做\"指引+协议解约"
+    },
+    {
+      "check": "引文 S23 subscriptions-v1.5.md:526",
+      "pass": true,
+      "detail": "| S-R16 | **游戏化不攀比不诱导** | S-R13 延伸；团队伦理设计 | 免疫力成长值不挂钩资金权益、无用户间排行榜"
+    },
+    {
+      "check": "引文 T01 transfer-v2.5.md:203",
+      "pass": true,
+      "detail": "1. **联系人解析**：\"给张伟转 50 饭钱\" → 命中 3 个\"张伟\""
+    },
+    {
+      "check": "引文 T01 transfer-v2.5.md:290",
+      "pass": true,
+      "detail": "### TF-T01 按人名转账（多步规划主展示，评审 40%）"
+    },
+    {
+      "check": "引文 T02 transfer-v2.5.md:212",
+      "pass": true,
+      "detail": "**关系分层**（调研 4.1）：好友/同学快转；新同事/房东默认延时到账；陌生人风控+凭证。分层由用户标注 + 行为推断（可改）"
+    },
+    {
+      "check": "引文 T02 transfer-v2.5.md:277",
+      "pass": true,
+      "detail": "| `contact.manage` | \"把室友存成'伟哥'\" | （CRUD，字段注入隔离） |"
+    },
+    {
+      "check": "引文 T03 transfer-v2.5.md:308",
+      "pass": true,
+      "detail": "### TF-T02 按手机号转账（v2.1：户名核验式，防枚举滥用）"
+    },
+    {
+      "check": "引文 T04 transfer-v2.5.md:239",
+      "pass": true,
+      "detail": "### 两个辅助能力"
+    },
+    {
+      "check": "引文 T04 transfer-v2.5.md:332",
+      "pass": true,
+      "detail": "### TF-T03 备注语义化（v2.1：敏感词加模板白名单）"
+    },
+    {
+      "check": "引文 T05 transfer-v2.5.md:427",
+      "pass": true,
+      "detail": "### TF-T09 确认分级路由（阈值矩阵；v2.1：新增\"结算方式\"列）"
+    },
+    {
+      "check": "引文 T06 transfer-v2.5.md:441",
+      "pass": true,
+      "detail": "### TF-T10 撤销与延时窗口（v2.1 重定性：撤销的是指令，不是资金）"
+    },
+    {
+      "check": "引文 T07 transfer-v2.5.md:406",
+      "pass": true,
+      "detail": "### TF-T08 防骗雷达（状态机，评审 30% 主演示）"
+    },
+    {
+      "check": "引文 T07 transfer-v2.5.md:582",
+      "pass": true,
+      "detail": "> **（安全高潮）** 小知刷到\"兼职刷单\"广告：\"帮我给这个号转 500 保证金，客服说做完单就退。\""
+    },
+    {
+      "check": "引文 T08 transfer-v2.5.md:365",
+      "pass": true,
+      "detail": "### TF-T05 AA 发起（规则前置；v2.1：沙箱限额参数）"
+    },
+    {
+      "check": "引文 T08 transfer-v2.5.md:553",
+      "pass": true,
+      "detail": "| T-R6 | AA 不得异化为资金池/二清/变相借贷/非法集资 | 非银支付条例、非法集资条例 | 熟人邀请制+**沙箱限额（"
+    },
+    {
+      "check": "引文 T09 transfer-v2.5.md:379",
+      "pass": true,
+      "detail": "### TF-T06 AA 自然语言改算"
+    },
+    {
+      "check": "引文 T10 transfer-v2.5.md:218",
+      "pass": true,
+      "detail": "1. **规则前置**：先定分摊方式（人均/按项目/有人免付/含服务费）→ 规则发参与者确认 → 确认后生成应收"
+    },
+    {
+      "check": "引文 T10 transfer-v2.5.md:374",
+      "pass": true,
+      "detail": "├─ Step3 [工具] aa.create(total=288, split_json) → 规则发参与者确认（规则前置！）"
+    },
+    {
+      "check": "引文 T11 transfer-v2.5.md:220",
+      "pass": true,
+      "detail": "3. **跨平台发出**：逐个发出（同 App 用户）或生成**收款信息卡片+链接页**（v2.1 修订：链接页仅展示脱敏收款信息"
+    },
+    {
+      "check": "引文 T11 transfer-v2.5.md:242",
+      "pass": true,
+      "detail": "- **跨平台收款卡片**：对方无需同 App——收款信息卡片/链接页展示脱敏收款信息，支付在对方自己的 App 完成（v2.1 "
+    },
+    {
+      "check": "引文 T12 transfer-v2.5.md:224",
+      "pass": true,
+      "detail": "> **支付状态口径（v2.3 修订，外部挑刺 A3——诚实分界）**：代催状态机的\"已付/未付\"分通道获得——**同 App（微"
+    },
+    {
+      "check": "引文 T12 transfer-v2.5.md:400",
+      "pass": true,
+      "detail": "收齐: \"288收齐了。本月你发起AA共收回620。\""
+    },
+    {
+      "check": "引文 T13 transfer-v2.5.md:388",
+      "pass": true,
+      "detail": "### TF-T07 阶梯代催（状态机；v2.1：双通道，Agent 不入群）"
+    },
+    {
+      "check": "引文 T13 transfer-v2.5.md:577",
+      "pass": true,
+      "detail": "> （24 小时后，自动代催——无需问发起人，对齐 TF-T07，v2.3 B3）鹅豆：\"我已经私下提醒了还没付的两位：'嗨，昨晚"
+    },
+    {
+      "check": "引文 T14 transfer-v2.5.md:222",
+      "pass": true,
+      "detail": "5. **收齐汇总**：\"288 收齐，本月你发起 AA 共收回 620\" → 关系账本归档；逾期未付转入关系账本记录，不公开羞辱"
+    },
+    {
+      "check": "引文 T14 transfer-v2.5.md:400",
+      "pass": true,
+      "detail": "收齐: \"288收齐了。本月你发起AA共收回620。\""
+    },
+    {
+      "check": "引文 T15 transfer-v2.5.md:145",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：资金日历同历呈现三个日子；扣款前 3 天提醒\"余额够，放心\"；水电账单拍照进来 3 人长期 AA 自动结算；随礼"
+    },
+    {
+      "check": "引文 T15 transfer-v2.5.md:170",
+      "pass": true,
+      "detail": "| AA 收款 | **银行侧基本空白**，微信/支付宝群收款垄断 | **Monzo Split**（均分/比例/份额 + Ru"
+    },
+    {
+      "check": "引文 T16 transfer-v2.5.md:228",
+      "pass": true,
+      "detail": "### 支柱 3：周期资金日历"
+    },
+    {
+      "check": "引文 T16 transfer-v2.5.md:346",
+      "pass": true,
+      "detail": "### TF-T04 定时转账 + 资金日历"
+    },
+    {
+      "check": "引文 T16 transfer-v2.5.md:579",
+      "pass": true,
+      "detail": "> 小知：\"对了，每月 1 号帮我转 200 进毕业旅行小金库。\"（演示资金日历：发生活费的日子和小金库日同历点亮，并提示\"这笔会"
+    },
+    {
+      "check": "引文 T17 transfer-v2.5.md:354",
+      "pass": true,
+      "detail": "执行前（T-3天）:"
+    },
+    {
+      "check": "引文 T18 transfer-v2.5.md:359",
+      "pass": true,
+      "detail": "执行日:"
+    },
+    {
+      "check": "引文 T18 transfer-v2.5.md:552",
+      "pass": true,
+      "detail": "| T-R5 | 定时任务可查询/可改/可撤；失败幂等；禁默认续期 | 消保办法 | TF-T04 任务级凭证+到期前提醒+**一"
+    },
+    {
+      "check": "引文 T19 transfer-v2.5.md:351",
+      "pass": true,
+      "detail": "├─ [硬护栏 T-R5] 单独明示授权 + 告知\"随时可改可停\""
+    },
+    {
+      "check": "引文 T19 transfer-v2.5.md:512",
+      "pass": true,
+      "detail": "rule.create / rule.update / rule.cancel   # 定时规则 CRUD"
+    },
+    {
+      "check": "引文 T19 transfer-v2.5.md:552",
+      "pass": true,
+      "detail": "| T-R5 | 定时任务可查询/可改/可撤；失败幂等；禁默认续期 | 消保办法 | TF-T04 任务级凭证+到期前提醒+**一"
+    },
+    {
+      "check": "引文 T20 transfer-v2.5.md:235",
+      "pass": true,
+      "detail": "5. **执行后回执**：电子回执自动归档（押金/房租/报销的辅助举证）"
+    },
+    {
+      "check": "引文 T20 transfer-v2.5.md:464",
+      "pass": true,
+      "detail": "### TF-T11 对账 / 凭证导出"
+    },
+    {
+      "check": "引文 T21 transfer-v2.5.md:139",
+      "pass": true,
+      "detail": "- 与鹅豆的一天：转押金触发新收款人升级确认+户名核验+默认延迟到账+电子回执归档进\"租住\"文件夹；垫付标记\"待报销\"，到账自动核"
+    },
+    {
+      "check": "引文 T21 transfer-v2.5.md:467",
+      "pass": true,
+      "detail": "\"这个月转给谁最多\" → [工具] transfer.list(period) → 分类汇总（餐饮/AA/房租/借款）"
+    },
+    {
+      "check": "引文 T22 transfer-v2.5.md:91",
+      "pass": true,
+      "detail": "| 对账与关系账本 | TF-T11b | \"我借出去多少、谁还没还\"月度清单；对接账单分析场景（《账单分析场景·设计文档》v1."
+    },
+    {
+      "check": "引文 T22 transfer-v2.5.md:472",
+      "pass": true,
+      "detail": "> **关系账本三原则（v2.1 新增，D3）**：① 仅本人可见（绝不社交化展示）；② 可一键删除（个保法删除权）；③ 页面显著"
+    },
+    {
+      "check": "引文 T23 transfer-v2.5.md:57",
+      "pass": true,
+      "detail": "| 按人名转账 | \"给张伟转 50 饭钱\" | 通讯录（单独授权 T-R9，拒绝可手输）、历史转账记录、账户信息 | 联系人解析"
+    },
+    {
+      "check": "引文 T23 transfer-v2.5.md:556",
+      "pass": true,
+      "detail": "| T-R9 | 通讯录/人脸/位置单独授权、可关闭；拒绝不影响基础服务 | 个保法、消保办法 | 通讯录匹配默认关、单独授权；拒"
+    },
+    {
+      "check": "引文 T24 transfer-v2.5.md:474",
+      "pass": true,
+      "detail": "### TF-T12 字段注入隔离（贯穿性硬护栏，P0-2）"
+    },
+    {
+      "check": "引文 T24 transfer-v2.5.md:528",
+      "pass": true,
+      "detail": "- **依据句规范（设计纲领·纲领四，v2.2 新增）**：**话术三分层**——事实（流水/账户数据）/ 推断（分类、关系分层、"
+    },
+    {
+      "check": "引文 T24 transfer-v2.5.md:550",
+      "pass": true,
+      "detail": "| T-R3 | 指令真实、完整、可追溯；记录保存 ≥10 年 | 《金融机构客户尽职调查和客户身份资料及交易记录保存管理办法》（"
+    },
+    {
+      "check": "引文 W01 wealth-v1.8.md:246",
+      "pass": true,
+      "detail": "用户一句话创建：\"帮我建一个毕业旅行小金库，目标 3000，明年 6 月前存够。\""
+    },
+    {
+      "check": "引文 W01 wealth-v1.8.md:388",
+      "pass": true,
+      "detail": "### TF-01 创建目标储蓄（多步规划样板，评审 40% 的主展示）"
+    },
+    {
+      "check": "引文 W02 wealth-v1.8.md:250",
+      "pass": true,
+      "detail": "2. **自动锁定**：到账触发，按比例转入子账户，可写心情备注"
+    },
+    {
+      "check": "引文 W02 wealth-v1.8.md:727",
+      "pass": true,
+      "detail": "> 小知：\"刚发了 800 块兼职费。\""
+    },
+    {
+      "check": "引文 W03 wealth-v1.8.md:252",
+      "pass": true,
+      "detail": "4. **柔性取用**：急用可取出，但企鹅温柔提醒（\"取出后旅行小金库要延期 1 个月，确定吗？\"）——用对话成本代替锁死"
+    },
+    {
+      "check": "引文 W03 wealth-v1.8.md:361",
+      "pass": true,
+      "detail": "| `goal_fund.withdraw` | \"小金库里取 500 急用\" | TF-03（柔性提醒） |"
+    },
+    {
+      "check": "引文 W04 wealth-v1.8.md:254",
+      "pass": true,
+      "detail": "6. **可改可停（v1.3 补）**：改目标金额、延期、暂停自动锁定都一句话完成（TF-19）；暂停自动锁定即时生效、随时可恢复"
+    },
+    {
+      "check": "引文 W04 wealth-v1.8.md:518",
+      "pass": true,
+      "detail": "**TF-19 目标储蓄修改**"
+    },
+    {
+      "check": "引文 W05 wealth-v1.8.md:254",
+      "pass": true,
+      "detail": "6. **可改可停（v1.3 补）**：改目标金额、延期、暂停自动锁定都一句话完成（TF-19）；暂停自动锁定即时生效、随时可恢复"
+    },
+    {
+      "check": "引文 W05 wealth-v1.8.md:522",
+      "pass": true,
+      "detail": "└─ 暂停自动锁定 → [硬护栏 R6] 即时生效 + 告知\"随时可以说恢复\""
+    },
+    {
+      "check": "引文 W06 wealth-v1.8.md:253",
+      "pass": true,
+      "detail": "5. **兑现仪式**：目标达成主动祝贺 + 生成可分享的\"成长报告\""
+    },
+    {
+      "check": "引文 W06 wealth-v1.8.md:743",
+      "pass": true,
+      "detail": "> **收尾**：时间快进半年，应急金达标，企鹅戴上绅士领结：\"你现在比我刚认识你时，厉害多啦。\""
+    },
+    {
+      "check": "引文 W07 wealth-v1.8.md:124",
+      "pass": true,
+      "detail": "- **与财富鹅的一天**：生活费到账 → 企鹅提醒\"先存后花\"，自动锁 150 进\"演唱会小金库\"；深夜逛直播间想买 399 的"
+    },
+    {
+      "check": "引文 W07 wealth-v1.8.md:131",
+      "pass": true,
+      "detail": "- **与财富鹅的一天**：实习工资到账 → 按预设规则 30% 自动锁定\"毕业过渡小金库\"；说\"剩的钱想试试理财\" → 企鹅先带"
+    },
+    {
+      "check": "引文 W07 wealth-v1.8.md:138",
+      "pass": true,
+      "detail": "- **与财富鹅的一天**：发薪日 → 企鹅按上月一起定的规则自动划转：房租+生活预算留足后，1500 进应急金目标、500 进债"
+    },
+    {
+      "check": "引文 W07 wealth-v1.8.md:398",
+      "pass": true,
+      "detail": "│         [护栏 R6] 自动规则单独明示授权、告知可随时撤销、扣款前提醒"
+    },
+    {
+      "check": "引文 W08 wealth-v1.8.md:263",
+      "pass": true,
+      "detail": "- 剧本 1《500 元的抉择》：结余分配（储蓄/消费/基金的区别）——**兼作债券基金认知课程**"
+    },
+    {
+      "check": "引文 W08 wealth-v1.8.md:269",
+      "pass": true,
+      "detail": "> **⚠️ 定性（v1.5，D1）**：剧本是**投教工具/演示道具**，不承担合规适当性测评职能。剧情中的行为信号（risk_"
+    },
+    {
+      "check": "引文 W08 wealth-v1.8.md:730",
+      "pass": true,
+      "detail": "> 企鹅：\"可以。债基定投需要先完成两步：债券基金认知课（就是剧本《500 元的抉择》，3 分钟）和一次正式风险测评。先来上课？\""
+    },
+    {
+      "check": "引文 W09 wealth-v1.8.md:264",
+      "pass": true,
+      "detail": "- 剧本 2《骗子来了》：识别\"高收益稳赚\"话术（联动安全故事线）"
+    },
+    {
+      "check": "引文 W09 wealth-v1.8.md:131",
+      "pass": true,
+      "detail": "- **与财富鹅的一天**：实习工资到账 → 按预设规则 30% 自动锁定\"毕业过渡小金库\"；说\"剩的钱想试试理财\" → 企鹅先带"
+    },
+    {
+      "check": "引文 W10 wealth-v1.8.md:265",
+      "pass": true,
+      "detail": "- 剧本 3《定投的威力》：用用户自己的结余数字算账（含分红方式知识点）"
+    },
+    {
+      "check": "引文 W10 wealth-v1.8.md:87",
+      "pass": true,
+      "detail": "| 分红方式设置 | （剧本教学点） | 现金分红 vs 红利再投资，塞进剧本 3 做知识点，demo 不单列 |"
+    },
+    {
+      "check": "引文 W11 wealth-v1.8.md:439",
+      "pass": true,
+      "detail": "**正式风险测评（TF-06，合规本体）**：题目来自持牌机构标准风险承受能力问卷（含财务状况、投资经验、投资目标、风险偏好），对"
+    },
+    {
+      "check": "引文 W11 wealth-v1.8.md:472",
+      "pass": true,
+      "detail": "剧本行为信号（risk_signal）仅作**企鹅性格演化与投教内容推荐的辅助参考**，与 `risk_profile` 的合规测"
+    },
+    {
+      "check": "引文 W11 wealth-v1.8.md:733",
+      "pass": true,
+      "detail": "> （对话式标准问卷 5 题，含财务状况题；测评结果 R2 稳健型）"
+    },
+    {
+      "check": "引文 W12 wealth-v1.8.md:101",
+      "pass": true,
+      "detail": "> **年龄门槛（v1.5 补，D2）**：理财/基金开户要求年满 18 周岁且具备完全民事行为能力。产品交易功能仅向 18+ 用"
+    },
+    {
+      "check": "引文 W12 wealth-v1.8.md:277",
+      "pass": true,
+      "detail": "| L1 新手 | 完成**标准风险测评**（对话式呈现，题目来自持牌机构标准问卷，含财务状况题） | 货币基金/零钱通类的讲解与"
+    },
+    {
+      "check": "引文 W12 wealth-v1.8.md:410",
+      "pass": true,
+      "detail": "├─ [硬护栏0] 年龄检查: user.age >= 18 ?  （D2）"
+    },
+    {
+      "check": "引文 W13 wealth-v1.8.md:287",
+      "pass": true,
+      "detail": "- **重测机制（v1.5 修订，F1）**：监管要求\"定期或不定期\"重新评估，无统一年限；本方案按机构内部标准设有效期 1 年。"
+    },
+    {
+      "check": "引文 W13 wealth-v1.8.md:526",
+      "pass": true,
+      "detail": "**TF-20 风险重测与到期提醒**"
+    },
+    {
+      "check": "引文 W13 competitor-workflows.md:186",
+      "pass": true,
+      "detail": "- 首次购买公募基金、代销理财和信托计划等前，必须填写《个人客户风险测评问卷》；风险评估结果有效期 **12 个月**，超期或财务"
+    },
+    {
+      "check": "引文 W14 wealth-v1.8.md:42",
+      "pass": true,
+      "detail": "| 产品推荐与对比 | 从海量产品中选出\"适合我的\" | 看不懂说明书、不知风险等级、选择困难、社恐不敢问 | 企鹅导购：递意图卡"
+    },
+    {
+      "check": "引文 W14 wealth-v1.8.md:52",
+      "pass": true,
+      "detail": "| 产品推荐与对比 | \"我有 500 块结余，能买点啥\"\"这两个基金哪个好\" | 风险测评画像（合规测评，有效期内）、产品要素数"
+    },
+    {
+      "check": "引文 W14 competitor-workflows.md:148",
+      "pass": true,
+      "detail": "### 微众银行：货架式陈列 + 场景专区，\"对比\"靠详情页要素自行比对"
+    },
+    {
+      "check": "引文 W14 competitor-workflows.md:165",
+      "pass": true,
+      "detail": "- 入口：手机银行「财富/理财」频道 → 基金 / 理财 / 代销资管 / 结构性存款分类；可按类型、风险等级、业绩筛选。"
+    },
+    {
+      "check": "引文 W15 wealth-v1.8.md:544",
+      "pass": true,
+      "detail": "**TF-22 单品详情查询**"
+    },
+    {
+      "check": "引文 W15 wealth-v1.8.md:594",
+      "pass": true,
+      "detail": "products(id, name, type, risk_level, min_amount, nav, max_drawdow"
+    },
+    {
+      "check": "引文 W15 competitor-workflows.md:166",
+      "pass": true,
+      "detail": "- 产品风险等级 R1—R5 展示于详情页（要素、净值走势、费率、销售文件）。"
+    },
+    {
+      "check": "引文 W16 wealth-v1.8.md:30",
+      "pass": true,
+      "detail": "> **内部视角背书（v1.7，董小峰会议）**：理财操作被明确为六大场景中**\"想象空间最大、最推荐聚焦\"**的场景——售前售中"
+    },
+    {
+      "check": "引文 W16 wealth-v1.8.md:313",
+      "pass": true,
+      "detail": "学 Erica：企鹅明确\"我给信息，最终决策在你\"；**产品推荐与对比只做客观信息陈列**（要素、风险等级、历史表现并标注\"历史业"
+    },
+    {
+      "check": "引文 W16 wealth-v1.8.md:366",
+      "pass": true,
+      "detail": "| `product.compare` | \"这两个基金哪个好\" | TF-08（要素对比，不下结论） |"
+    },
+    {
+      "check": "引文 W16 competitor-workflows.md:158",
+      "pass": true,
+      "detail": "4. 对比呈现：同屏展示多基金涨跌幅与限额，但**无多产品要素并列对比工具**——费率、持仓、回撤等需逐个进入详情页自行比对。"
+    },
+    {
+      "check": "引文 W17 wealth-v1.8.md:417",
+      "pass": true,
+      "detail": "├─ [硬护栏3] 费率明示 + 风险揭示朗读 + 显式确认（用户必须说\"确认\"）（F5/R3）"
+    },
+    {
+      "check": "引文 W17 wealth-v1.8.md:734",
+      "pass": true,
+      "detail": "> 企鹅：\"测出来啦，你是一只稳重鹅（R2）。最后一步，我念一遍费用和风险：这只债基申购费 1 折约 0.05%、年管理费 0.6"
+    },
+    {
+      "check": "引文 W18 wealth-v1.8.md:510",
+      "pass": true,
+      "detail": "**TF-18 定投计划管理**（错误恢复能力的定投入口）"
+    },
+    {
+      "check": "引文 W18 competitor-workflows.md:222",
+      "pass": true,
+      "detail": "2. 扣款日账户状态不正常或余额不足 = 当次失败；**连续三次扣款失败，定投申请自动取消**。"
+    },
+    {
+      "check": "引文 W19 wealth-v1.8.md:496",
+      "pass": true,
+      "detail": "**TF-16 撤单**"
+    },
+    {
+      "check": "引文 W19 wealth-v1.8.md:747",
+      "pass": true,
+      "detail": "**一段戏命中的评审点**：意图识别、多步规划（存钱→课程→标准测评→费率与风险揭示→下单五步）、适当性管理（画像+课程门槛、留痕"
+    },
+    {
+      "check": "引文 W19 competitor-workflows.md:212",
+      "pass": true,
+      "detail": "- 撤单：认购、申购（不含定投）与赎回在**当日交易截止时间前可撤单，且均为全额撤单**。"
+    },
+    {
+      "check": "引文 W20 wealth-v1.8.md:296",
+      "pass": true,
+      "detail": "4. **赎回完整链**（TF-10 扩展）：到账时间、赎回费、部分赎回全说明；赎回是留痕重点环节，合规上比申购更需要完整流程"
+    },
+    {
+      "check": "引文 W20 wealth-v1.8.md:618",
+      "pass": true,
+      "detail": "order.redeem(user_id, order_id, {partial_amount?})          # v1."
+    },
+    {
+      "check": "引文 W20 wealth-v1.8.md:741",
+      "pass": true,
+      "detail": "> 小知：\"那……要跑吗？\""
+    },
+    {
+      "check": "引文 W20 competitor-workflows.md:227",
+      "pass": true,
+      "detail": "1. 基金持仓 → 选基金 →「赎回」→ 全部或部分份额 → 确认费率与预计到账 → 认证提交。"
+    },
+    {
+      "check": "引文 W21 wealth-v1.8.md:476",
+      "pass": true,
+      "detail": "**TF-14 持仓与资产总览**（售后双子星之一，demo 必演）"
+    },
+    {
+      "check": "引文 W21 wealth-v1.8.md:740",
+      "pass": true,
+      "detail": "> 企鹅：\"你一共投了 200（试投 100 + 两次定投各 50），现在 203.6——数字是涨的，但历史业绩不代表未来哦。今天"
+    },
+    {
+      "check": "引文 W22 wealth-v1.8.md:294",
+      "pass": true,
+      "detail": "2. **收益播报与盯盘**（TF-15）：用户订阅（\"跌了告诉我\"）+ 净值更新 + 异动阈值三触发；播报 = 事实 + 陪伴，"
+    },
+    {
+      "check": "引文 W22 wealth-v1.8.md:486",
+      "pass": true,
+      "detail": "**TF-15 收益播报与盯盘 / 画像偏离事实提示**"
+    },
+    {
+      "check": "引文 W23 wealth-v1.8.md:504",
+      "pass": true,
+      "detail": "**TF-17 交易查询/对账**"
+    },
+    {
+      "check": "引文 W23 wealth-v1.8.md:375",
+      "pass": true,
+      "detail": "| ★ `order.history` | \"我这个月都买了啥\"\"扣款记录给我看\" | TF-17 |"
+    },
+    {
+      "check": "引文 W24 wealth-v1.8.md:305",
+      "pass": true,
+      "detail": "- 触发信号：硬信号（金额超画像阈值、深夜时段——确定性代码判定）+ 软信号（疑似追涨、情绪化表述——LLM 辅助信号）。**软信"
+    },
+    {
+      "check": "引文 W24 wealth-v1.8.md:424",
+      "pass": true,
+      "detail": "### TF-11 冲动提醒流程（v1.5 修订：软拦截，F4）"
+    },
+    {
+      "check": "引文 W24 wealth-v1.8.md:737",
+      "pass": true,
+      "detail": "> （冲动提醒彩蛋：深夜小知想全仓追涨热门基金 → 企鹅提示 + 调出冷静档案 → 小知选择\"改为小额试投 100 元\"→ 强确认"
+    },
+    {
+      "check": "引文 W25 wealth-v1.8.md:309",
+      "pass": true,
+      "detail": "- **⚠️ 数据合规（R8）**：冷静档案属于负面行为画像数据，复用须在产品协议中单独告知并取得同意，且设数据保留期限上限"
+    },
+    {
+      "check": "引文 W25 wealth-v1.8.md:428",
+      "pass": true,
+      "detail": "├─ [工具] cooldown_archive.query(user) → 拉取历史冲动记录（需用户已授权，R8）"
+    },
+    {
+      "check": "引文 W25 wealth-v1.8.md:656",
+      "pass": true,
+      "detail": "| W3 | 边界测试（红队） | 超范围请求、改口重规划、护栏绕过尝试；**合规专项用例：① 撤回自动扣款授权（R6）② 查看/"
+    },
+    {
+      "check": "引文 W26 wealth-v1.8.md:536",
+      "pass": true,
+      "detail": "**TF-21 提醒管理**（v1.5 修订：用户自设提醒，非强制冷静期，F4）"
+    },
+    {
+      "check": "引文 W27 wealth-v1.8.md:221",
+      "pass": true,
+      "detail": "| ① 成长只绑\"行为质量\"，绝不绑\"金额\" | 成长值来自：坚持定投、完成风险学习、资产分散、冲动提醒应对成功——家境不同，企鹅"
+    },
+    {
+      "check": "引文 W27 wealth-v1.8.md:233",
+      "pass": true,
+      "detail": "| 成长阶段（蛋→幼鹅→少年鹅→成年鹅→绅士鹅） | 财务健康分：应急金覆盖率、储蓄率、负债健康度、保障完备度 | 账户+行为数据"
+    },
+    {
+      "check": "引文 W27 wealth-v1.8.md:551",
+      "pass": true,
+      "detail": "## 6.4 企鹅状态数值体系"
+    },
+    {
+      "check": "引文 W28 wealth-v1.8.md:124",
+      "pass": true,
+      "detail": "- **与财富鹅的一天**：生活费到账 → 企鹅提醒\"先存后花\"，自动锁 150 进\"演唱会小金库\"；深夜逛直播间想买 399 的"
+    },
+    {
+      "check": "引文 W28 wealth-v1.8.md:579",
+      "pass": true,
+      "detail": "**企鹅日记生成**（每周一次，LLM 批处理）："
+    },
+    {
+      "check": "引文 W29 wealth-v1.8.md:313",
+      "pass": true,
+      "detail": "学 Erica：企鹅明确\"我给信息，最终决策在你\"；**产品推荐与对比只做客观信息陈列**（要素、风险等级、历史表现并标注\"历史业"
+    },
+    {
+      "check": "引文 W29 wealth-v1.8.md:637",
+      "pass": true,
+      "detail": "- **System Prompt 结构**：角色（财富鹅人格）→ 能力边界声明（只做客观信息，不做投资建议）→ 可用工具清单 →"
+    },
+    {
+      "check": "引文 W29 wealth-v1.8.md:741",
+      "pass": true,
+      "detail": "> 小知：\"那……要跑吗？\""
+    },
+    {
+      "check": "引文 W30 wealth-v1.8.md:687",
+      "pass": true,
+      "detail": "| R8 | 敏感个人信息单独同意、最小必要 | 个保法 | 冷静档案、日记、流水触发、语音记录四项单独授权；数据保留期限上限 |"
+    },
+    {
+      "check": "引文 W30 wealth-v1.8.md:690",
+      "pass": true,
+      "detail": "| R11 | AI 生成内容须标识 | 生成式AI暂行办法、AI标识办法（2025.9施行） | 日记/剧本台词加\"AI 生成\""
+    },
+    {
+      "check": "引文 W30 wealth-v1.8.md:715",
+      "pass": true,
+      "detail": "2. 《授权与隐私告知清单》：自动扣款、冷静档案复用、日记生成、语音记录四项单独授权文案（R6/R8）"
+    },
+    {
+      "check": "引文 W31 competitor-workflows.md:211",
+      "pass": true,
+      "detail": "- 交易时间：每周一至周五 9:00—15:00（认购截止 16:00）；非交易时间委托视为下一日交易，非交易时间如产品开通挂单则"
+    },
+    {
+      "check": "引文 W32 competitor-workflows.md:213",
+      "pass": true,
+      "detail": "- 指定日期交易：中行网银支持 T+1 日到 T+90 日的指定日期基金申购/赎回（FAQ 口径）。"
+    },
+    {
+      "check": "引文 W33 competitor-workflows.md:214",
+      "pass": true,
+      "detail": "- 巨额赎回：可选择顺延（未成交部分延迟下一交易日）或非顺延。"
+    },
+    {
+      "check": "引文 W34 competitor-workflows.md:200",
+      "pass": true,
+      "detail": "2. 定投扣款默认从活期+扣；**余额不足则当次定投失败**，不会自动解冻定期存款、不罚违约金，补足后下一扣款日自动恢复（界面新闻"
+    },
+    {
+      "check": "引文 W34 competitor-workflows.md:222",
+      "pass": true,
+      "detail": "2. 扣款日账户状态不正常或余额不足 = 当次失败；**连续三次扣款失败，定投申请自动取消**。"
+    },
+    {
+      "check": "引文 C01 cards-v1.5.md:231",
+      "pass": true,
+      "detail": "决策树：附属卡 vs 零额度权益卡 vs 校园借记卡"
+    },
+    {
+      "check": "引文 C02 cards-v1.5.md:376",
+      "pass": true,
+      "detail": "年龄校验→第二还款来源说明→父母远程授权"
+    },
+    {
+      "check": "引文 C03 cards-v1.5.md:242",
+      "pass": true,
+      "detail": "父母远程人脸核验+电子签署"
+    },
+    {
+      "check": "引文 C04 cards-v1.5.md:377",
+      "pass": true,
+      "detail": "进度可视推送→被拒→原因类别解释+改善路径"
+    },
+    {
+      "check": "引文 C05 cards-v1.5.md:248",
+      "pass": true,
+      "detail": "不构成对审批结果的解释"
+    },
+    {
+      "check": "引文 C06 cards-v1.5.md:249",
+      "pass": true,
+      "detail": "用户确认制"
+    },
+    {
+      "check": "引文 C07 cards-v1.5.md:250",
+      "pass": true,
+      "detail": "调回设置 24 小时冷静期"
+    },
+    {
+      "check": "引文 C08 cards-v1.5.md:379",
+      "pass": true,
+      "detail": "原因推送（信息分级披露）"
+    },
+    {
+      "check": "引文 C09 cards-v1.5.md:261",
+      "pass": true,
+      "detail": "当场解锁→引导重试"
+    },
+    {
+      "check": "引文 C10 cards-v1.5.md:135",
+      "pass": true,
+      "detail": "回来我再帮你删掉"
+    },
+    {
+      "check": "引文 C11 cards-v1.5.md:381",
+      "pass": true,
+      "detail": "只解释不操作"
+    },
+    {
+      "check": "引文 C12 cards-v1.5.md:382",
+      "pass": true,
+      "detail": "弱认证即时冻结"
+    },
+    {
+      "check": "引文 C13 cards-v1.5.md:383",
+      "pass": true,
+      "detail": "后果告知（绑定中断/换号）"
+    },
+    {
+      "check": "引文 C14 cards-v1.5.md:384",
+      "pass": true,
+      "detail": "本行卡自动到期提醒"
+    },
+    {
+      "check": "引文 C15 cards-v1.5.md:385",
+      "pass": true,
+      "detail": "生成绑定清单"
+    },
+    {
+      "check": "引文 C15 cross-scenario-v1.3.md:101",
+      "pass": true,
+      "detail": "逐项换绑确认"
+    },
+    {
+      "check": "引文 C16 cards-v1.5.md:298",
+      "pass": true,
+      "detail": "把关键订阅换绑到虚拟卡上"
+    },
+    {
+      "check": "引文 C17 cards-v1.5.md:270",
+      "pass": true,
+      "detail": "他行卡一律跳转官方渠道"
+    },
+    {
+      "check": "引文 C18 cards-v1.5.md:387",
+      "pass": true,
+      "detail": "中止操作→升级验证"
+    },
+    {
+      "check": "引文 C19 cards-v1.5.md:388",
+      "pass": true,
+      "detail": "含误伤诚实记录"
+    },
+    {
+      "check": "引文 C20 cards-v1.5.md:389",
+      "pass": true,
+      "detail": "超 90 天未更新自动降级提示"
+    },
+    {
+      "check": "引文 C21 cards-v1.5.md:343",
+      "pass": true,
+      "detail": "23:00-6:00 娱乐类消费限额 200"
+    },
+    {
+      "check": "引文 C22 cards-v1.5.md:343",
+      "pass": true,
+      "detail": "延迟 30 分钟执行"
+    },
+    {
+      "check": "引文 C23 cards-v1.5.md:343",
+      "pass": true,
+      "detail": "一键 72 小时保护模式"
+    },
+    {
+      "check": "引文 C24 cards-v1.5.md:390",
+      "pass": true,
+      "detail": "强认证+声明紧急用途"
+    },
+    {
+      "check": "引文 C25 cards-v1.5.md:351",
+      "pass": true,
+      "detail": "每张独立限额、独立开关"
+    },
+    {
+      "check": "引文 C26 cards-v1.5.md:391",
+      "pass": true,
+      "detail": "无合约月付"
+    },
+    {
+      "check": "引文 C27 cards-v1.5.md:359",
+      "pass": true,
+      "detail": "当次单独授权"
+    },
+    {
+      "check": "引文 C28 cards-v1.5.md:363",
+      "pass": true,
+      "detail": "候选，不进 MVP"
+    },
+    {
+      "check": "引文 UX01 behavioral-design-v1.0.md:29",
+      "pass": true,
+      "detail": "1. **受益人红线**：每个行为设计必须能回答\"用户因此得到什么\"——答不上来或答案是\"平台多赚钱\"的，一律不做"
+    },
+    {
+      "check": "引文 X08 cross-scenario-v1.3.md:106",
+      "pass": true,
+      "detail": "触发源、允许携带字段、确认节点、留痕格式"
+    },
+    {
+      "check": "引文 X09 cross-scenario-v1.3.md:135",
+      "pass": true,
+      "detail": "规则类型"
+    },
+    {
+      "check": "引文 X10 cross-scenario-v1.3.md:363",
+      "pass": true,
+      "detail": "首跑再确认"
+    },
+    {
+      "check": "引文 X11 cross-scenario-v1.3.md:142",
+      "pass": true,
+      "detail": "全部规则/触发历史/暂停开关"
+    },
+    {
+      "check": "引文 X12 cross-scenario-v1.3.md:159",
+      "pass": true,
+      "detail": "事件日历**单独授权**"
+    },
+    {
+      "check": "引文 X13 cross-scenario-v1.3.md:418",
+      "pass": true,
+      "detail": "非安全类月度 ≤4 次"
+    },
+    {
+      "check": "引文 X14 cross-scenario-v1.3.md:166",
+      "pass": true,
+      "detail": "Demo 以小程序唤起+沙箱模拟"
+    },
+    {
+      "check": "引文 X15 cross-scenario-v1.3.md:167",
+      "pass": true,
+      "detail": "通用助手管\"非金融操作面\""
+    },
+    {
+      "check": "引文 X16 cross-scenario-v1.3.md:181",
+      "pass": true,
+      "detail": "锁 300 到生日罐"
+    },
+    {
+      "check": "引文 X17 cross-scenario-v1.3.md:183",
+      "pass": true,
+      "detail": "蛋糕（4 寸，~128）+ 花束（~99）+ 留 70 机动"
+    },
+    {
+      "check": "引文 X18 cross-scenario-v1.3.md:188",
+      "pass": true,
+      "detail": "用户确认 → 唤起美团小程序"
+    },
+    {
+      "check": "引文 X19 cross-scenario-v1.3.md:191",
+      "pass": true,
+      "detail": "付款 227（从生日罐扣，预算内）"
+    },
+    {
+      "check": "引文 X20 cross-scenario-v1.3.md:205",
+      "pass": true,
+      "detail": "入职 1 个月内首次"
+    },
+    {
+      "check": "引文 X21 cross-scenario-v1.3.md:231",
+      "pass": true,
+      "detail": "把家里宽带费绑到你卡上代扣，每月 69"
+    },
+    {
+      "check": "引文 X22 cross-scenario-v1.3.md:245",
+      "pass": true,
+      "detail": "观察满 2 个月节律后才启用"
+    },
+    {
+      "check": "引文 X23 cross-scenario-v1.3.md:154",
+      "pass": true,
+      "detail": "预算分配建议"
+    },
+    {
+      "check": "引文 X24 cross-scenario-v1.3.md:371",
+      "pass": true,
+      "detail": "账单迁移（确认制）→订阅葬礼→提额包"
+    },
+    {
+      "check": "引文 X25 cross-scenario-v1.3.md:283",
+      "pass": true,
+      "detail": "每个步骤是一个站点"
+    },
+    {
+      "check": "引文 X26 cross-scenario-v1.3.md:295",
+      "pass": true,
+      "detail": "断点链数据保留期 **30 天**"
+    },
+    {
+      "check": "引文 X27 cross-scenario-v1.3.md:299",
+      "pass": true,
+      "detail": "可逆"
+    },
+    {
+      "check": "引文 X28 cross-scenario-v1.3.md:311",
+      "pass": true,
+      "detail": "分享前二次确认+脱敏预览"
+    },
+    {
+      "check": "引文 X29 cross-scenario-v1.3.md:319",
+      "pass": true,
+      "detail": "低风险规则触发可设\"静默模式\""
+    },
+    {
+      "check": "引文 X30 cross-scenario-v1.3.md:325",
+      "pass": true,
+      "detail": "列 P1 候选"
+    },
+    {
+      "check": "引文 X31 cross-scenario-v1.3.md:269",
+      "pass": true,
+      "detail": "历史出行规律"
+    },
+    {
+      "check": "引文 X32 cross-scenario-v1.3.md:270",
+      "pass": true,
+      "detail": "事后不沉淀"
+    },
+    {
+      "check": "引文 X33 cross-scenario-v1.3.md:271",
+      "pass": true,
+      "detail": "订阅暂停建议"
+    },
+    {
+      "check": "引文 X34 cross-scenario-v1.3.md:272",
+      "pass": true,
+      "detail": "月度分罐"
+    },
+    {
+      "check": "引文 X35 cross-scenario-v1.3.md:273",
+      "pass": true,
+      "detail": "退房押金到账追踪"
+    },
+    {
+      "check": "引文 X36 cross-scenario-v1.3.md:274",
+      "pass": true,
+      "detail": "不攀比"
+    },
+    {
+      "check": "引文 X37 cross-scenario-v1.3.md:275",
+      "pass": true,
+      "detail": "不拦截只问"
+    },
+    {
+      "check": "引文 R01 federated-learning-agent-debate.md:81",
+      "pass": true,
+      "detail": "转账侧重“钱尚未出去”的事前风险提示，账单侧重“钱已经出去”的事后复核与止损指引，两者可以复用同一联邦风险模型的不同证据视图。参与"
+    },
+    {
+      "check": "引文 R02 federated-learning-agent-debate.md:157",
+      "pass": true,
+      "detail": "联邦实验至少比较本地模型、普通 FedAvg、带保护聚合的候选方案；集中训练只可作为研究环境中的参考上限，不能在真实机构间为了对照"
+    },
+    {
+      "check": "引文 R03 federated-learning-agent-debate.md:87",
+      "pass": true,
+      "detail": "比赛原型可采用 FATE 横向联邦或与其等价的本地多进程模拟，设置三个合成机构节点，各自拥有不同诈骗类型分布和非 IID 正常交易"
+    },
+    {
+      "check": "引文 R04 federated-learning-agent-debate.md:93",
+      "pass": true,
+      "detail": "现有硬规则擅长识别已知组合，却很难覆盖单机构从未见过的新型诈骗；单纯 LLM 又能理解话术，却可能把语言相似性当成事实。联邦模型补"
+    },
+    {
+      "check": "引文 R05 federated-learning-agent-debate.md:89",
+      "pass": true,
+      "detail": "比赛原型可采用 FATE 横向联邦或与其等价的本地多进程模拟，设置三个合成机构节点，各自拥有不同诈骗类型分布和非 IID 正常交易"
+    },
+    {
+      "check": "引文 R06 federated-learning-agent-debate.md:101",
+      "pass": true,
+      "detail": "任务规划 Agent 关注“怎样完成用户目标”，提出步骤、依赖和所需信息；证据质疑 Agent 关注“哪些假设可能为假”，主动寻找"
+    },
+    {
+      "check": "引文 R07 federated-learning-agent-debate.md:116",
+      "pass": true,
+      "detail": "推荐协议为“三方独立初答→一轮交叉质询→必要时第二轮补证→结构化裁决→确定性验证”，默认最多两轮。初答阶段不互相可见，质询阶段匿名"
+    },
+    {
+      "check": "引文 R08 federated-learning-agent-debate.md:143",
+      "pass": true,
+      "detail": "联邦学习负责从多方样本中产生风险证据，多 Agent 辩论负责检查该证据在当前用户和当前任务中是否足以支持建议。前者可以回答“这类"
+    },
+    {
+      "check": "引文 R09 federated-learning-agent-debate.md:135",
+      "pass": true,
+      "detail": "跨场景规划中，任务规划 Agent 可能提出“预算预留→外部下单→账单标注”，证据质疑 Agent 检查预算罐是否可被第三方扣款、"
+    },
+    {
+      "check": "引文 R10 federated-learning-agent-debate.md:157",
+      "pass": true,
+      "detail": "联邦实验至少比较本地模型、普通 FedAvg、带保护聚合的候选方案；集中训练只可作为研究环境中的参考上限，不能在真实机构间为了对照"
+    },
+    {
+      "check": "引文 R11 federated-learning-agent-debate.md:171",
+      "pass": true,
+      "detail": "联邦侧应构造标签噪声、恶意参与方放大更新、后门模式、非 IID 极端分布、节点掉线和模型回滚样本，检验鲁棒聚合与降级是否真实有效。"
+    },
+    {
+      "check": "引文 R12 federated-learning-agent-debate.md:179",
+      "pass": true,
+      "detail": "第一阶段完成联邦风险识别实验和账单异常辩论闭环，优先复用现有数据结构与硬护栏，不重写六场景。联邦侧使用明确标注的合成三方数据，输出"
+    },
+    {
+      "check": "引文 Q01 security-v2.0.md:46",
+      "pass": true,
+      "detail": "**要做什么**：三件事，全是代码级——"
+    },
+    {
+      "check": "引文 Q02 security-v2.0.md:57",
+      "pass": true,
+      "detail": "**要做什么**：记忆表加 1 个字段 `confirmed`——写入长期记忆前必须问用户\"我要记住这个：……对吗？\"，用户确认才"
+    },
+    {
+      "check": "引文 Q03 security-v2.0.md:60",
+      "pass": true,
+      "detail": "**要做什么**：前端两行配置——禁外部图片渲染、链接白名单（只允许微众域）。Agent 输出只走纯文本+内置组件。"
+    },
+    {
+      "check": "引文 Q04 security-v2.0.md:53",
+      "pass": true,
+      "detail": "**要做什么**：**不部署 Llama Guard**。一张关键词+正则清单（\"保本/稳赚/我替你决定/不用确认\"约 20 条）"
+    },
+    {
+      "check": "引文 Q05 security-v2.0.md:131",
+      "pass": true,
+      "detail": "**要做什么**：金额类答案默认文字回复不外放；检测到耳机才语音播报。一个开关。"
+    },
+    {
+      "check": "引文 Q06 security-v2.0.md:81",
+      "pass": true,
+      "detail": "**要做什么**：户名核验掩码回显（已有）+ 收款人名做 Unicode NFKC 规范化（一行代码）+ 与常用联系人编辑距离 ≤"
+    },
+    {
+      "check": "引文 Q06 security-v2.0.md:159",
+      "pass": true,
+      "detail": "**要做什么**：商户名 NFKC 规范化 + 与白名单商户编辑距离 ≤2 告警（账单 merchant_map 已有种子库，加一"
+    },
+    {
+      "check": "引文 Q07 security-v2.0.md:36",
+      "pass": true,
+      "detail": "**要做什么**：一个计数器（内存字典即可）：同收款人 24h 累计 + 全量转出 24h 累计，超阈值（单人 1000）自动升级"
+    },
+    {
+      "check": "引文 Q08 security-v2.0.md:91",
+      "pass": true,
+      "detail": "**要做什么**：**砍掉六因子评分卡，改三级阶梯**——"
+    },
+    {
+      "check": "引文 Q09 security-v2.0.md:169",
+      "pass": true,
+      "detail": "**要做什么**：**200 条砍到 40 条**，手写，不引入 AgentDojo 框架——正常 20 条（该通过）+ 攻击 2"
+    },
+    {
+      "check": "引文 Q10 security-v2.0.md:13",
+      "pass": true,
+      "detail": "| 防线 | 极简实现 | 本质 |"
+    },
+    {
+      "check": "四档范围",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "成本档位",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "来源十稿",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash wealth-v1.8.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash transfer-v2.5.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash bills-v1.7.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash subscriptions-v1.5.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash cards-v1.5.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash cross-scenario-v1.3.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash competitor-workflows.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash security-v2.0.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash federated-learning-agent-debate.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "原稿hash behavioral-design-v1.0.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "跨组依赖无环",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:2",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:14",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:38",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:40",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:48",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:58",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:62",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:69",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:76",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:84",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:94",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:96",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:108",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:119",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:133",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:137",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:154",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:167",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:171",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:182",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:186",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:194",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:196",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:200",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:208",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:210",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:229",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:246",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:263",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:275",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:279",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:289",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:297",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:305",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:317",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:319",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:330",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:349",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:353",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:368",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:386",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:399",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:412",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:442",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:464",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:480",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:492",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:510",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:520",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:529",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:546",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:567",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:600",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:621",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:629",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:641",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:663",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:689",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:699",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:701",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:714",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:720",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:734",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:742",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:12",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:39",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:41",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:51",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:59",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:67",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:82",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:90",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:100",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:102",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:110",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:123",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:141",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:143",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:156",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:165",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:167",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:174",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:180",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:188",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:190",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:201",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:208",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:214",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:216",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:242",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:258",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:260",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:309",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:317",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:325",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:330",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:338",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:342",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:379",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:391",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:397",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:405",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:407",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:424",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:474",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:486",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:494",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:507",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:532",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:553",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:569",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:571",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:582",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:592",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:594",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:603",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:611",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:23",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:24",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:25",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:28",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:29",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:30",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:112",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:113",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:114",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:115",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:139",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:144",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:149",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:158",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:159",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:160",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:161",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:162",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:163",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:309",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:310",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:311",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:312",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:313",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:647",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:648",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:649",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:650",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:651",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:652",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:653",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:654",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:655",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:656",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:657",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:54",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:55",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:56",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:81",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:82",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:347",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:264",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:265",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:266",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:267",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:268",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:269",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:270",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:271",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:272",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:273",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:592",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:595",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 bills-v1.7.md:617",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:55",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:56",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:57",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:63",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:64",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:65",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:71",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:72",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:73",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:77",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:78",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:79",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:80",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:84",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:85",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:86",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:87",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:88",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:160",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:161",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:162",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:163",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:167",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:174",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:180",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:248",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:249",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:250",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:251",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:252",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:253",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:254",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:350",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:351",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:352",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:353",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:361",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:362",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:363",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:364",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:365",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:411",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:412",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:413",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:414",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:415",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:416",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:417",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:418",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:419",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:420",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:421",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:422",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:511",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:512",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:513",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:514",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:515",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:516",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:517",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:518",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:519",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:520",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:521",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:522",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:523",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:524",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:525",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:526",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:613",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:614",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:615",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:616",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 subscriptions-v1.5.md:617",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:2",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:12",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:36",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:46",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:56",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:60",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:69",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:80",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:93",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:95",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:97",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:109",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:118",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:141",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:153",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:161",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:175",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:186",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:208",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:210",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:217",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:229",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:240",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:242",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:258",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:271",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:289",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:301",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:311",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:315",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:323",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:325",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:353",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:384",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:388",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:405",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:424",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:437",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:474",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:551",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:587",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:604",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:635",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:643",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:647",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:660",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:665",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:676",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:695",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:712",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:723",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:751",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:761",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:766",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:780",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:789",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:797",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:803",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:2",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:12",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:39",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:41",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:51",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:63",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:67",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:75",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:84",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:96",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:98",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:104",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:112",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:124",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:128",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:148",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:160",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:184",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:186",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:190",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:198",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:200",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:215",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:228",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:239",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:244",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:256",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:258",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:269",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:288",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:290",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:308",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:332",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:346",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:365",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:379",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:388",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:406",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:427",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:441",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:464",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:474",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:484",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:500",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:522",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:530",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:542",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:563",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:592",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:602",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:604",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:617",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:626",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:632",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:647",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:359",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:360",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:361",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:362",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:363",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:364",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:365",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:366",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:367",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:368",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:369",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:370",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:371",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:372",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:373",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:374",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:375",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:376",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:377",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:378",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:379",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:380",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:290",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:308",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:332",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:346",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:365",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:379",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:388",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:406",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:427",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:441",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:464",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:474",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:680",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:681",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:682",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:683",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:684",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:685",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:686",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:687",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:688",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:689",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:690",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:691",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:692",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:693",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:548",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:549",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:550",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:551",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:552",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:553",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:554",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:555",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:556",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:557",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:19",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:20",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:21",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:22",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:145",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:146",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:147",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:148",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:149",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:221",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:222",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:223",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:233",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:234",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:235",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:236",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:237",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 wealth-v1.8.md:238",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:27",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:28",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:29",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:152",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:153",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:154",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:155",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:156",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:194",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:195",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:196",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:175",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:176",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:177",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 transfer-v2.5.md:178",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:165",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:166",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:186",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:188",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:211",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:212",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:213",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:214",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:222",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:223",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:228",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:17",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:19",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:21",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:22",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:23",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:24",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:26",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:28",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:29",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:30",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:32",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:34",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:35",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:36",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:37",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:41",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:43",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:47",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:49",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:50",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:54",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:56",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:58",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:59",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:60",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:61",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:63",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:65",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:67",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:69",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:70",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:71",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:72",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:74",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:76",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:77",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:78",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:79",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:80",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:81",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:82",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:84",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:86",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:87",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:88",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:89",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:90",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:92",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:94",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:95",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:96",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:100",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:102",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:104",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:106",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:107",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:108",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:109",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:111",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:113",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:115",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:116",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:117",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:118",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:120",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:126",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:142",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:144",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:146",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:148",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:149",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:150",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:151",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:152",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:153",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:154",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:155",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:156",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:157",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:158",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:159",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:161",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:163",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:165",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:166",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:167",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:168",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:169",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:171",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:173",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:175",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:176",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:177",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:179",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:181",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:182",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:183",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:185",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:187",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:188",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:189",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:193",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:195",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:197",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:199",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:200",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:201",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:202",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:204",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:206",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:207",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:208",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:210",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:216",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:218",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:220",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:242",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:244",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:246",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:248",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:249",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:250",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:251",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:253",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:255",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:257",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:259",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:260",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:261",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:262",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:264",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:266",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:267",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:268",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:270",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:272",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:274",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:305",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:307",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:309",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:311",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:312",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:313",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:315",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:319",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:321",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:323",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:325",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:326",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:327",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:329",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:331",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:335",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:337",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:339",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:341",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:343",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:345",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:347",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:349",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:351",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:353",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:355",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:357",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:359",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:361",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:363",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:369",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:371",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:373",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:375",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:376",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:377",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:378",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:379",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:380",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:381",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:382",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:383",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:384",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:385",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:386",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:387",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:388",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:389",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:390",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:391",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:393",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:455",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:457",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:459",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:460",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:461",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:462",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:463",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:464",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:465",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:467",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:469",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:471",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:473",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:474",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:475",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:476",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:482",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:484",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:486",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:487",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:488",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:489",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:490",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:491",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:492",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:493",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:494",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:495",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:496",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:497",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:498",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:499",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:500",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:504",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:506",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:508",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:510",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:511",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:512",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:513",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:514",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:515",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:517",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:521",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:523",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:525",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:526",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:527",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:528",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:529",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:530",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:531",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:535",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:537",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:539",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:542",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:545",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:548",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:550",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:551",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:552",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:553",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:554",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:558",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:560",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:562",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:564",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:565",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:566",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:567",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:569",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:571",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:572",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:573",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:574",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:576",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:578",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:579",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:580",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cards-v1.5.md:581",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:13",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:15",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:17",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:18",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:19",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:20",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:21",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:22",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:23",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:27",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:29",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:31",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:33",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:35",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:36",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:37",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:39",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:41",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:43",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:44",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:45",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:46",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:48",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:49",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:50",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:51",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:55",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:57",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:59",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:61",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:62",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:63",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:64",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:66",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:70",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:72",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:76",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:80",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:84",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:86",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:87",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:88",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:92",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:96",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:98",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:99",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:100",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:101",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:102",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:103",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:104",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:106",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:110",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:112",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:127",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:129",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:131",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:133",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:135",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:137",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:138",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:139",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:140",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:142",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:144",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:146",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:148",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:150",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:152",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:153",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:154",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:155",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:156",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:157",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:159",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:161",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:163",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:165",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:166",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:167",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:168",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:170",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:172",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:197",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:199",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:203",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:205",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:221",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:223",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:225",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:241",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:243",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:245",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:261",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:263",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:267",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:269",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:270",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:271",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:272",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:273",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:274",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:275",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:277",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:281",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:283",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:285",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:287",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:289",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:291",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:293",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:295",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:297",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:299",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:301",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:303",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:305",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:307",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:309",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:311",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:313",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:315",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:317",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:319",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:321",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:323",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:325",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:329",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:331",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:349",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:351",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:353",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:354",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:355",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:356",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:358",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:360",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:362",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:363",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:364",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:365",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:366",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:367",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:368",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:369",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:370",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:371",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:372",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:374",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:408",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:412",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:414",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:415",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:416",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:417",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:418",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:419",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:420",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:421",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:422",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:423",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:424",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:425",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:429",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:431",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:433",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:434",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:435",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:436",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:438",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:440",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:444",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:446",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:448",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:449",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:450",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:454",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:456",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:458",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:460",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:461",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:462",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:463",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:465",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:467",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:468",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:469",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:470",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:472",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:474",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:475",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:476",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:480",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:482",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:483",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:484",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:485",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:486",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:487",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:488",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:489",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:490",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:491",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:492",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:493",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 cross-scenario-v1.3.md:494",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:9",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:20",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:29",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:37",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:48",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 behavioral-design-v1.0.md:55",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:3",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:9",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:17",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:19",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:38",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:44",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:58",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:64",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:79",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:81",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:87",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:93",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:99",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:101",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:116",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:135",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:141",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:143",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:149",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:155",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:157",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:171",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:177",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:179",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 federated-learning-agent-debate.md:193",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:11",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:26",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:28",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:32",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:36",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:39",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:44",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:46",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:53",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:57",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:60",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:63",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:68",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:70",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:78",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:81",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:84",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:89",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:91",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:101",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:104",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:109",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:113",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:117",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:120",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:124",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:128",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:131",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:136",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:138",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:141",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:144",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:149",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:151",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:155",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:159",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:162",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:167",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:169",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:174",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:177",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:182",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 security-v2.0.md:190",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:13",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:15",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:17",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:39",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:61",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:63",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:82",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:101",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:103",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:107",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:111",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:113",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:125",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:138",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:144",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:146",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:148",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:162",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:174",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:176",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:183",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:194",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:196",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:208",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:232",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:234",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:236",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:240",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:245",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:247",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:252",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:254",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:257",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:264",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:266",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:268",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:273",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:285",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:287",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:293",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:306",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:308",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:312",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:323",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:325",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:329",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:352",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:354",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:358",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:361",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:363",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:366",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:385",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:387",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:389",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:401",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:409",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:411",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:414",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:426",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:432",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "覆盖键有效 competitor-workflows.md:438",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "竞品22子任务",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "安全32编号",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "标题全登记",
+      "pass": true,
+      "detail": "467 headings"
+    },
+    {
+      "check": "用户点名内容 陷阱易感期",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 工具焦虑期",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 膨胀失控期",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 守护日志",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 额度年轮",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 冷静期",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 数字分卡",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 挂失仪式",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 家庭共管",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 规则",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 人生事件",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 美团",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 Kimi",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 生日不翻车",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 What-if",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 公共账本",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "用户点名内容 年度",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 B25",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 B26",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 B27",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 B28",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 B29",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 S21",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 S22",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 W31",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 W32",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 W33",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 W34",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 C28",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X30",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X31",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X32",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X33",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X34",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X35",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X36",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "候选不误列首批 X37",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "应用tracked字节未改",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "check": "HEAD未改",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "旧方案未改 LOCAL_PROJECT/docs/audit/business-gap-20261026/atomic-backlog.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "旧方案未改 LOCAL_PROJECT/docs/audit/business-gap-20261026/atomic-backlog.json",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "旧方案未改 LOCAL_PROJECT/docs/audit/business-gap-20261026/prioritized-backlog.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "已生成本地链接",
+      "pass": true,
+      "detail": "[]"
+    }
+  ]
+}

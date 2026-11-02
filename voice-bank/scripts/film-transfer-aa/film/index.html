@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>知行 · 转账与分项AA</title>
+<style>
+:root{--ink:#1d2430;--muted:#7a8494;--blue:#1278ef;--line:rgba(28,46,74,.08);--paper:#f6f8fb}
+*{box-sizing:border-box}html,body{margin:0;background:#e9edf3;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--ink)}
+.controls{display:flex;gap:10px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.controls button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+.controls input[type=range]{flex:1;min-width:200px}
+.controls output{font-variant-numeric:tabular-nums;color:var(--muted)}
+body.clean .controls{display:none}
+.viewport{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--paper)}
+body.clean .viewport{position:fixed;inset:0;width:100vw;height:100vh;aspect-ratio:auto}
+.stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:radial-gradient(1200px 700px at 50% 40%,#fdfefe 0%,#f3f6fa 60%,#eaeff5 100%);overflow:hidden}
+.phone{position:absolute;left:723px;top:50px;width:430px;height:900px;transform:scale(1.095);transform-origin:0 0;border-radius:34px;overflow:hidden;background:#fafbfc;box-shadow:0 30px 80px rgba(24,40,68,.16),0 0 0 1px rgba(24,40,68,.06)}
+.phone iframe{border:0;width:430px;height:900px;display:block;background:#fafbfc}
+.touch{position:absolute;width:0;height:0;pointer-events:none;opacity:0}
+.touch i{position:absolute;left:0;top:0;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;border:3px solid rgba(18,120,239,.75);background:rgba(18,120,239,.08)}
+.side{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center}
+.left{left:110px;width:540px}
+.right{left:1290px;width:520px}
+.sub{opacity:0;transform:translateY(12px)}
+.sub .who{display:inline-block;font-size:24px;letter-spacing:.08em;color:#fff;background:#25364d;border-radius:999px;padding:6px 18px;margin-bottom:18px}
+.sub.assistant .who{background:#1278ef}
+.sub p{margin:0;font-size:40px;line-height:1.5;font-weight:600;color:#1d2430}
+.sub.assistant p{font-size:34px;font-weight:500;color:#2a3442}
+.note{opacity:0;transform:translateX(16px);background:#fff;border-radius:22px;padding:30px 34px;box-shadow:0 18px 50px rgba(24,40,68,.10);border:1px solid var(--line)}
+.note h3{margin:0 0 12px;font-size:30px;color:#1278ef;font-weight:650}
+.note p{margin:0;font-size:30px;line-height:1.55;white-space:pre-line;color:#2a3442}
+.brand{position:absolute;left:110px;top:60px;font-size:24px;color:var(--muted);letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="controls"><button id="play" type="button">播放</button><button id="restart" type="button">从头</button><input id="seek" type="range" min="0" step="0.01" value="0" aria-label="进度"><output id="time">0.0s</output><button id="clean" type="button">纯画面 H</button><span id="status"></span></div>
+<div class="viewport" id="viewport"><div class="stage" id="stage">
+  <div class="brand">知行 · 智能转账与分项 AA · 真实模型回复</div>
+  <div class="side left"><div class="sub" id="sub"><span class="who" id="who"></span><p id="line"></p></div></div>
+  <div class="phone" id="phone"></div>
+  <div class="touch" id="touch"><i></i><i></i><i></i></div>
+  <div class="side right"><div class="note" id="note"><h3 id="noteTitle"></h3><p id="noteBody"></p></div></div>
+</div></div>
+<script src="data/timeline.js"></script>
+<script src="dist/product-surface.js"></script>
+<script src="player.js"></script>
+</body>
+</html>

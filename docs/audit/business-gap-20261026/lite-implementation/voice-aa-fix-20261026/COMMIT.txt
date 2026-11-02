@@ -1,0 +1,9 @@
+Local commit: 177a24b943ee3051090b1eed2483147347268827
+Branch: main
+Scope: 23 files from this task (core1–20, review UI, AA voice fixes and regression scripts).
+Exact staged tree: 526b1a096e8dd7017e2dbba95a61428122d19de0
+Verified staged snapshot: 213 unit tests passed;20/20 quick checks;TypeScript and both browser-script syntax checks passed.
+Working-tree216 test count additionally includes3 tests belonging to pre-existing uncommitted voice work; those were intentionally excluded from this commit.
+Pre-existing qwen-protocol hunks were removed only from the staged snapshot by a clean3-way merge, not from the working file. Other voice-isolation/failure-audio changes remain uncommitted.
+No push, pull or remote operation. Live source hashes unchanged by commit.
+Detailed local commit ledger: LOCAL_AUXILIARY/webank-commit-20261026-042951

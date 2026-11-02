@@ -1,0 +1,10 @@
+module.exports=[
+ {input:'先查询理财产品，然后做风险测评，最后查询订阅清单。',assessment:[],current:'IN05',planTasks:['IN06','IN05','SU01']},
+ {input:'第一题选三',assessment:[3,0,0],current:'IN05'},
+ {input:'先查看银行卡列表，查完继续原来的测评。',readFunction:'CA01',current:'IN05'},
+ {input:'为什么填写完问卷还需要确认？只解释，不提交。',current:'IN05'},
+ {input:'第二题选二',assessment:[3,2,0],current:'IN05'},
+ {input:'先查询2026年10月账单明细，查完继续测评。',readFunction:'BI01',current:'IN05'},
+ {input:'第三题选一',assessment:[3,2,1],current:'IN05'},
+ {input:'确认当前风险测评信息，请提交这份测评。',confirmed:true,current:'SU01',planStatus:'complete'},
+];

@@ -1,0 +1,1683 @@
+{
+  "scenario": "smoke",
+  "classification": {
+    "realQwenWebRTCProvider": true,
+    "syntheticBankOnly": true,
+    "humanMicrophoneTested": false,
+    "textTurnsValidateASR": false
+  },
+  "serverConfigPresence": {
+    ".env": false,
+    ".env.local": false,
+    ".dev.vars": true
+  },
+  "sessions": [
+    {
+      "name": "read",
+      "provider": {
+        "liveConfigured": true,
+        "sessionStatus": 201,
+        "sessionUpdated": true,
+        "errors": [],
+        "connectedLiveUi": true,
+        "unexpectedErrorCount": 0
+      },
+      "initialState": {
+        "status": 200,
+        "state": {
+          "revision": 0,
+          "view": "home",
+          "currentWorkflow": null,
+          "workflowTaskCount": 0,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "finalState": {
+        "status": 200,
+        "state": {
+          "revision": 6,
+          "view": "workflow",
+          "currentWorkflow": {
+            "id": "9dc1bf91-a317-4d22-a2af-5cb2679b097a",
+            "functionId": "CA01",
+            "title": "查看卡片列表",
+            "status": "complete",
+            "params": {},
+            "missing": [],
+            "resultPresent": true,
+            "resultKeys": [
+              "0",
+              "1",
+              "2"
+            ],
+            "result": {
+              "kind": "array",
+              "length": 3,
+              "items": [
+                {
+                  "id": "card-daily",
+                  "name": "日常借记卡",
+                  "status": "active"
+                },
+                {
+                  "id": "card-risk",
+                  "name": "储蓄借记卡",
+                  "status": "restricted"
+                },
+                {
+                  "id": "card-judicial",
+                  "name": "司法限制演示卡",
+                  "status": "restricted"
+                }
+              ]
+            }
+          },
+          "workflowTaskCount": 6,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "turns": [
+        {
+          "index": 0,
+          "input": "查看我的收款联系人清单，只读取不修改",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "TR08"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:46:04.185Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 14469,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "TR08",
+                "params": {
+                  "action": "list"
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "TR08"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 1,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "f6ebee99-f722-4760-b2ec-cdac74242307",
+                "functionId": "TR08",
+                "title": "管理收款联系人",
+                "status": "complete",
+                "params": {
+                  "action": "list"
+                },
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "0",
+                  "1",
+                  "2"
+                ],
+                "result": {
+                  "kind": "array",
+                  "length": 3,
+                  "items": [
+                    {
+                      "id": "zhang-roommate",
+                      "name": "张三",
+                      "label": "室友"
+                    },
+                    {
+                      "id": "zhang-landlord",
+                      "name": "张三",
+                      "label": "房东"
+                    },
+                    {
+                      "id": "li-friend",
+                      "name": "李四",
+                      "label": "同学"
+                    }
+                  ]
+                }
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "管理收款联系人",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:46:18.765Z",
+          "assistantTranscripts": [
+            "你的收款联系人里有三位：室友张三、房东张三，还有同学李四。这次只是读取清单，没有做任何修改。"
+          ]
+        },
+        {
+          "index": 1,
+          "input": "比较演示现金基金和演示债券基金这两款产品，只读比较",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "IN07"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:46:18.766Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 24007,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "IN06",
+                "params": {
+                  "type": "现金基金"
+                }
+              }
+            },
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "IN07",
+                "params": {
+                  "productIds": [
+                    "fund-cash",
+                    "fund-bond"
+                  ]
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "IN06",
+            "IN07"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            },
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 3,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "90ba5747-935a-4927-8c16-6c9684f050ea",
+                "functionId": "IN07",
+                "title": "比较指定产品",
+                "status": "complete",
+                "params": {
+                  "productIds": [
+                    "fund-cash",
+                    "fund-bond"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "products",
+                  "comparedFields",
+                  "differences",
+                  "missing"
+                ],
+                "result": {
+                  "kind": "object",
+                  "keys": [
+                    "products",
+                    "comparedFields",
+                    "differences",
+                    "missing"
+                  ],
+                  "products": {
+                    "count": 2,
+                    "items": [
+                      {
+                        "id": "fund-cash",
+                        "name": "演示现金基金",
+                        "risk": 1,
+                        "type": "货币"
+                      },
+                      {
+                        "id": "fund-bond",
+                        "name": "演示债券基金",
+                        "risk": 3,
+                        "type": "债券"
+                      }
+                    ]
+                  },
+                  "differenceFields": [
+                    "risk"
+                  ],
+                  "missingFields": [
+                    "managementFee",
+                    "custodyFee",
+                    "managementFee",
+                    "custodyFee"
+                  ]
+                }
+              },
+              "workflowTaskCount": 3,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "比较指定产品",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:46:42.851Z",
+          "assistantTranscripts": [
+            "演示现金基金风险等级是1，而债券基金是3。这两款产品的流动性都是赎回预计T+1工作日到账，当前合成交易费率均为0。不过管理费和托管费在数据里都没提供，所以没法比较这两项。"
+          ]
+        },
+        {
+          "index": 2,
+          "input": "查看2026年10月的月度账单报告，只读查询",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "BI01",
+            "BI02",
+            "BI06"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:46:42.852Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 9532,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "BI06",
+                "params": {
+                  "period": "2026-10"
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "BI06"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 4,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "2bc39069-a8cc-4d87-a9c8-a4250a8fa4ca",
+                "functionId": "BI06",
+                "title": "查看月度或年度账单报告",
+                "status": "complete",
+                "params": {
+                  "period": "2026-10"
+                },
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "period",
+                  "periodType",
+                  "periodSource",
+                  "periodNotice",
+                  "summary",
+                  "categoryBreakdown",
+                  "comparison",
+                  "insights"
+                ],
+                "result": {
+                  "kind": "object",
+                  "keys": [
+                    "period",
+                    "periodType",
+                    "periodSource",
+                    "periodNotice",
+                    "summary",
+                    "categoryBreakdown",
+                    "comparison",
+                    "insights"
+                  ],
+                  "period": "2026-10",
+                  "periodType": "month",
+                  "periodSource": "requested-month",
+                  "summary": {
+                    "period": "2026-10",
+                    "periodType": "month",
+                    "grossExpenses": 11500,
+                    "netExpenses": 10300,
+                    "refunds": 1200,
+                    "income": 0,
+                    "count": 5
+                  }
+                }
+              },
+              "workflowTaskCount": 4,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "查看月度或年度账单报告",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:46:52.454Z",
+          "assistantTranscripts": [
+            "稍等，我帮你调出2026年10月的月度账单报告。\n\n",
+            "2026年10月账单显示，总支出115元，退款12元，净支出103元。餐饮净支出52元，饮品26元，订阅25元。相比9月的25元净支出，本月增加了78元，涨幅312%。"
+          ]
+        },
+        {
+          "index": 3,
+          "input": "查看我的订阅清单，只读取不更改",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "SU01"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:46:52.454Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 24364,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "SU01",
+                "params": {}
+              }
+            }
+          ],
+          "actualFunctions": [
+            "SU01"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 5,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "3d55ac88-772c-4e51-92b7-7d73001b1c7a",
+                "functionId": "SU01",
+                "title": "查看订阅清单和详情",
+                "status": "complete",
+                "params": {},
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "0",
+                  "1",
+                  "2"
+                ],
+                "result": {
+                  "kind": "array",
+                  "length": 3,
+                  "items": [
+                    {
+                      "id": "sub-video",
+                      "name": "视频会员",
+                      "status": "active",
+                      "amount": 2500,
+                      "channel": "bank",
+                      "cycle": "monthly"
+                    },
+                    {
+                      "id": "sub-cloud",
+                      "name": "云存储",
+                      "status": "active",
+                      "amount": 600,
+                      "channel": "platform",
+                      "cycle": "monthly"
+                    },
+                    {
+                      "id": "sub-loan",
+                      "name": "助学贷款还款",
+                      "status": "active",
+                      "amount": 50000,
+                      "channel": "bank",
+                      "cycle": "monthly"
+                    }
+                  ]
+                }
+              },
+              "workflowTaskCount": 5,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "查看订阅清单和详情",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:47:16.890Z",
+          "assistantTranscripts": [
+            "稍等，这就帮你调出订阅清单。\n\n",
+            "你目前有三项有效订阅。视频会员每月25元，下次扣款是11月15日；云存储每月6元，11月3日扣款；助学贷款还款每月500元，11月5日扣款。这次只做了读取，没有改动任何设置。"
+          ]
+        },
+        {
+          "index": 4,
+          "input": "查看我的银行卡列表和状态，只读查询",
+          "inputChannel": "keyboard-live",
+          "expectedFunctions": [
+            "CA01"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:47:16.890Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "wait": {
+            "elapsedMs": 22949,
+            "timedOut": false
+          },
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "CA01",
+                "params": {}
+              }
+            }
+          ],
+          "actualFunctions": [
+            "CA01"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 6,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "9dc1bf91-a317-4d22-a2af-5cb2679b097a",
+                "functionId": "CA01",
+                "title": "查看卡片列表",
+                "status": "complete",
+                "params": {},
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "0",
+                  "1",
+                  "2"
+                ],
+                "result": {
+                  "kind": "array",
+                  "length": 3,
+                  "items": [
+                    {
+                      "id": "card-daily",
+                      "name": "日常借记卡",
+                      "status": "active"
+                    },
+                    {
+                      "id": "card-risk",
+                      "name": "储蓄借记卡",
+                      "status": "restricted"
+                    },
+                    {
+                      "id": "card-judicial",
+                      "name": "司法限制演示卡",
+                      "status": "restricted"
+                    }
+                  ]
+                }
+              },
+              "workflowTaskCount": 6,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "查看卡片列表",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:47:39.903Z",
+          "assistantTranscripts": [
+            "这就帮你调出银行卡列表和状态。",
+            "你名下有三张卡。日常借记卡尾号8021，状态正常；储蓄借记卡尾号3609和司法限制演示卡尾号9012，这两张目前都受限。这次只是读取列表，没有做任何修改。"
+          ]
+        }
+      ],
+      "eventTypes": [
+        "session.created",
+        "session.updated",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "conversation.item.deleted",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "conversation.item.created",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.output_item.done",
+        "response.done",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta"
+      ],
+      "functionCalls": [
+        {
+          "id": "call_480ed190d04045d484e82c02",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR08",
+            "params": {
+              "action": "list"
+            }
+          }
+        },
+        {
+          "id": "call_183ff786a98948ba98311f0c",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "IN06",
+            "params": {
+              "type": "现金基金"
+            }
+          }
+        },
+        {
+          "id": "call_3dc8f0e920474127a1ec7516",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "IN07",
+            "params": {
+              "productIds": [
+                "fund-cash",
+                "fund-bond"
+              ]
+            }
+          }
+        },
+        {
+          "id": "call_cbcac02e227f413cbfafaaf8",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "BI06",
+            "params": {
+              "period": "2026-10"
+            }
+          }
+        },
+        {
+          "id": "call_cfe949de6e8e46378f035afa",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "SU01",
+            "params": {}
+          }
+        },
+        {
+          "id": "call_cd6a5904f93f4e1aa89d7f3e",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "CA01",
+            "params": {}
+          }
+        }
+      ],
+      "bankRequests": [
+        {
+          "turnIndex": 0,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR08",
+            "params": {
+              "action": "list"
+            }
+          },
+          "utterance": "查看我的收款联系人清单，只读取不修改",
+          "historyCount": 1,
+          "revision": 0
+        },
+        {
+          "turnIndex": 1,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "IN06",
+            "params": {
+              "type": "现金基金"
+            }
+          },
+          "utterance": "比较演示现金基金和演示债券基金这两款产品，只读比较",
+          "historyCount": 2,
+          "revision": 1
+        },
+        {
+          "turnIndex": 1,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "IN07",
+            "params": {
+              "productIds": [
+                "fund-cash",
+                "fund-bond"
+              ]
+            }
+          },
+          "utterance": "比较演示现金基金和演示债券基金这两款产品，只读比较",
+          "historyCount": 2,
+          "revision": 2
+        },
+        {
+          "turnIndex": 2,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "BI06",
+            "params": {
+              "period": "2026-10"
+            }
+          },
+          "utterance": "查看2026年10月的月度账单报告，只读查询",
+          "historyCount": 3,
+          "revision": 3
+        },
+        {
+          "turnIndex": 3,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "SU01",
+            "params": {}
+          },
+          "utterance": "查看我的订阅清单，只读取不更改",
+          "historyCount": 4,
+          "revision": 4
+        },
+        {
+          "turnIndex": 4,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "CA01",
+            "params": {}
+          },
+          "utterance": "查看我的银行卡列表和状态，只读查询",
+          "historyCount": 5,
+          "revision": 5
+        }
+      ],
+      "bankResponses": [
+        {
+          "turnIndex": 0,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 1,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "f6ebee99-f722-4760-b2ec-cdac74242307",
+              "functionId": "TR08",
+              "title": "管理收款联系人",
+              "status": "complete",
+              "params": {
+                "action": "list"
+              },
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "0",
+                "1",
+                "2"
+              ],
+              "result": {
+                "kind": "array",
+                "length": 3,
+                "items": [
+                  {
+                    "id": "zhang-roommate",
+                    "name": "张三",
+                    "label": "室友"
+                  },
+                  {
+                    "id": "zhang-landlord",
+                    "name": "张三",
+                    "label": "房东"
+                  },
+                  {
+                    "id": "li-friend",
+                    "name": "李四",
+                    "label": "同学"
+                  }
+                ]
+              }
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 1
+        },
+        {
+          "turnIndex": 1,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 2,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "0638d1e5-632b-4cab-a83e-f112ffffa59c",
+              "functionId": "IN06",
+              "title": "查询理财产品列表和详情",
+              "status": "complete",
+              "params": {
+                "type": "现金基金"
+              },
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [],
+              "result": {
+                "kind": "array",
+                "length": 0,
+                "items": []
+              }
+            },
+            "workflowTaskCount": 2,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 3
+        },
+        {
+          "turnIndex": 1,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 3,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "90ba5747-935a-4927-8c16-6c9684f050ea",
+              "functionId": "IN07",
+              "title": "比较指定产品",
+              "status": "complete",
+              "params": {
+                "productIds": [
+                  "fund-cash",
+                  "fund-bond"
+                ]
+              },
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "products",
+                "comparedFields",
+                "differences",
+                "missing"
+              ],
+              "result": {
+                "kind": "object",
+                "keys": [
+                  "products",
+                  "comparedFields",
+                  "differences",
+                  "missing"
+                ],
+                "products": {
+                  "count": 2,
+                  "items": [
+                    {
+                      "id": "fund-cash",
+                      "name": "演示现金基金",
+                      "risk": 1,
+                      "type": "货币"
+                    },
+                    {
+                      "id": "fund-bond",
+                      "name": "演示债券基金",
+                      "risk": 3,
+                      "type": "债券"
+                    }
+                  ]
+                },
+                "differenceFields": [
+                  "risk"
+                ],
+                "missingFields": [
+                  "managementFee",
+                  "custodyFee",
+                  "managementFee",
+                  "custodyFee"
+                ]
+              }
+            },
+            "workflowTaskCount": 3,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 4
+        },
+        {
+          "turnIndex": 2,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 4,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "2bc39069-a8cc-4d87-a9c8-a4250a8fa4ca",
+              "functionId": "BI06",
+              "title": "查看月度或年度账单报告",
+              "status": "complete",
+              "params": {
+                "period": "2026-10"
+              },
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "period",
+                "periodType",
+                "periodSource",
+                "periodNotice",
+                "summary",
+                "categoryBreakdown",
+                "comparison",
+                "insights"
+              ],
+              "result": {
+                "kind": "object",
+                "keys": [
+                  "period",
+                  "periodType",
+                  "periodSource",
+                  "periodNotice",
+                  "summary",
+                  "categoryBreakdown",
+                  "comparison",
+                  "insights"
+                ],
+                "period": "2026-10",
+                "periodType": "month",
+                "periodSource": "requested-month",
+                "summary": {
+                  "period": "2026-10",
+                  "periodType": "month",
+                  "grossExpenses": 11500,
+                  "netExpenses": 10300,
+                  "refunds": 1200,
+                  "income": 0,
+                  "count": 5
+                }
+              }
+            },
+            "workflowTaskCount": 4,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 5
+        },
+        {
+          "turnIndex": 3,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 5,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "3d55ac88-772c-4e51-92b7-7d73001b1c7a",
+              "functionId": "SU01",
+              "title": "查看订阅清单和详情",
+              "status": "complete",
+              "params": {},
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "0",
+                "1",
+                "2"
+              ],
+              "result": {
+                "kind": "array",
+                "length": 3,
+                "items": [
+                  {
+                    "id": "sub-video",
+                    "name": "视频会员",
+                    "status": "active",
+                    "amount": 2500,
+                    "channel": "bank",
+                    "cycle": "monthly"
+                  },
+                  {
+                    "id": "sub-cloud",
+                    "name": "云存储",
+                    "status": "active",
+                    "amount": 600,
+                    "channel": "platform",
+                    "cycle": "monthly"
+                  },
+                  {
+                    "id": "sub-loan",
+                    "name": "助学贷款还款",
+                    "status": "active",
+                    "amount": 50000,
+                    "channel": "bank",
+                    "cycle": "monthly"
+                  }
+                ]
+              }
+            },
+            "workflowTaskCount": 5,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 7
+        },
+        {
+          "turnIndex": 4,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 6,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "9dc1bf91-a317-4d22-a2af-5cb2679b097a",
+              "functionId": "CA01",
+              "title": "查看卡片列表",
+              "status": "complete",
+              "params": {},
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "0",
+                "1",
+                "2"
+              ],
+              "result": {
+                "kind": "array",
+                "length": 3,
+                "items": [
+                  {
+                    "id": "card-daily",
+                    "name": "日常借记卡",
+                    "status": "active"
+                  },
+                  {
+                    "id": "card-risk",
+                    "name": "储蓄借记卡",
+                    "status": "restricted"
+                  },
+                  {
+                    "id": "card-judicial",
+                    "name": "司法限制演示卡",
+                    "status": "restricted"
+                  }
+                ]
+              }
+            },
+            "workflowTaskCount": 6,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 9
+        }
+      ],
+      "browserErrorCount": 0,
+      "cleanup": {
+        "rtcStates": [
+          "closed"
+        ],
+        "syntheticTracks": [
+          "ended"
+        ]
+      },
+      "transcripts": {
+        "user": [],
+        "assistant": [
+          "你的收款联系人里有三位：室友张三、房东张三，还有同学李四。这次只是读取清单，没有做任何修改。",
+          "演示现金基金风险等级是1，而债券基金是3。这两款产品的流动性都是赎回预计T+1工作日到账，当前合成交易费率均为0。不过管理费和托管费在数据里都没提供，所以没法比较这两项。",
+          "稍等，我帮你调出2026年10月的月度账单报告。\n\n",
+          "2026年10月账单显示，总支出115元，退款12元，净支出103元。餐饮净支出52元，饮品26元，订阅25元。相比9月的25元净支出，本月增加了78元，涨幅312%。",
+          "稍等，这就帮你调出订阅清单。\n\n",
+          "你目前有三项有效订阅。视频会员每月25元，下次扣款是11月15日；云存储每月6元，11月3日扣款；助学贷款还款每月500元，11月5日扣款。这次只做了读取，没有改动任何设置。",
+          "这就帮你调出银行卡列表和状态。",
+          "你名下有三张卡。日常借记卡尾号8021，状态正常；储蓄借记卡尾号3609和司法限制演示卡尾号9012，这两张目前都受限。这次只是读取列表，没有做任何修改。"
+        ]
+      }
+    }
+  ],
+  "status": "completed"
+}

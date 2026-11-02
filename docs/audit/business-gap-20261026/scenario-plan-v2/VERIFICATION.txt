@@ -1,0 +1,224 @@
+方案V2补充验证记录
+DATE: 2026-10-26
+ACTIVE_OBJECT: LOCAL_PROJECT
+ACTION: 交付新方案；不是应用实现
+GOAL: 十稿需求/画像/故事/数据/最小功能同步映射；原四角色保持
+CODE_HEAD: 4689188140299059ba324720726bb33ba266bad8
+
+NEW_CHECK
+COMMAND: ["python3", "-X", "utf8", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/validate-plan.py"]
+EXIT: 0
+STDOUT (literal):
+{
+  "rows": 191,
+  "source_quote_count": 455,
+  "source_documents": 10,
+  "headings": 467,
+  "coverage_records": 1080,
+  "scenarios": 37,
+  "counts_by_tier": {
+    "1": 140,
+    "2": 29,
+    "3": 12,
+    "4": 10
+  },
+  "candidates": [
+    "B25",
+    "B26",
+    "B27",
+    "B28",
+    "B29",
+    "S21",
+    "S22",
+    "W31",
+    "W32",
+    "W33",
+    "W34",
+    "C28",
+    "X30",
+    "X31",
+    "X32",
+    "X33",
+    "X34",
+    "X35",
+    "X36",
+    "X37"
+  ],
+  "cycles": [],
+  "deferred_final_links": [],
+  "checks_passed": 1598,
+  "checks_total": 1598,
+  "issues": []
+}
+
+STDERR (literal):
+
+
+OBSERVED: 191 rows; 37 scenarios; 20 candidates; 455 exact citations; 467 heading registrations; 1080 coverage records; 22 competitor subtasks; 32 security IDs.
+NOTE: Static proposal validation only, no application/business/browser/external service tests this turn.
+
+ORIGINAL FOUR ROLES (reopened, unchanged):
+MODIFIED_FILE: LOCAL_PROJECT/docs/DOC_INDEX.md
+SHA256: 0848a4c9aeea7d2229ee627207fa089c62d5f12195f683129a7ae0b5506008a2
+BYTES: 9520
+DIFF_FILE: LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/DIFF_FILE.patch
+SHA256: 637812f42e25972d538c5485141d47549fa7b44cf36daf2b70589afdfc8e93b1
+BYTES: 6006
+VERIFICATION.txt: LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/VERIFICATION.txt
+SHA256: 1e860d8046b13f187022264cd33feb44ef3309751f6646da9edf33710b0cd85b
+BYTES: 11061
+ROLLBACK.sh: LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/ROLLBACK.sh
+SHA256: 3e600a49ed583d9f1fe204031ba9e43f555c0291aa3c5f898aaacdd032f430cb
+BYTES: 8894
+
+ORIGINAL ADOPTION TRANSACTION (index only, not application business):
+BASELINE
+COMMAND: ["python3", "LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/check-adoption.py", "LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/baseline/docs/DOC_INDEX.md", "adoption-entry"]
+EXIT: 0
+STDOUT (literal):
+LEGACY_5
+
+STDERR (literal):
+
+MODIFIED
+COMMAND: ["python3", "LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/check-adoption.py", "LOCAL_PROJECT/docs/DOC_INDEX.md", "adoption-entry"]
+EXIT: 0
+STDOUT (literal):
+FINAL_10
+
+STDERR (literal):
+
+ROLLBACK_EXECUTE
+COMMAND: ["LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/ROLLBACK.sh", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/plan-v2-rollback-index-copy.md"]
+EXIT: 0
+STDOUT (literal):
+restored DOC_INDEX.md baseline
+
+STDERR (literal):
+
+ROLLBACK
+COMMAND: ["python3", "LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/check-adoption.py", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/plan-v2-rollback-index-copy.md", "adoption-entry"]
+EXIT: 0
+STDOUT (literal):
+LEGACY_5
+
+STDERR (literal):
+
+PATCH_REAPPLY
+COMMAND: ["patch", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/plan-v2-rollback-index-copy.md", "LOCAL_AUXILIARY/backups/webank-final-docs-20261026-4679afab/DIFF_FILE.patch"]
+EXIT: 0
+STDOUT (literal):
+patching file 'LOCAL_AUXILIARY/webank-scenario-plan-20261026/plan-v2-rollback-index-copy.md'
+
+STDERR (literal):
+
+BASELINE = LEGACY_5; MODIFIED = FINAL_10; ROLLBACK = LEGACY_5; restored hash matches pristine; actual project index stays FINAL_10.
+
+SUPPLEMENT: CURRENT_STATUS.md / TODO.md pointer transaction
+EVIDENCE: LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/verification.json
+ROLLBACK: LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-pointers.sh
+SCOPE: only two planning-pointer documents, not financial business state.
+BASELINE CURRENT_STATUS.md
+COMMAND: ["python3", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/check-plan-pointer.py", "LOCAL_PROJECT/docs/CURRENT_STATUS.md", "plan-pointer"]
+EXIT: 0
+STDOUT (literal):
+BEFORE_PLAN_V2
+
+STDERR (literal):
+
+MODIFIED CURRENT_STATUS.md
+COMMAND: ["python3", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/check-plan-pointer.py", "LOCAL_PROJECT/docs/CURRENT_STATUS.md", "plan-pointer"]
+EXIT: 0
+STDOUT (literal):
+SCENARIO_V2
+
+STDERR (literal):
+
+ROLLBACK EXECUTE CURRENT_STATUS.md
+COMMAND: ["LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-pointers.sh", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-CURRENT_STATUS.md", "CURRENT_STATUS.md"]
+EXIT: 0
+STDOUT (literal):
+restored CURRENT_STATUS.md baseline
+
+STDERR (literal):
+
+ROLLBACK CURRENT_STATUS.md
+COMMAND: ["python3", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/check-plan-pointer.py", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-CURRENT_STATUS.md", "plan-pointer"]
+EXIT: 0
+STDOUT (literal):
+BEFORE_PLAN_V2
+
+STDERR (literal):
+
+REAPPLY CURRENT_STATUS.md
+COMMAND: ["patch", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-CURRENT_STATUS.md", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/CURRENT_STATUS.md.patch"]
+EXIT: 0
+STDOUT (literal):
+patching file 'LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-CURRENT_STATUS.md'
+
+STDERR (literal):
+
+BASELINE TODO.md
+COMMAND: ["python3", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/check-plan-pointer.py", "LOCAL_PROJECT/docs/TODO.md", "plan-pointer"]
+EXIT: 0
+STDOUT (literal):
+BEFORE_PLAN_V2
+
+STDERR (literal):
+
+MODIFIED TODO.md
+COMMAND: ["python3", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/check-plan-pointer.py", "LOCAL_PROJECT/docs/TODO.md", "plan-pointer"]
+EXIT: 0
+STDOUT (literal):
+SCENARIO_V2
+
+STDERR (literal):
+
+ROLLBACK EXECUTE TODO.md
+COMMAND: ["LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-pointers.sh", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-TODO.md", "TODO.md"]
+EXIT: 0
+STDOUT (literal):
+restored TODO.md baseline
+
+STDERR (literal):
+
+ROLLBACK TODO.md
+COMMAND: ["python3", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/check-plan-pointer.py", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-TODO.md", "plan-pointer"]
+EXIT: 0
+STDOUT (literal):
+BEFORE_PLAN_V2
+
+STDERR (literal):
+
+REAPPLY TODO.md
+COMMAND: ["patch", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-TODO.md", "LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/TODO.md.patch"]
+EXIT: 0
+STDOUT (literal):
+patching file 'LOCAL_AUXILIARY/webank-scenario-plan-20261026/pointer-transaction/rollback-copy-TODO.md'
+
+STDERR (literal):
+
+BASELINE = BEFORE_PLAN_V2; MODIFIED = SCENARIO_V2; ROLLBACK = BEFORE_PLAN_V2. Both restored hashes equal originals; actual documents retain new pointers.
+
+ERRORS RETAINED / CORRECTIONS:
+1. Earlier inline Python with Chinese and no coding header: SyntaxError: Non-UTF-8 code starting with \xe6 in file <stdin> on line 3. Parse failed before writes. Corrected PYTHONUTF8=1 python3 -X utf8 plus coding:utf-8; corrected exit 0.
+2. Intermediate validator exit 1: 已生成本地链接: [(implementation-plan.md, kimi-cite://web...)] from a long source quotation. Corrected root quotes to precise short continuous excerpts; final all 455 source excerpts verified.
+3. Intermediate validator exit 1: quick-review.md/shared-and-dependencies.md not generated yet. Created and reopened the planned files; final missing links 0.
+4. Premature cat of final-review-bills.json returned No such file or directory (exit 1); reviewer subsequently created it, reopened and included in review-evidence.json.
+5. Review finding B13 BA-B06/BI04 corrected to BI05 in source draft and generated artifacts, checked against current literal catalog.
+
+PRESERVED: original ten files/hash manifest, old226 files, original four roles, app tracked bytes and HEAD.
+FILES REOPENED:
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/README.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/REVIEW.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/VERIFICATION.txt
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/coverage-matrix.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/implementation-plan.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/plan.json
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/quick-review.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/review-evidence.json
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/scenario-walkthroughs.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/shared-and-dependencies.md
+LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/validation.json
+LOCAL_PROJECT/docs/CURRENT_STATUS.md
+LOCAL_PROJECT/docs/TODO.md

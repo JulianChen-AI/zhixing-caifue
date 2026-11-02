@@ -1,0 +1,8 @@
+PR: https://github.com/Rafael-Terris/Webank_competition/pull/3
+State: open; no merge performed
+Head: fix/aa-voice-core-workflows @ 177a24b943ee3051090b1eed2483147347268827
+Base: main
+Remote branch hash verified with git ls-remote.
+Includes three committed local revisions:50169d3,2e9fe0f,177a24b.
+Pre-existing uncommitted files/hunks and current local main unchanged; no force push.
+CI status not asserted.

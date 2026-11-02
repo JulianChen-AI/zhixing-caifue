@@ -1,0 +1,1572 @@
+UI review feedback transaction — 2026-10-26
+Recorded UTC: 2026-10-26T09:12:38.764093+00:00
+TARGET: LOCAL_PROJECT/code/webank-competition/voice-bank
+Changed sites: WorkflowPanelState completed form disclosure and TR05 field visibility; BusinessResult IN07 product comparison and BI06 report presentation; WorkflowResult technical-key filtering; review-lite startNormalAa/listExistingAa and item20 documentation-only branch; browser regression.
+GOAL: normal AA sandbox experience without weakening limits; concise cards; user-readable missing values; hide technical insight keys; explain document-only item20.
+
+BASELINE: 0/4 new browser checks, exit1. Existing business checks remain20/20.
+MODIFIED: 4/4 new browser checks, exit0;20/20 business checks;203 tests;tsc/build/browser regression passed.
+ROLLBACK: standalone ROLLBACK.sh on credential-free application COPY restored4 pristine files; identical browser probe against copy returned0/4 exit1.
+REAPPLIED: native patch reconstructed4 exact modified hashes; same probe returned4/4 exit0.
+No live rollback was executed on the working application. All37 protected lib source hashes are unchanged: no financial guardrails/authentication/voice business logic changed.
+
+FOUR SUPPLEMENTAL ROLES (original roles preserved):
+MODIFIED_FILE: LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/MODIFIED_FILE.tar.gz
+DIFF_FILE: LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/DIFF_FILE.patch
+VERIFICATION.txt: LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/VERIFICATION.txt
+ROLLBACK.sh: LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/ROLLBACK.sh
+BACKUP: LOCAL_AUXILIARY/backups/webank-review-ui-20261026-015853
+Independent runtime copy: LOCAL_AUXILIARY/backups/webank-review-ui-20261026-015853/runtime-copy (temporary5181server stopped after check)
+
+SOURCE HASHES:
+{
+  "target": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "backup": "LOCAL_AUXILIARY/backups/webank-review-ui-20261026-015853",
+  "modified": {
+    "components/workflow-panel.tsx": "d857ebed1c7ce8ada9c09aa788b059ae6774ae7b0e24ce1d60655af5c050ece2",
+    "app/review-lite/page.tsx": "f215d179ccc12396333bb2a2449d5e010c461ad83f3bde993efdd2786ba689ae",
+    "tests/browser/lite-review.cjs": "98497ded6e92e89219aa62e23bf955685c6dff29a4ff2d091dbd4f02911fc97d",
+    "docs/workflows/lite-1-20-review.md": "9f73df8349b1b54acbd1c561db15b57df1ac285a2dc05136a1bb40b44b82b8e5"
+  },
+  "baseline": {
+    "components/workflow-panel.tsx": "75bdbc5046267c7746b18070d18992c4256a0d68b6b171ea9d54f67e0f1197ef",
+    "app/review-lite/page.tsx": "48a7ff7efa46805aca15c544b6d49a3425b61f0e6822148a1841c33afef795ca",
+    "tests/browser/lite-review.cjs": "d7af3c75ce43a9d373f302cefdbd1226a6d2399d7cd2102f24e960bfb34319be",
+    "docs/workflows/lite-1-20-review.md": "b4ab4a23f137722d1b8bbef6ec1f04e39481a18fbcbef0cd72a4c6393c0bd37e"
+  }
+}
+
+BASELINE
+COMMAND: BANK_TEST_URL=http://127.0.0.1:5180 node LOCAL_AUXILIARY/webank-gap-audit-20261026/probe-review-ui.cjs
+INPUT: same four selected items (4,20,11,10) in isolated synthetic browser session.
+EXIT: 1
+LITERAL OUTPUT (stdout/stderr captured together):
+FAIL AA offers normal experience beside deliberate limit fixture
+FAIL documentation item does not display unrelated business launcher
+FAIL product comparison has compact dedicated table
+FAIL technical insight keys hidden by default
+RESULT 0/4
+
+
+MODIFIED
+COMMAND: BANK_TEST_URL=http://127.0.0.1:5180 node LOCAL_AUXILIARY/webank-gap-audit-20261026/probe-review-ui.cjs
+INPUT: same four selected items (4,20,11,10) in isolated synthetic browser session.
+EXIT: 0
+LITERAL OUTPUT (stdout/stderr captured together):
+PASS AA offers normal experience beside deliberate limit fixture
+PASS documentation item does not display unrelated business launcher
+PASS product comparison has compact dedicated table
+PASS technical insight keys hidden by default
+RESULT 4/4
+
+
+ROLLBACK
+COMMAND: BANK_TEST_URL=http://127.0.0.1:5181 node LOCAL_AUXILIARY/webank-gap-audit-20261026/probe-review-ui.cjs
+INPUT: same four selected items (4,20,11,10) in isolated synthetic browser session.
+EXIT: 1
+LITERAL OUTPUT (stdout/stderr captured together):
+FAIL AA offers normal experience beside deliberate limit fixture
+FAIL documentation item does not display unrelated business launcher
+FAIL product comparison has compact dedicated table
+FAIL technical insight keys hidden by default
+RESULT 0/4
+
+
+REAPPLIED
+COMMAND: BANK_TEST_URL=http://127.0.0.1:5181 node LOCAL_AUXILIARY/webank-gap-audit-20261026/probe-review-ui.cjs
+INPUT: same four selected items (4,20,11,10) in isolated synthetic browser session.
+EXIT: 0
+LITERAL OUTPUT (stdout/stderr captured together):
+PASS AA offers normal experience beside deliberate limit fixture
+PASS documentation item does not display unrelated business launcher
+PASS product comparison has compact dedicated table
+PASS technical insight keys hidden by default
+RESULT 4/4
+
+
+COMMAND RECORD:
+{
+  "command": [
+    "npm",
+    "run",
+    "verify:lite"
+  ],
+  "cwd": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "exit": 0
+}
+LITERAL STDOUT:
+
+> zhixing-live-bank@0.1.0 verify:lite
+> node --experimental-transform-types tests/quick-1-20.ts
+
+PASS 01 目标改期改金额重算月供 | 月供 ¥375→¥750；账户未扣款
+PASS 02 撤单日期和窗口 | 当日撤单余额恢复；昨日/赎回/过期/摘要后变旧均阻断
+PASS 03 AA单笔限额 | 5000元创建1笔；5000.01元被阻断
+PASS 04 AA每日次数 | 当日5次成功，第6次阻断；移出昨日后可再次发起
+PASS 05 未来分类规则生效 | 新咖啡流水→人情往来，历史食堂保持餐饮
+PASS 06 商户自动分类 | 校园食堂→餐饮，来源merchant-map
+PASS 07 低置信度确认 | 未知商户→未分类，需确认=true
+PASS 08 月报分类图 | 3个分类，合计¥103
+PASS 09 环比和退款口径 | 本期净支出¥103；退款¥12；上期¥25；零基数显示不可比
+PASS 10 月报可复核洞察 | 2026-10记录支出¥115，退款¥12，净支出¥103。；2026-10当前记录中，餐饮净支出为¥52。；2026-10净支出较2026-09增加¥78（312%）。
+PASS 11 产品比较差异与缺项 | 风险1 vs 3；债券基金流动性缺失明确列出
+PASS 12 单品费用和最坏情形 | 申购费:0；赎回费:0；管理费:未知；托管费:未知；可能发生本金损失；当前合成数据未提供或保证最大亏损上限。
+PASS 13 赎回费用和预计到账 | 费用¥0，预计2026-10-27；账户尚未到账
+PASS 14 办卡用途分流 | 日常用途→借记；另列信用/虚拟，虚拟明确未接入；无申请记录
+PASS 15 司法冻结处置指引 | 身份证明/卡片线索/相关文书准备指引；自助解除阻断
+PASS 16 转账与待执行分开 | 转账已扣¥100有回执；周期规则仅保存未执行，余额未动
+PASS 17 理财三阶段结果 | 申购受理→结算后份额确认；赎回受理→结算后资金到账
+PASS 18 银行解约/商户退订/停扣 | 银行协议已解除；商户退订未知；仅沙箱此银行协议停扣；外部待核验
+PASS 19 挂失责任和后续说明 | 此处只记录本沙箱挂失状态；真实交易责任及是否赔付需按官方规则核实，不承诺赔付。；尽快通过发卡机构官方渠道核实挂失状态及争议交易处理方式。；本人核对近期交易并保留回执和相关材料；不要在对话中提交密码、验证码或完整卡号。；补卡和第三方换绑分别按发卡机构及服务商官方流程办理；本沙箱不自动迁移绑定。
+PASS 20 竞品正文与总表矛盾校正 | 校正对照：正文§3.1称微众无分类、中行有分析，总表450相反；正文§3.3称微众无月年报、中行有，总表452相反。原文SHA-256：563620d7e1c710ee845c6dcb41b7d021eb47c1c6a821b0a5f5dae56ae250a0fd。仅记录冲突，未裁定真实能力；文件及哈希另由verify:lite核验。
+RESULT 20/20 (synthetic, no external services)
+
+LITERAL STDERR:
+(node:15930) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+COMMAND RECORD:
+{
+  "command": [
+    "npm",
+    "test"
+  ],
+  "cwd": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "exit": 0
+}
+LITERAL STDOUT:
+
+> zhixing-live-bank@0.1.0 test
+> node --experimental-transform-types --test tests/engine.test.ts tests/qwen.test.ts tests/checklists.test.ts tests/workflows.test.ts tests/tailscale.test.ts tests/plans.test.ts tests/lite.test.ts
+
+TAP version 13
+# (node:15948) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: four source snapshots retain hashes and valid rule line references
+ok 1 - four source snapshots retain hashes and valid rule line references
+  ---
+  duration_ms: 2.589542
+  type: 'test'
+  ...
+# Subtest: catalog has unique IDs, bounded predicates and no implicit empty-context success
+ok 2 - catalog has unique IDs, bounded predicates and no implicit empty-context success
+  ---
+  duration_ms: 0.381292
+  type: 'test'
+  ...
+# Subtest: sequential checks stop at the first unresolved condition
+ok 3 - sequential checks stop at the first unresolved condition
+  ---
+  duration_ms: 0.043833
+  type: 'test'
+  ...
+# Subtest: model cannot resolve an ambiguous name or silently select a funding account
+ok 4 - model cannot resolve an ambiguous name or silently select a funding account
+  ---
+  duration_ms: 3.597709
+  type: 'test'
+  ...
+# Subtest: every required payment field must come from speech or an explicit card choice
+ok 5 - every required payment field must come from speech or an explicit card choice
+  ---
+  duration_ms: 1.927125
+  type: 'test'
+  ...
+# Subtest: model amount mismatch and imprecise money requests require clarification
+ok 6 - model amount mismatch and imprecise money requests require clarification
+  ---
+  duration_ms: 0.650458
+  type: 'test'
+  ...
+# Subtest: multiple unrelated actions cannot silently run as a transfer
+ok 7 - multiple unrelated actions cannot silently run as a transfer
+  ---
+  duration_ms: 0.500042
+  type: 'test'
+  ...
+# Subtest: subscription cancellation cannot cancel the current transfer
+ok 8 - subscription cancellation cannot cancel the current transfer
+  ---
+  duration_ms: 0.749417
+  type: 'test'
+  ...
+# Subtest: protected mandates and external channels are distinct routes
+ok 9 - protected mandates and external channels are distinct routes
+  ---
+  duration_ms: 0.256583
+  type: 'test'
+  ...
+# Subtest: billing and investment requests report the selected checklist without fabricating results
+ok 10 - billing and investment requests report the selected checklist without fabricating results
+  ---
+  duration_ms: 0.894916
+  type: 'test'
+  ...
+# Subtest: unknown utterances and uncertain cancel targets cannot authorize an action
+ok 11 - unknown utterances and uncertain cancel targets cannot authorize an action
+  ---
+  duration_ms: 1.0525
+  type: 'test'
+  ...
+# Subtest: sensitive fields are stopped before entering business drafts or audit evidence
+ok 12 - sensitive fields are stopped before entering business drafts or audit evidence
+  ---
+  duration_ms: 0.239291
+  type: 'test'
+  ...
+# Subtest: risk-sensitive requests cannot bypass unavailable upgraded verification
+ok 13 - risk-sensitive requests cannot bypass unavailable upgraded verification
+  ---
+  duration_ms: 0.227625
+  type: 'test'
+  ...
+# Subtest: explicit sandbox policy accepts 500 yuan while risk and missing adapters still fail closed
+ok 14 - explicit sandbox policy accepts 500 yuan while risk and missing adapters still fail closed
+  ---
+  duration_ms: 0.218333
+  type: 'test'
+  ...
+# Subtest: a routed balance query preserves current confirmation and authorization
+ok 15 - a routed balance query preserves current confirmation and authorization
+  ---
+  duration_ms: 0.40875
+  type: 'test'
+  ...
+# Subtest: changes invalidate old authorization and audit results share the executable rules
+ok 16 - changes invalidate old authorization and audit results share the executable rules
+  ---
+  duration_ms: 0.585791
+  type: 'test'
+  ...
+# Subtest: legacy active drafts must reselect accounts while completed receipts survive normalization
+ok 17 - legacy active drafts must reselect accounts while completed receipts survive normalization
+  ---
+  duration_ms: 0.599708
+  type: 'test'
+  ...
+# Subtest: audit is bounded and duplicate request IDs do not create duplicate events
+ok 18 - audit is bounded and duplicate request IDs do not create duplicate events
+  ---
+  duration_ms: 108.481458
+  type: 'test'
+  ...
+# Subtest: amount parsing respects correction, exact cents and ambiguity
+ok 19 - amount parsing respects correction, exact cents and ambiguity
+  ---
+  duration_ms: 0.177
+  type: 'test'
+  ...
+# Subtest: unsupported money formats never silently turn into a different amount
+ok 20 - unsupported money formats never silently turn into a different amount
+  ---
+  duration_ms: 0.046959
+  type: 'test'
+  ...
+# Subtest: one stated amount cannot silently become transfers to several people
+ok 21 - one stated amount cannot silently become transfers to several people
+  ---
+  duration_ms: 0.137042
+  type: 'test'
+  ...
+# Subtest: document example utterances map to their intended checklists
+ok 22 - document example utterances map to their intended checklists
+  ---
+  duration_ms: 0.093416
+  type: 'test'
+  ...
+# Subtest: zero, oversized and relative amounts stay unresolved instead of keeping an old amount
+ok 23 - zero, oversized and relative amounts stay unresolved instead of keeping an old amount
+  ---
+  duration_ms: 0.831
+  type: 'test'
+  ...
+# Subtest: negated edits are not executed as positive instructions
+ok 24 - negated edits are not executed as positive instructions
+  ---
+  duration_ms: 0.211542
+  type: 'test'
+  ...
+# Subtest: planned adapters never become executable just because business facts are filled
+ok 25 - planned adapters never become executable just because business facts are filled
+  ---
+  duration_ms: 0.2215
+  type: 'test'
+  ...
+# Subtest: risk mentioned in a separate turn remains attached to the active transfer
+ok 26 - risk mentioned in a separate turn remains attached to the active transfer
+  ---
+  duration_ms: 0.2605
+  type: 'test'
+  ...
+# Subtest: viewing an annual report does not request sharing authorization
+ok 27 - viewing an annual report does not request sharing authorization
+  ---
+  duration_ms: 0.046875
+  type: 'test'
+  ...
+# Subtest: omitted currency asks a contextual question and yes confirms only the amount
+ok 28 - omitted currency asks a contextual question and yes confirms only the amount
+  ---
+  duration_ms: 0.443834
+  type: 'test'
+  ...
+# Subtest: currency-only replies supplement the active transfer instead of starting a new intent
+ok 29 - currency-only replies supplement the active transfer instead of starting a new intent
+  ---
+  duration_ms: 0.586625
+  type: 'test'
+  ...
+# Subtest: account queries preserve authorization and tail selection is not parsed as money
+ok 30 - account queries preserve authorization and tail selection is not parsed as money
+  ---
+  duration_ms: 0.333625
+  type: 'test'
+  ...
+# Subtest: ordinals depend on the visible list and cannot select an unseen account
+ok 31 - ordinals depend on the visible list and cannot select an unseen account
+  ---
+  duration_ms: 0.183833
+  type: 'test'
+  ...
+# Subtest: yes cannot skip missing data, perform authentication or override a risk stop
+ok 32 - yes cannot skip missing data, perform authentication or override a risk stop
+  ---
+  duration_ms: 0.40975
+  type: 'test'
+  ...
+# Subtest: changing a draft after spoken confirmation revokes the old authentication
+ok 33 - changing a draft after spoken confirmation revokes the old authentication
+  ---
+  duration_ms: 0.261
+  type: 'test'
+  ...
+# Subtest: relative and malformed quantities cannot become partial Chinese amounts
+ok 34 - relative and malformed quantities cannot become partial Chinese amounts
+  ---
+  duration_ms: 0.028958
+  type: 'test'
+  ...
+# Subtest: a side query cannot use an unrelated yes to acknowledge an earlier inferred amount
+ok 35 - a side query cannot use an unrelated yes to acknowledge an earlier inferred amount
+  ---
+  duration_ms: 0.232625
+  type: 'test'
+  ...
+# Subtest: unclear speech keeps the current business question instead of restarting generic intent discovery
+ok 36 - unclear speech keeps the current business question instead of restarting generic intent discovery
+  ---
+  duration_ms: 0.10575
+  type: 'test'
+  ...
+# Subtest: a model repeating the known amount while filling a payee does not erase the draft
+ok 37 - a model repeating the known amount while filling a payee does not erase the draft
+  ---
+  duration_ms: 0.193708
+  type: 'test'
+  ...
+# (node:15949) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: ambiguous recipients are not guessed
+ok 38 - ambiguous recipients are not guessed
+  ---
+  duration_ms: 4.825375
+  type: 'test'
+  ...
+# Subtest: correction cancels the old authorization and requires new confirmation
+ok 39 - correction cancels the old authorization and requires new confirmation
+  ---
+  duration_ms: 2.854792
+  type: 'test'
+  ...
+# Subtest: authentication cannot be skipped or guessed
+ok 40 - authentication cannot be skipped or guessed
+  ---
+  duration_ms: 0.638792
+  type: 'test'
+  ...
+# Subtest: duplicate submissions only debit once
+ok 41 - duplicate submissions only debit once
+  ---
+  duration_ms: 1.019958
+  type: 'test'
+  ...
+# Subtest: cancel preserves balances and completed receipts
+ok 42 - cancel preserves balances and completed receipts
+  ---
+  duration_ms: 0.907875
+  type: 'test'
+  ...
+# Subtest: amounts use integer cents and insufficient funds are blocked
+ok 43 - amounts use integer cents and insufficient funds are blocked
+  ---
+  duration_ms: 1.407208
+  type: 'test'
+  ...
+# Subtest: changing funding accounts invalidates confirmation
+ok 44 - changing funding accounts invalidates confirmation
+  ---
+  duration_ms: 0.607959
+  type: 'test'
+  ...
+# Subtest: unrelated balance queries do not lose the transaction authorization
+ok 45 - unrelated balance queries do not lose the transaction authorization
+  ---
+  duration_ms: 1.637125
+  type: 'test'
+  ...
+# Subtest: demo commands handle Chinese numbers and keep small talk separate
+ok 46 - demo commands handle Chinese numbers and keep small talk separate
+  ---
+  duration_ms: 1.559
+  type: 'test'
+  ...
+# (node:15950) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: lite \#1 目标改期改金额重算月供
+ok 47 - lite \#1 目标改期改金额重算月供
+  ---
+  duration_ms: 0.383625
+  type: 'test'
+  ...
+# Subtest: lite \#2 撤单日期和窗口
+ok 48 - lite \#2 撤单日期和窗口
+  ---
+  duration_ms: 0.066208
+  type: 'test'
+  ...
+# Subtest: lite \#3 AA单笔限额
+ok 49 - lite \#3 AA单笔限额
+  ---
+  duration_ms: 0.027583
+  type: 'test'
+  ...
+# Subtest: lite \#4 AA每日次数
+ok 50 - lite \#4 AA每日次数
+  ---
+  duration_ms: 0.026167
+  type: 'test'
+  ...
+# Subtest: lite \#5 未来分类规则生效
+ok 51 - lite \#5 未来分类规则生效
+  ---
+  duration_ms: 0.029125
+  type: 'test'
+  ...
+# Subtest: lite \#6 商户自动分类
+ok 52 - lite \#6 商户自动分类
+  ---
+  duration_ms: 0.024375
+  type: 'test'
+  ...
+# Subtest: lite \#7 低置信度确认
+ok 53 - lite \#7 低置信度确认
+  ---
+  duration_ms: 0.022541
+  type: 'test'
+  ...
+# Subtest: lite \#8 月报分类图
+ok 54 - lite \#8 月报分类图
+  ---
+  duration_ms: 0.021417
+  type: 'test'
+  ...
+# Subtest: lite \#9 环比和退款口径
+ok 55 - lite \#9 环比和退款口径
+  ---
+  duration_ms: 0.176125
+  type: 'test'
+  ...
+# Subtest: lite \#10 月报可复核洞察
+ok 56 - lite \#10 月报可复核洞察
+  ---
+  duration_ms: 0.192042
+  type: 'test'
+  ...
+# Subtest: lite \#11 产品比较差异与缺项
+ok 57 - lite \#11 产品比较差异与缺项
+  ---
+  duration_ms: 0.062083
+  type: 'test'
+  ...
+# Subtest: lite \#12 单品费用和最坏情形
+ok 58 - lite \#12 单品费用和最坏情形
+  ---
+  duration_ms: 0.025083
+  type: 'test'
+  ...
+# Subtest: lite \#13 赎回费用和预计到账
+ok 59 - lite \#13 赎回费用和预计到账
+  ---
+  duration_ms: 0.0175
+  type: 'test'
+  ...
+# Subtest: lite \#14 办卡用途分流
+ok 60 - lite \#14 办卡用途分流
+  ---
+  duration_ms: 0.015167
+  type: 'test'
+  ...
+# Subtest: lite \#15 司法冻结处置指引
+ok 61 - lite \#15 司法冻结处置指引
+  ---
+  duration_ms: 0.014917
+  type: 'test'
+  ...
+# Subtest: lite \#16 转账与待执行分开
+ok 62 - lite \#16 转账与待执行分开
+  ---
+  duration_ms: 0.013541
+  type: 'test'
+  ...
+# Subtest: lite \#17 理财三阶段结果
+ok 63 - lite \#17 理财三阶段结果
+  ---
+  duration_ms: 0.017125
+  type: 'test'
+  ...
+# Subtest: lite \#18 银行解约/商户退订/停扣
+ok 64 - lite \#18 银行解约/商户退订/停扣
+  ---
+  duration_ms: 0.014708
+  type: 'test'
+  ...
+# Subtest: lite \#19 挂失责任和后续说明
+ok 65 - lite \#19 挂失责任和后续说明
+  ---
+  duration_ms: 0.014
+  type: 'test'
+  ...
+# Subtest: cancellation follows Shanghai date boundary, rejects malformed dates and cannot cancel redemptions
+ok 66 - cancellation follows Shanghai date boundary, rejects malformed dates and cannot cancel redemptions
+  ---
+  duration_ms: 0.138
+  type: 'test'
+  ...
+# Subtest: AA count is rechecked at confirmation; an old review cannot create a sixth entry
+ok 67 - AA count is rechecked at confirmation; an old review cannot create a sixth entry
+  ---
+  duration_ms: 2.271209
+  type: 'test'
+  ...
+# Subtest: AA day accounting uses Shanghai midnight rather than host timezone
+ok 68 - AA day accounting uses Shanghai midnight rather than host timezone
+  ---
+  duration_ms: 0.086375
+  type: 'test'
+  ...
+# Subtest: latest explicit future merchant correction wins, single correction does not silently make a future rule
+ok 69 - latest explicit future merchant correction wins, single correction does not silently make a future rule
+  ---
+  duration_ms: 0.701833
+  type: 'test'
+  ...
+# Subtest: report preserves negative refund categories and uses matching summary for omitted period
+ok 70 - report preserves negative refund categories and uses matching summary for omitted period
+  ---
+  duration_ms: 0.178667
+  type: 'test'
+  ...
+# Subtest: new money fields stay cents internally and yuan in model output
+ok 71 - new money fields stay cents internally and yuan in model output
+  ---
+  duration_ms: 0.799375
+  type: 'test'
+  ...
+# Subtest: updated goal preview does not change saved rules until confirmation; duplicate confirm cannot mutate twice
+ok 72 - updated goal preview does not change saved rules until confirmation; duplicate confirm cannot mutate twice
+  ---
+  duration_ms: 2.151417
+  type: 'test'
+  ...
+# Subtest: comparison risk readings are not mistakenly serialized as monetary cents
+ok 73 - comparison risk readings are not mistakenly serialized as monetary cents
+  ---
+  duration_ms: 0.946459
+  type: 'test'
+  ...
+# Subtest: nonjudicial card query keeps its own restriction route and generic daily purpose selects debit
+ok 74 - nonjudicial card query keeps its own restriction route and generic daily purpose selects debit
+  ---
+  duration_ms: 0.366709
+  type: 'test'
+  ...
+# (node:15951) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: ordinary tasks stay single layer and corrections do not become a multi-step plan
+ok 75 - ordinary tasks stay single layer and corrections do not become a multi-step plan
+  ---
+  duration_ms: 8.383708
+  type: 'test'
+  ...
+# Subtest: balance comparison and one-third produce read, deterministic calculation, and inner transfer checklist
+ok 76 - balance comparison and one-third produce read, deterministic calculation, and inner transfer checklist
+  ---
+  duration_ms: 4.213167
+  type: 'test'
+  ...
+# Subtest: ambiguous later purposes are retained and stop the entire chain before a debit
+ok 77 - ambiguous later purposes are retained and stop the entire chain before a debit
+  ---
+  duration_ms: 3.267708
+  type: 'test'
+  ...
+# Subtest: dependencies stop a second transfer until the first has passed its own authentication
+ok 78 - dependencies stop a second transfer until the first has passed its own authentication
+  ---
+  duration_ms: 2.414125
+  type: 'test'
+  ...
+# Subtest: failure, pause and reload retain completed checkmarks and never skip to later business
+ok 79 - failure, pause and reload retain completed checkmarks and never skip to later business
+  ---
+  duration_ms: 3.688209
+  type: 'test'
+  ...
+# Subtest: changed balances recompute a fraction, revoke prior auth and require a new summary
+ok 80 - changed balances recompute a fraction, revoke prior auth and require a new summary
+  ---
+  duration_ms: 2.836875
+  type: 'test'
+  ...
+# Subtest: ties require an explicit account and model computed amounts are not trusted
+ok 81 - ties require an explicit account and model computed amounts are not trusted
+  ---
+  duration_ms: 1.163417
+  type: 'test'
+  ...
+# Subtest: plan schemas cannot forge completion, skip authentication, omit clauses or ground arbitrary amounts
+ok 82 - plan schemas cannot forge completion, skip authentication, omit clauses or ground arbitrary amounts
+  ---
+  duration_ms: 1.158375
+  type: 'test'
+  ...
+# Subtest: completed writes are not replayed on resume, duplicate requests or cancellation
+ok 83 - completed writes are not replayed on resume, duplicate requests or cancellation
+  ---
+  duration_ms: 4.504584
+  type: 'test'
+  ...
+# Subtest: public facts report outer dependencies, inner task IDs and explicit currency units
+ok 84 - public facts report outer dependencies, inner task IDs and explicit currency units
+  ---
+  duration_ms: 1.339417
+  type: 'test'
+  ...
+# Subtest: text replies fill only the current step and confirmations do not authorize future steps
+ok 85 - text replies fill only the current step and confirmations do not authorize future steps
+  ---
+  duration_ms: 1.064167
+  type: 'test'
+  ...
+# Subtest: one spoken confirmation cannot authorize the next step or a newly amended summary
+ok 86 - one spoken confirmation cannot authorize the next step or a newly amended summary
+  ---
+  duration_ms: 2.999917
+  type: 'test'
+  ...
+# Subtest: ambiguous proportions, contradictory proposed purposes and negated transfers fail closed
+ok 87 - ambiguous proportions, contradictory proposed purposes and negated transfers fail closed
+  ---
+  duration_ms: 0.626209
+  type: 'test'
+  ...
+# Subtest: accepted investment orders pause dependencies until actual sandbox settlement
+ok 88 - accepted investment orders pause dependencies until actual sandbox settlement
+  ---
+  duration_ms: 1.067834
+  type: 'test'
+  ...
+# Subtest: unsupported steps do not run subsequent queries or claim completion
+ok 89 - unsupported steps do not run subsequent queries or claim completion
+  ---
+  duration_ms: 0.232708
+  type: 'test'
+  ...
+# Subtest: a model cannot turn a purpose-free clause into a checked business step
+ok 90 - a model cannot turn a purpose-free clause into a checked business step
+  ---
+  duration_ms: 0.206833
+  type: 'test'
+  ...
+# Subtest: separate ratio steps are parsed independently and read balances only when reached
+ok 91 - separate ratio steps are parsed independently and read balances only when reached
+  ---
+  duration_ms: 2.21
+  type: 'test'
+  ...
+# Subtest: model clause punctuation does not prevent valid grounded plans
+ok 92 - model clause punctuation does not prevent valid grounded plans
+  ---
+  duration_ms: 0.619125
+  type: 'test'
+  ...
+# Subtest: a later startup failure preserves an already authenticated step instead of replaying its debit
+ok 93 - a later startup failure preserves an already authenticated step instead of replaying its debit
+  ---
+  duration_ms: 4.034708
+  type: 'test'
+  ...
+# Subtest: amending a paused plan preserves the pause until an explicit resume
+ok 94 - amending a paused plan preserves the pause until an explicit resume
+  ---
+  duration_ms: 1.95875
+  type: 'test'
+  ...
+# Subtest: restating a derived amount while changing a note retains its balance binding
+ok 95 - restating a derived amount while changing a note retains its balance binding
+  ---
+  duration_ms: 1.702667
+  type: 'test'
+  ...
+# Subtest: a previously used confirmation turn cannot authorize a third step or a later edit
+ok 96 - a previously used confirmation turn cannot authorize a third step or a later edit
+  ---
+  duration_ms: 6.474625
+  type: 'test'
+  ...
+# Subtest: a now unpayable proportion revokes authorization, persists the stop and can recover
+ok 97 - a now unpayable proportion revokes authorization, persists the stop and can recover
+  ---
+  duration_ms: 3.505834
+  type: 'test'
+  ...
+# Subtest: negated cancellations cannot cancel an outer checklist
+ok 98 - negated cancellations cannot cancel an outer checklist
+  ---
+  duration_ms: 1.441459
+  type: 'test'
+  ...
+# Subtest: a balance tie appearing after confirmation returns to account selection without retaining authorization
+ok 99 - a balance tie appearing after confirmation returns to account selection without retaining authorization
+  ---
+  duration_ms: 2.717958
+  type: 'test'
+  ...
+# Subtest: proportions reject truncated precision, signs and unsupported numeric notation
+ok 100 - proportions reject truncated precision, signs and unsupported numeric notation
+  ---
+  duration_ms: 2.651917
+  type: 'test'
+  ...
+# (node:15952) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: schema-valid tail selection reaches review and contradictory identities still require clarification
+ok 101 - schema-valid tail selection reaches review and contradictory identities still require clarification
+  ---
+  duration_ms: 6.162834
+  type: 'test'
+  ...
+# Subtest: closing/navigation and backgrounding stop activity; returning does not reconnect
+ok 102 - closing/navigation and backgrounding stop activity; returning does not reconnect
+  ---
+  duration_ms: 0.11075
+  type: 'test'
+  ...
+# Subtest: refreshing committed facts after interruption does not cancel a newer response or fabricate a tool output
+ok 103 - refreshing committed facts after interruption does not cancel a newer response or fabricate a tool output
+  ---
+  duration_ms: 0.445541
+  type: 'test'
+  ...
+# Subtest: a semantic amount correction preserves transfer selections and cannot reuse the old confirmation
+ok 104 - a semantic amount correction preserves transfer selections and cannot reuse the old confirmation
+  ---
+  duration_ms: 1.516958
+  type: 'test'
+  ...
+# Subtest: a speech-only completed response returns the UI to listening without unlocking a pending tool
+ok 105 - a speech-only completed response returns the UI to listening without unlocking a pending tool
+  ---
+  duration_ms: 4.492
+  type: 'test'
+  ...
+# Subtest: explicit backend rejections retain their actual explanation and cannot masquerade as an unknown confirmation outcome
+ok 106 - explicit backend rejections retain their actual explanation and cannot masquerade as an unknown confirmation outcome
+  ---
+  duration_ms: 1.044541
+  type: 'test'
+  ...
+# Subtest: one user turn cannot sustain an unbounded chain of fresh tool call IDs
+ok 107 - one user turn cannot sustain an unbounded chain of fresh tool call IDs
+  ---
+  duration_ms: 18.453708
+  type: 'test'
+  ...
+# Subtest: a late done event cannot finish a newer response and start a duplicate continuation
+ok 108 - a late done event cannot finish a newer response and start a duplicate continuation
+  ---
+  duration_ms: 1.692916
+  type: 'test'
+  ...
+# Subtest: invalid confirmation stays unresolved while a proposed note is reviewed before authorization
+ok 109 - invalid confirmation stays unresolved while a proposed note is reviewed before authorization
+  ---
+  duration_ms: 1.510208
+  type: 'test'
+  ...
+# Subtest: original compound probes ask for evidence instead of accepting model-computed money
+ok 110 - original compound probes ask for evidence instead of accepting model-computed money
+  ---
+  duration_ms: 0.453375
+  type: 'test'
+  ...
+# Subtest: function item metadata supplies missing done-event name and accumulated JSON without guessing a tool
+ok 111 - function item metadata supplies missing done-event name and accumulated JSON without guessing a tool
+  ---
+  duration_ms: 1.665541
+  type: 'test'
+  ...
+# Subtest: object-valued arguments are accepted as data and interrupted metadata cannot execute a late call
+ok 112 - object-valued arguments are accepted as data and interrupted metadata cannot execute a late call
+  ---
+  duration_ms: 2.80675
+  type: 'test'
+  ...
+# Subtest: provider endpoints remain scoped and model output cannot invent authentication
+ok 113 - provider endpoints remain scoped and model output cannot invent authentication
+  ---
+  duration_ms: 0.425833
+  type: 'test'
+  ...
+# Subtest: Omni owns natural dialogue and has a native bank tool rather than an ASR router
+ok 114 - Omni owns natural dialogue and has a native bank tool rather than an ASR router
+  ---
+  duration_ms: 0.439084
+  type: 'test'
+  ...
+# Subtest: native complex planning has a dedicated tool and returns outer progress before continuing once
+ok 115 - native complex planning has a dedicated tool and returns outer progress before continuing once
+  ---
+  duration_ms: 0.567042
+  type: 'test'
+  ...
+# Subtest: tool waits without polling or response generation, then returns actual output and resumes once
+ok 116 - tool waits without polling or response generation, then returns actual output and resumes once
+  ---
+  duration_ms: 5.794459
+  type: 'test'
+  ...
+# Subtest: interruption aborts old tool work without replying to a removed call and discards late results
+ok 117 - interruption aborts old tool work without replying to a removed call and discards late results
+  ---
+  duration_ms: 3.001667
+  type: 'test'
+  ...
+# Subtest: early interruption never cancels a requested response before response.created
+ok 118 - early interruption never cancels a requested response before response.created
+  ---
+  duration_ms: 0.095416
+  type: 'test'
+  ...
+# Subtest: malformed tool JSON produces an error result without executing the backend
+ok 119 - malformed tool JSON produces an error result without executing the backend
+  ---
+  duration_ms: 1.642916
+  type: 'test'
+  ...
+# Subtest: a truncated done event uses actual final item JSON and never synthetically closes braces
+ok 120 - a truncated done event uses actual final item JSON and never synthetically closes braces
+  ---
+  duration_ms: 3.953208
+  type: 'test'
+  ...
+# Subtest: interrupting while waiting for final arguments cannot execute the later complete item
+ok 121 - interrupting while waiting for final arguments cannot execute the later complete item
+  ---
+  duration_ms: 2.983375
+  type: 'test'
+  ...
+# Subtest: an unreadable backend response is unknown outcome rather than claiming no effect was committed
+ok 122 - an unreadable backend response is unknown outcome rather than claiming no effect was committed
+  ---
+  duration_ms: 1.55475
+  type: 'test'
+  ...
+# Subtest: card facts never reopen a cancelled provider turn; new user input continues the same conversation
+ok 123 - card facts never reopen a cancelled provider turn; new user input continues the same conversation
+  ---
+  duration_ms: 0.208458
+  type: 'test'
+  ...
+# Subtest: page authentication suppresses old output without cancelling a tool turn or creating an empty continuation
+ok 124 - page authentication suppresses old output without cancelling a tool turn or creating an empty continuation
+  ---
+  duration_ms: 5.655
+  type: 'test'
+  ...
+# (node:15952) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# Subtest: a page update fences a requested old reply even when session acknowledgement arrives first
+ok 125 - a page update fences a requested old reply even when session acknowledgement arrives first
+  ---
+  duration_ms: 1.536084
+  type: 'test'
+  ...
+# Subtest: page facts update only between responses and the next user turn waits for their acknowledgement
+ok 126 - page facts update only between responses and the next user turn waits for their acknowledgement
+  ---
+  duration_ms: 0.111
+  type: 'test'
+  ...
+# Subtest: a provider that stops returning progress times out without executing late tool arguments
+ok 127 - a provider that stops returning progress times out without executing late tool arguments
+  ---
+  duration_ms: 0.362958
+  type: 'test'
+  ...
+# Subtest: a response done event cannot remove the timeout while its bank request is still pending
+ok 128 - a response done event cannot remove the timeout while its bank request is still pending
+  ---
+  duration_ms: 0.443333
+  type: 'test'
+  ...
+# Subtest: VAD splitting an acknowledgement before any model reply preserves both actual speech segments
+ok 129 - VAD splitting an acknowledgement before any model reply preserves both actual speech segments
+  ---
+  duration_ms: 1.658041
+  type: 'test'
+  ...
+# Subtest: split acknowledgement never borrows confirmation across replies, page updates, negations or edits
+ok 130 - split acknowledgement never borrows confirmation across replies, page updates, negations or edits
+  ---
+  duration_ms: 4.104833
+  type: 'test'
+  ...
+# Subtest: a delayed continue cannot reuse an earlier voice confirmation
+ok 131 - a delayed continue cannot reuse an earlier voice confirmation
+  ---
+  duration_ms: 1.489333
+  type: 'test'
+  ...
+# Subtest: a continuation cancelled by new input is a control event and cannot disconnect or replay the old request
+ok 132 - a continuation cancelled by new input is a control event and cannot disconnect or replay the old request
+  ---
+  duration_ms: 1.597167
+  type: 'test'
+  ...
+# Subtest: literal confirmation submits the trusted current command without waiting for a model tool call
+ok 133 - literal confirmation submits the trusted current command without waiting for a model tool call
+  ---
+  duration_ms: 2.957458
+  type: 'test'
+  ...
+# Subtest: ASR confirmation is deduplicated and an automatic model reply cannot repeat it
+ok 134 - ASR confirmation is deduplicated and an automatic model reply cannot repeat it
+  ---
+  duration_ms: 1.488834
+  type: 'test'
+  ...
+# Subtest: interrupting direct confirmation aborts its request and cannot publish its late result
+ok 135 - interrupting direct confirmation aborts its request and cannot publish its late result
+  ---
+  duration_ms: 1.4395
+  type: 'test'
+  ...
+# Subtest: actual provider progress extends the deadline and completed or stopped responses clear it
+ok 136 - actual provider progress extends the deadline and completed or stopped responses clear it
+  ---
+  duration_ms: 0.16975
+  type: 'test'
+  ...
+# Subtest: native tool generation and execution keep audio muted until the result response
+ok 137 - native tool generation and execution keep audio muted until the result response
+  ---
+  duration_ms: 2.835625
+  type: 'test'
+  ...
+# Subtest: audio and filler traffic cannot indefinitely extend a response with no useful progress
+ok 138 - audio and filler traffic cannot indefinitely extend a response with no useful progress
+  ---
+  duration_ms: 0.098708
+  type: 'test'
+  ...
+# Subtest: late progress from an old response cannot extend the current response watchdog
+ok 139 - late progress from an old response cannot extend the current response watchdog
+  ---
+  duration_ms: 0.054542
+  type: 'test'
+  ...
+# Subtest: stop aborts outstanding tools and ignores later events
+ok 140 - stop aborts outstanding tools and ignores later events
+  ---
+  duration_ms: 1.468583
+  type: 'test'
+  ...
+# Subtest: closing cancels generation, aborts pending tools and cannot execute queued or late work
+ok 141 - closing cancels generation, aborts pending tools and cannot execute queued or late work
+  ---
+  duration_ms: 2.832584
+  type: 'test'
+  ...
+# Subtest: all ordinary 500 replies ground to 500 yuan without a currency confirmation loop
+ok 142 - all ordinary 500 replies ground to 500 yuan without a currency confirmation loop
+  ---
+  duration_ms: 1.489833
+  type: 'test'
+  ...
+# Subtest: tool amount cannot disagree with user evidence and a guessed contact or account is unresolved
+ok 143 - tool amount cannot disagree with user evidence and a guessed contact or account is unresolved
+  ---
+  duration_ms: 0.188125
+  type: 'test'
+  ...
+# Subtest: account listing preserves task and authorization; selecting a displayed ordinal resumes transfer
+ok 144 - account listing preserves task and authorization; selecting a displayed ordinal resumes transfer
+  ---
+  duration_ms: 0.275666
+  type: 'test'
+  ...
+# Subtest: confirm requires a current summary token, actual acknowledgement and the same checklist
+ok 145 - confirm requires a current summary token, actual acknowledgement and the same checklist
+  ---
+  duration_ms: 0.375209
+  type: 'test'
+  ...
+# Subtest: edits revoke summary tokens, confirmation and authentication
+ok 146 - edits revoke summary tokens, confirmation and authentication
+  ---
+  duration_ms: 0.206625
+  type: 'test'
+  ...
+# Subtest: risk signals remain blocking and unimplemented workflows cannot invent results
+ok 147 - risk signals remain blocking and unimplemented workflows cannot invent results
+  ---
+  duration_ms: 0.249583
+  type: 'test'
+  ...
+# Subtest: compact tool output omits audit, transcript, verification token and codes
+ok 148 - compact tool output omits audit, transcript, verification token and codes
+  ---
+  duration_ms: 0.140542
+  type: 'test'
+  ...
+# Subtest: Omni can ask several natural questions before a tool; final fields are grounded in recent actual user turns
+ok 149 - Omni can ask several natural questions before a tool; final fields are grounded in recent actual user turns
+  ---
+  duration_ms: 0.154125
+  type: 'test'
+  ...
+# Subtest: numeric string tool arguments are normalized without accepting malformed or ambiguous money
+ok 150 - numeric string tool arguments are normalized without accepting malformed or ambiguous money
+  ---
+  duration_ms: 0.277875
+  type: 'test'
+  ...
+# Subtest: a cancelled response cannot execute truncated late function arguments or emit unknown call results
+ok 151 - a cancelled response cannot execute truncated late function arguments or emit unknown call results
+  ---
+  duration_ms: 1.894416
+  type: 'test'
+  ...
+# Subtest: a new automatic response after a completed user interruption is not mistaken for an old queued continuation
+ok 152 - a new automatic response after a completed user interruption is not mistaken for an old queued continuation
+  ---
+  duration_ms: 0.091792
+  type: 'test'
+  ...
+# Subtest: all monetary facts returned to Omni use explicit yuan units
+ok 153 - all monetary facts returned to Omni use explicit yuan units
+  ---
+  duration_ms: 0.585708
+  type: 'test'
+  ...
+# Subtest: changing 500 to 300 preserves recipient and account chosen on cards despite stale ambiguous history
+ok 154 - changing 500 to 300 preserves recipient and account chosen on cards despite stale ambiguous history
+  ---
+  duration_ms: 0.452416
+  type: 'test'
+  ...
+# Subtest: untouched collected fields cannot be replaced by older speech or model restatements
+ok 155 - untouched collected fields cannot be replaced by older speech or model restatements
+  ---
+  duration_ms: 0.435958
+  type: 'test'
+  ...
+# Subtest: checklist progress only asks missing fields and amount corrections revoke only the old authorization
+ok 156 - checklist progress only asks missing fields and amount corrections revoke only the old authorization
+  ---
+  duration_ms: 0.615958
+  type: 'test'
+  ...
+# Subtest: explicit recipient/account edits and unclear new amounts still require their own evidence
+ok 157 - explicit recipient/account edits and unclear new amounts still require their own evidence
+  ---
+  duration_ms: 0.325333
+  type: 'test'
+  ...
+# Subtest: repeated unchanged fields or confirmation do not restart a completed confirmation step
+ok 158 - repeated unchanged fields or confirmation do not restart a completed confirmation step
+  ---
+  duration_ms: 0.57
+  type: 'test'
+  ...
+# Subtest: retaining collected fields cannot retain authorization when current balance no longer permits the transfer
+ok 159 - retaining collected fields cannot retain authorization when current balance no longer permits the transfer
+  ---
+  duration_ms: 0.245584
+  type: 'test'
+  ...
+# (node:15953) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Serve identity is opt-in and requires an authenticated login and the configured host
+ok 160 - Serve identity is opt-in and requires an authenticated login and the configured host
+  ---
+  duration_ms: 15.564125
+  type: 'test'
+  ...
+# Subtest: TLS-terminated requests use the exact external HTTPS origin and preserve distinct owners
+ok 161 - TLS-terminated requests use the exact external HTTPS origin and preserve distinct owners
+  ---
+  duration_ms: 0.241125
+  type: 'test'
+  ...
+# Subtest: invalid or non-origin Serve configuration cannot enable header authentication
+ok 162 - invalid or non-origin Serve configuration cannot enable header authentication
+  ---
+  duration_ms: 0.460541
+  type: 'test'
+  ...
+# (node:15954) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: direct voice confirmation uses only a literal acknowledgement and the current visible review token
+ok 163 - direct voice confirmation uses only a literal acknowledgement and the current visible review token
+  ---
+  duration_ms: 5.1275
+  type: 'test'
+  ...
+# Subtest: literal card queries are read-only shortcuts and cannot absorb negations or a compound write request
+ok 164 - literal card queries are read-only shortcuts and cannot absorb negations or a compound write request
+  ---
+  duration_ms: 0.361958
+  type: 'test'
+  ...
+# Subtest: card aliases select one card and conflicting tails or negated freeze instructions cannot authorize a draft
+ok 165 - card aliases select one card and conflicting tails or negated freeze instructions cannot authorize a draft
+  ---
+  duration_ms: 1.438583
+  type: 'test'
+  ...
+# Subtest: fund and card reviews return exact confirmation requests and action choices rather than transfer instructions
+ok 166 - fund and card reviews return exact confirmation requests and action choices rather than transfer instructions
+  ---
+  duration_ms: 1.495833
+  type: 'test'
+  ...
+# Subtest: a read-only side query retains enough pending fund facts to resume the original summary
+ok 167 - a read-only side query retains enough pending fund facts to resume the original summary
+  ---
+  duration_ms: 0.935166
+  type: 'test'
+  ...
+# Subtest: plain confirmations continue the current bond task and never submit without page authentication
+ok 168 - plain confirmations continue the current bond task and never submit without page authentication
+  ---
+  duration_ms: 1.876625
+  type: 'test'
+  ...
+# Subtest: card selection and fund product replies amend the existing checklist instead of creating another task
+ok 169 - card selection and fund product replies amend the existing checklist instead of creating another task
+  ---
+  duration_ms: 0.756917
+  type: 'test'
+  ...
+# Subtest: four-layer catalog covers 54 unique functions and 85 unique logical tools; every reference resolves
+ok 170 - four-layer catalog covers 54 unique functions and 85 unique logical tools; every reference resolves
+  ---
+  duration_ms: 0.2305
+  type: 'test'
+  ...
+# Subtest: shared concrete readers are reusable without mutating state; catalog write IDs cannot bypass checklists
+ok 171 - shared concrete readers are reusable without mutating state; catalog write IDs cannot bypass checklists
+  ---
+  duration_ms: 0.3425
+  type: 'test'
+  ...
+# Subtest: draft previews cannot be mistaken for committed business results in model facts
+ok 172 - draft previews cannot be mistaken for committed business results in model facts
+  ---
+  duration_ms: 0.536334
+  type: 'test'
+  ...
+# Subtest: every catalog entry opens a real sandbox query, collecting draft or explicit unavailable result
+ok 173 - every catalog entry opens a real sandbox query, collecting draft or explicit unavailable result
+  ---
+  duration_ms: 3.915791
+  type: 'test'
+  ...
+# Subtest: optional note is skipped; a supplied note persists across omitted patches and null explicitly clears
+ok 174 - optional note is skipped; a supplied note persists across omitted patches and null explicitly clears
+  ---
+  duration_ms: 6.136125
+  type: 'test'
+  ...
+# Subtest: edits invalidate current summary and old authentication, duplicate requests only debit once
+ok 175 - edits invalidate current summary and old authentication, duplicate requests only debit once
+  ---
+  duration_ms: 2.566625
+  type: 'test'
+  ...
+# Subtest: unchanged voice amendments and repeated confirmation preserve workflow authorization but card back still edits
+ok 176 - unchanged voice amendments and repeated confirmation preserve workflow authorization but card back still edits
+  ---
+  duration_ms: 5.907875
+  type: 'test'
+  ...
+# Subtest: an unchanged amendment must recheck current balance before retaining authorization
+ok 177 - an unchanged amendment must recheck current balance before retaining authorization
+  ---
+  duration_ms: 1.15525
+  type: 'test'
+  ...
+# Subtest: explicit monetary conflicts cannot become a different amount
+ok 178 - explicit monetary conflicts cannot become a different amount
+  ---
+  duration_ms: 0.396458
+  type: 'test'
+  ...
+# Subtest: workflow recipient identity uses all stated constraints rather than the first matching label
+ok 179 - workflow recipient identity uses all stated constraints rather than the first matching label
+  ---
+  duration_ms: 0.284083
+  type: 'test'
+  ...
+# Subtest: a negated voice cancellation cannot cancel an active workflow
+ok 180 - a negated voice cancellation cannot cancel an active workflow
+  ---
+  duration_ms: 0.927291
+  type: 'test'
+  ...
+# Subtest: cancelling an old workflow cannot cancel another current transfer
+ok 181 - cancelling an old workflow cannot cancel another current transfer
+  ---
+  duration_ms: 0.729917
+  type: 'test'
+  ...
+# Subtest: transfer cancellation checks its selected target rather than cancelling whichever draft is current
+ok 182 - transfer cancellation checks its selected target rather than cancelling whichever draft is current
+  ---
+  duration_ms: 0.762542
+  type: 'test'
+  ...
+# Subtest: new workflow transfer risk also revokes the shared legacy authentication
+ok 183 - new workflow transfer risk also revokes the shared legacy authentication
+  ---
+  duration_ms: 0.771458
+  type: 'test'
+  ...
+# Subtest: model cannot authenticate, contradict explicit identity or bypass policy with parameters
+ok 184 - model cannot authenticate, contradict explicit identity or bypass policy with parameters
+  ---
+  duration_ms: 0.718292
+  type: 'test'
+  ...
+# Subtest: semantic drafting preserves collected fields and requires confirmation of the updated card
+ok 185 - semantic drafting preserves collected fields and requires confirmation of the updated card
+  ---
+  duration_ms: 1.466292
+  type: 'test'
+  ...
+# Subtest: natural confirmation cannot absorb an edit, question, opposite action or missing information
+ok 186 - natural confirmation cannot absorb an edit, question, opposite action or missing information
+  ---
+  duration_ms: 0.574083
+  type: 'test'
+  ...
+# Subtest: billing refunds reduce spend, account transfers stay out of consumption, and correction defaults to one transaction
+ok 187 - billing refunds reduce spend, account transfers stay out of consumption, and correction defaults to one transaction
+  ---
+  duration_ms: 0.967458
+  type: 'test'
+  ...
+# Subtest: subscription cancellation protects obligations, separates external guidance, and verifies actual bank state
+ok 188 - subscription cancellation protects obligations, separates external guidance, and verifies actual bank state
+  ---
+  duration_ms: 1.091334
+  type: 'test'
+  ...
+# Subtest: creating a goal does not create recurring deductions; goal in/out is conserved and excessive withdrawals stop
+ok 189 - creating a goal does not create recurring deductions; goal in/out is conserved and excessive withdrawals stop
+  ---
+  duration_ms: 0.985208
+  type: 'test'
+  ...
+# Subtest: purchase resumes after actual questionnaire; receipt is pending and cancel restores funds without duplicate debit
+ok 190 - purchase resumes after actual questionnaire; receipt is pending and cancel restores funds without duplicate debit
+  ---
+  duration_ms: 1.104583
+  type: 'test'
+  ...
+# Subtest: judicial card cannot be unlocked; formally lost cards cannot be unfrozen through either path
+ok 191 - judicial card cannot be unlocked; formally lost cards cannot be unfrozen through either path
+  ---
+  duration_ms: 1.271625
+  type: 'test'
+  ...
+# Subtest: revalidation prevents an old review from spending balance consumed by another completed task
+ok 192 - revalidation prevents an old review from spending balance consumed by another completed task
+  ---
+  duration_ms: 0.659208
+  type: 'test'
+  ...
+# Subtest: public model facts use yuan and omit authentication tokens and questionnaire answers
+ok 193 - public model facts use yuan and omit authentication tokens and questionnaire answers
+  ---
+  duration_ms: 0.270666
+  type: 'test'
+  ...
+# Subtest: unavailable device adapters fail explicitly and never publish forged imported data
+ok 194 - unavailable device adapters fail explicitly and never publish forged imported data
+  ---
+  duration_ms: 0.069375
+  type: 'test'
+  ...
+# Subtest: explicit sandbox settlement conserves assets and cannot settle an order twice
+ok 195 - explicit sandbox settlement conserves assets and cannot settle an order twice
+  ---
+  duration_ms: 2.094166
+  type: 'test'
+  ...
+# Subtest: field evidence survives amendments without capturing authentication codes or replacing untouched sources
+ok 196 - field evidence survives amendments without capturing authentication codes or replacing untouched sources
+  ---
+  duration_ms: 0.267083
+  type: 'test'
+  ...
+# Subtest: manually registered protected obligations cannot bypass cancellation guard by omitting protected flags
+ok 197 - manually registered protected obligations cannot bypass cancellation guard by omitting protected flags
+  ---
+  duration_ms: 0.329292
+  type: 'test'
+  ...
+# Subtest: new transfer entry cannot bypass speech-derived risk checks and assessment cannot infer answers from money
+ok 198 - new transfer entry cannot bypass speech-derived risk checks and assessment cannot infer answers from money
+  ---
+  duration_ms: 0.332083
+  type: 'test'
+  ...
+# Subtest: a workflow review is bound to its exact legacy draft; other entry points cannot change its payment target
+ok 199 - a workflow review is bound to its exact legacy draft; other entry points cannot change its payment target
+  ---
+  duration_ms: 0.522458
+  type: 'test'
+  ...
+# Subtest: card restriction and replacement checks cannot be bypassed through a different function or card selection
+ok 200 - card restriction and replacement checks cannot be bypassed through a different function or card selection
+  ---
+  duration_ms: 1.72325
+  type: 'test'
+  ...
+# Subtest: monetary record amendments keep cents and automatic goal results disclose scheduler boundary
+ok 201 - monetary record amendments keep cents and automatic goal results disclose scheduler boundary
+  ---
+  duration_ms: 0.775291
+  type: 'test'
+  ...
+# Subtest: bill details expose deterministic totals and terminal unavailable tasks do not grow without bound
+ok 202 - bill details expose deterministic totals and terminal unavailable tasks do not grow without bound
+  ---
+  duration_ms: 10.988167
+  type: 'test'
+  ...
+# Subtest: an unavailable optional enhancement is disclosed without repeating a completed core action
+ok 203 - an unavailable optional enhancement is disclosed without repeating a completed core action
+  ---
+  duration_ms: 0.54175
+  type: 'test'
+  ...
+1..203
+# tests 203
+# suites 0
+# pass 203
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 330.27925
+
+LITERAL STDERR:
+
+
+COMMAND RECORD:
+{
+  "command": [
+    "npm",
+    "run",
+    "check"
+  ],
+  "cwd": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "exit": 0
+}
+LITERAL STDOUT:
+
+> zhixing-live-bank@0.1.0 check
+> tsc --noEmit
+
+
+LITERAL STDERR:
+
+
+COMMAND RECORD:
+{
+  "command": [
+    "node",
+    "--check",
+    "tests/browser/lite-review.cjs"
+  ],
+  "cwd": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "exit": 0
+}
+LITERAL STDOUT:
+
+LITERAL STDERR:
+
+
+COMMAND RECORD:
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "cwd": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "exit": 0
+}
+LITERAL STDOUT:
+
+LITERAL STDERR:
+
+
+COMMAND RECORD:
+{
+  "command": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "cwd": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "exit": 0
+}
+LITERAL STDOUT:
+
+> zhixing-live-bank@0.1.0 build
+> node scripts/run-framework.mjs build
+
+
+  vinext build  (Vite 8.0.13)
+
+[1/5] analyze client references...
+[2K
+transforming...✓ 269 modules transformed.
+rendering chunks...
+✓ built in 326ms
+[2/5] analyze server references...
+[2K
+transforming...✓ 155 modules transformed.
+rendering chunks...
+✓ built in 107ms
+[3/5] build rsc environment...
+[2K
+transforming...✓ 266 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 238ms
+[4/5] build client environment...
+[2K
+transforming...✓ 1947 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 555ms
+[5/5] build ssr environment...
+[2K
+transforming...✓ 161 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 219ms
+[0m
+  Route (app)
+  ┌ ? /                
+  ├ λ /api/bank        
+  ├ λ /api/live/session
+  └ ? /review-lite     
+
+  λ API  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+
+
+LITERAL STDERR:
+
+
+FINAL BROWSER REGRESSION (npm run verify:lite:browser; exit0; no business requests/page errors):
+
+> zhixing-live-bank@0.1.0 verify:lite:browser
+> node tests/browser/lite-review.cjs
+
+{
+  "status": "passed",
+  "checks": [
+    "20/20 rendered and each selectable",
+    "item 4 deliberate daily-limit block and normal AA confirmation reaches awaiting-participants",
+    "category chart and 312% formatting",
+    "item 11 compact comparison table with unitless risk grades and no raw fields",
+    "item 10 collapsed monthly summary with Chinese conclusion and no raw rules",
+    "completed goal editor collapsed; 7000 edit confirmed and fixture restored",
+    "item 20 errata-only with no business launcher",
+    "1164x836 and 390x844 without horizontal overflow"
+  ],
+  "viewportChecks": [
+    {
+      "width": 1164,
+      "height": 836
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "screenshots": [
+    "LOCAL_AUXILIARY/webank-gap-audit-20261026/review-ui-desktop.png",
+    "LOCAL_AUXILIARY/webank-gap-audit-20261026/review-ui-mobile.png"
+  ],
+  "browserErrors": [],
+  "businessRequests": [],
+  "synthetic": true
+}
+
+
+PARENT FOUR ROLES REOPENED UNCHANGED:
+[
+  {
+    "role": "MODIFIED_FILE.tar.gz",
+    "absolute_path": "LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/MODIFIED_FILE.tar.gz",
+    "sha256": "576c0c57ca6b8bdd14f532bd28a21aa64317e4bbd52f9122ced8e811b2263c47",
+    "bytes": 67792
+  },
+  {
+    "role": "DIFF_FILE.patch",
+    "absolute_path": "LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/DIFF_FILE.patch",
+    "sha256": "cfec61c6d8bf2143c2f550def386635591a21e69b66bd5f93238402cc1c12c95",
+    "bytes": 131046
+  },
+  {
+    "role": "VERIFICATION.txt",
+    "absolute_path": "LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/VERIFICATION.txt",
+    "sha256": "a3c44a686af627e8ac2b6c3db3c3dc392b2e098eeefdf0109ddc3ad0b31a6ae9",
+    "bytes": 76230
+  },
+  {
+    "role": "ROLLBACK.sh",
+    "absolute_path": "LOCAL_PROJECT/docs/audit/business-gap-20261026/lite-implementation/ROLLBACK.sh",
+    "sha256": "293450f7073e521dfaefdd5edd8da573e1567cc76a15cc62a4293e2560898abf",
+    "bytes": 217669
+  }
+]
+Parent transaction observed behaviors retained as historical evidence: BASELINE0/20 -> MODIFIED20/20 -> ROLLBACK0/20 -> REAPPLIED20/20. Those roles were not overwritten by this UI repair.
+
+Corrected validation issues: first browser regression asserted item20 explanation in article but actual intended explanation was in aside; corrected locator, rerun exit0. First wrapper assigned zsh read-only variable status (error1); used rc thereafter. Initial full-page screenshot captured entering-card opacity and repeated mobile tiles; not accepted as visual evidence. Final screenshots wait for animations, disable animation during capture and capture the actual product card; visibly checked desktop460x511 and mobile316x572, no repeated header and no faded content. UI skill searches did not establish a relevant match; native details disclosure and existing design patterns were used as design judgment, not a claimed database recommendation.
+
+Boundaries: synthetic review only; 5000 yuan and5/day AA guards unchanged. The normal-AA button resets only isolated review-page demo state and stops at review; requires explicit confirmation. No bank/merchant/live-voice API calls, production auth changes, commits or pushes. Documentation item20 is only two internal-source contradictions, not verification of competitors' real capabilities. Product fee/risk boundaries and missing-as-unknown retained.

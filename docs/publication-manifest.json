@@ -1,0 +1,787 @@
+{
+  "date": "2026-10-26",
+  "scope": "全部本轮业务/方案相关文字文档；不含密钥/配置/备份压缩包/图像/其他未提交文件",
+  "base_commit": "82d1867c487d2843ec602a2652dedea3d11ed7e0",
+  "canonical_code_snapshot": "4689188140299059ba324720726bb33ba266bad8",
+  "exact_final_sources": 10,
+  "files": [
+    {
+      "source": "docs/ARCHITECTURE.md",
+      "destination": "docs/ARCHITECTURE.md",
+      "canonical_sha256": "8db48b03a413aaa7510b0cad8ac26e771e1fc8a10988377d37bcc89fe3a99a89",
+      "export_sha256": "3161066d4e86bb8344c0214861cf556b39efe4938d8da0dc4e1c540a1f293d82",
+      "bytes": 7680,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/BUSINESS_FLOWS.md",
+      "destination": "docs/BUSINESS_FLOWS.md",
+      "canonical_sha256": "6b85488c36d24ae1d9d30689c84082a086303b07f863876e43d10be3bf48ecd0",
+      "export_sha256": "9d49dd29d611548518f9b2a5e5f3f1e1b533ac41983f9184e0bd1f344016e2ee",
+      "bytes": 5856,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/CODE_INTEGRATION.md",
+      "destination": "docs/CODE_INTEGRATION.md",
+      "canonical_sha256": "f8e08e8f620af30db595c6853f8ae64935f90362ca210cee5aef9da107b55fc2",
+      "export_sha256": "ff6d1c8655fc544c051381097a083545c9e8025779e01cef86f5ee64bd9af262",
+      "bytes": 5385,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/CURRENT_STATUS.md",
+      "destination": "docs/CURRENT_STATUS.md",
+      "canonical_sha256": "ed1f057054c06270b979351742b9b0d1ceb28d56829c215441ec0d7af34c6722",
+      "export_sha256": "dcb4ffaeb60e0d39fa03a1e3de671db071f937115979b25619ccc61657bcf74f",
+      "bytes": 26702,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/DECISIONS.md",
+      "destination": "docs/DECISIONS.md",
+      "canonical_sha256": "97b0d09ea233fff756919a0f19c85b7aa6bb89688fe144da9f37a84eaf096f8b",
+      "export_sha256": "c7fe7906b94e45cf321789062d732b51c74e774f82f7b0330b9f230aaf1a0d6b",
+      "bytes": 4851,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/DOC_INDEX.md",
+      "destination": "docs/DOC_INDEX.md",
+      "canonical_sha256": "0848a4c9aeea7d2229ee627207fa089c62d5f12195f683129a7ae0b5506008a2",
+      "export_sha256": "f36f831f3f7ccd30e3ee7180d966fd7ea873b8e6e44bdf8a45f224697944050f",
+      "bytes": 10708,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/PROJECT_OVERVIEW.md",
+      "destination": "docs/PROJECT_OVERVIEW.md",
+      "canonical_sha256": "0dc5197534326e15d026d894230904f66f2471b455f540f129dda13f5d7c7a25",
+      "export_sha256": "0dc5197534326e15d026d894230904f66f2471b455f540f129dda13f5d7c7a25",
+      "bytes": 2802,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/TODO.md",
+      "destination": "docs/TODO.md",
+      "canonical_sha256": "377c99e9a99275d5981a906f9368201091411189e3d785a6cf9d50b34b249099",
+      "export_sha256": "4fbd16d5256a5dc1d1b579ee030ba1eb510e8eae8b4491f250803238bfa3ed64",
+      "bytes": 13495,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/README.md",
+      "destination": "docs/audit/business-gap-20261026/README.md",
+      "canonical_sha256": "ff0c510379946bee07484dd754c2087f7952009d7be107ed3abd47cb3dccff73",
+      "export_sha256": "8c85e14f3949fb118420fbba22cc3f259d6b207972194972815d0b22718df763",
+      "bytes": 10027,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/atomic-backlog.json",
+      "destination": "docs/audit/business-gap-20261026/atomic-backlog.json",
+      "canonical_sha256": "2d6a72974a6508d9c2f930bb8a476ca74331ef39611cafa65adeb3865d6ec608",
+      "export_sha256": "2d6a72974a6508d9c2f930bb8a476ca74331ef39611cafa65adeb3865d6ec608",
+      "bytes": 69967,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/atomic-backlog.md",
+      "destination": "docs/audit/business-gap-20261026/atomic-backlog.md",
+      "canonical_sha256": "59422ec2048c5a7fa6a5251ad650eee05eb56632304a6271227508305e386c09",
+      "export_sha256": "7306860550f7c6f393be804e371745069a5a50c1d5043001f47631fc56ce5a6d",
+      "bytes": 34467,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/evidence.json",
+      "destination": "docs/audit/business-gap-20261026/evidence.json",
+      "canonical_sha256": "c49ddebc1480725f5477b23c5d8a129025f1502f41be51416c7add474b57637d",
+      "export_sha256": "1ec909d8cfb6865d2c867dd41eccb6f2d9b05d60fc706d251d721c5da3a80271",
+      "bytes": 26614,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/README.md",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/README.md",
+      "canonical_sha256": "e5b5bc4f2a79704b089367c6d48275933b60ea55580e4a5a91ff2e6cc097d2a9",
+      "export_sha256": "cec45dfe5a3bcceccda3e5cdfa5518554224b6941368cebc4870e7c83fb784b3",
+      "bytes": 1415,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/VERIFICATION.txt",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/VERIFICATION.txt",
+      "canonical_sha256": "a3c44a686af627e8ac2b6c3db3c3dc392b2e098eeefdf0109ddc3ad0b31a6ae9",
+      "export_sha256": "57e69b0a138feb631eb52d92e86d1dfa4cf805ae039f1205588be51d02ff1f4d",
+      "bytes": 75438,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/evidence.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/evidence.json",
+      "canonical_sha256": "698ee98fd87e2d5f60c820c49a348c16c9e6993ca854e5d571577fa9dda5e098",
+      "export_sha256": "54e4daa94d87df88af233a0cd7d8af899acca359defe1fed56133d77ff1f2851",
+      "bytes": 72617,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "canonical_sha256": "03178fec561cb48f2a1929ceb3950c88a56147868656cfad0c985fd8d3054bc0",
+      "export_sha256": "91fff4b9d1d1c50dabda2b12ac215cd14f22fb0aa010c24751dd254609b765fb",
+      "bytes": 1720,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/VERIFICATION.txt",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/VERIFICATION.txt",
+      "canonical_sha256": "f5a069c82a6f65a7dec766bed6c40028b71d7e84af2910109b860798c880a7ae",
+      "export_sha256": "f2677b80daaa99fd6fa84b37e68ac1e6bfb4cf5a10178f016a4625ebaee01241",
+      "bytes": 62388,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/evidence.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/evidence.json",
+      "canonical_sha256": "29058d6d79afb8d9e687ca29087f2e0adef2d8ba7e01546955024264ad22adb9",
+      "export_sha256": "ce0e26d7b02574e16c1d74776d230e12378fb87399dda64621c479697e081bcb",
+      "bytes": 1019,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/COMMIT.txt",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/COMMIT.txt",
+      "canonical_sha256": "4dc3be1c55239aa1193ce879065ba3d63fb5159c6f016bc29180174c5c6bb7e0",
+      "export_sha256": "5553c1b19e376d1802bc2cf0e9188ba62fe36bbba73a3a798f807db0e03cd290",
+      "bytes": 846,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/PULL_REQUEST.txt",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/PULL_REQUEST.txt",
+      "canonical_sha256": "78744a9ca5930c2c1c41db8c7f3a7bd66c2aaab7e751fa47a4ef77bf0e31e615",
+      "export_sha256": "78744a9ca5930c2c1c41db8c7f3a7bd66c2aaab7e751fa47a4ef77bf0e31e615",
+      "bytes": 407,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/README.md",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/README.md",
+      "canonical_sha256": "61b5a48960a9b4410995c87422f3d6a15624465db95855b33e5718023a8af97d",
+      "export_sha256": "8676311d40191b1ca4b291cf79c7602c141369b7b1c5f4cc640cd6dace3d32a5",
+      "bytes": 1894,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/VERIFICATION.txt",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/VERIFICATION.txt",
+      "canonical_sha256": "fee62651ce71b9a38644397a7985a9856afcd8e49bb98f87c37d4c086a1e45cd",
+      "export_sha256": "90060ace21095e5cd82c27591b8d1f6701271f81a99ce65eba52dc375cb11645",
+      "bytes": 92205,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/evidence.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/evidence.json",
+      "canonical_sha256": "1adc783e86b822c258b25f4a4c2cff32cc3796f4366f47c92bcd45715533db58",
+      "export_sha256": "0e807f45d1b4f0aa29f029e4959932269d7ad102c41a7a38961a93ab398bf4ae",
+      "bytes": 90247,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/audio-2026-10-26T10-47-52-185Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/audio-2026-10-26T10-47-52-185Z.json",
+      "canonical_sha256": "5ff968e5f83128e361de810243183f09acc45cd95b172512061eff5b1e62b8e8",
+      "export_sha256": "5aa2107b9184966b3597dcdc11570014d0e4cc490189e7d6b5080c21ed942087",
+      "bytes": 18180,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/audio-safe-2026-10-26T10-58-23-237Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/audio-safe-2026-10-26T10-58-23-237Z.json",
+      "canonical_sha256": "cacd22e4b6cee0cc91f245d7d0fe18de1e852e8e3bcce4fa5cde02fb11807707",
+      "export_sha256": "ed616959349d181e4b4bb4611ec1a699d46d31e47ea08f516e984523d460f924",
+      "bytes": 33418,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/baseline-2026-10-26T10-49-02-631Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/baseline-2026-10-26T10-49-02-631Z.json",
+      "canonical_sha256": "a0d1004eacb62bb8d348d829db2f463abed5bd4b0a6c8a5c1e689d30c09b7091",
+      "export_sha256": "bf60813998c6850746b38f45ff6ab7de38ff0f5ce0815b5f7e65f2998f985826",
+      "bytes": 11207,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/baseline.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/baseline.json",
+      "canonical_sha256": "e0310f938d551c43ea11a7e0eee00d141736cb49b0c0fb57deeaa8b3fa69c314",
+      "export_sha256": "79e1ab4fd41781afba7bbf3256d3bdf6cfc3c6328f100077d9d8ac2eecdfac84",
+      "bytes": 5117,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-2026-10-26T10-31-31-935Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-2026-10-26T10-31-31-935Z.json",
+      "canonical_sha256": "653c8a8de57e00e56837b7fd1070975e212055f220892d5f04c7c299e3790fd9",
+      "export_sha256": "f395fa20d2b311a66e801490feb7d93145ed31c85ba636754a065e86ccee1f16",
+      "bytes": 14724,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-2026-10-26T10-36-48-976Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-2026-10-26T10-36-48-976Z.json",
+      "canonical_sha256": "9e5ac3c1f61ebab99c9bf073416e6ce494488721d651b28a53ab92fb2533606e",
+      "export_sha256": "4654048551a56fb98e638587a591a2c26b0e1e69b2af2c1e47abcbe7c4091bea",
+      "bytes": 62560,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-read-2026-10-26T10-46-01-471Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-read-2026-10-26T10-46-01-471Z.json",
+      "canonical_sha256": "11654f93d25ae826077d016471044aae77de05ba3cc8300b9eda53ba01c1fff2",
+      "export_sha256": "7be2958783f9d652dd2c1e5aa55d5e09482f6b23d6e33b0433165a2cfd784b97",
+      "bytes": 55544,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-short-2026-10-26T10-40-40-980Z.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke-short-2026-10-26T10-40-40-980Z.json",
+      "canonical_sha256": "17dd60dabf4c9271481efdc70127d8a818894db73ee6f8940a64ea2e48707ce2",
+      "export_sha256": "923162c643f94ebecc6ad8ae797fadb4aa3460aadcd05ee0a2953da54db527b5",
+      "bytes": 52785,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke.json",
+      "destination": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/reports/smoke.json",
+      "canonical_sha256": "91ada8a5c78384843d35a0f308985f39fe358e14d540e4174c69ab713d204f80",
+      "export_sha256": "5ebdd143a21f1b573438a520a1880d47f4007329ec03fb868351d7e1de55f9a1",
+      "bytes": 4887,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/prioritized-backlog.md",
+      "destination": "docs/audit/business-gap-20261026/prioritized-backlog.md",
+      "canonical_sha256": "e88df406535f8f3124593dad0c30b04570dce709cea2d659ad3c49647c342bef",
+      "export_sha256": "a604b0de220200af0b558efe4d7f4f23f70e84b899455f0977b3cde4ee2cf783",
+      "bytes": 11742,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/README.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/README.md",
+      "canonical_sha256": "b4114a79f5347256a3159232977f17f47f2f99470d639a93e4851d6825c268e8",
+      "export_sha256": "b4114a79f5347256a3159232977f17f47f2f99470d639a93e4851d6825c268e8",
+      "bytes": 36438,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/REVIEW.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/REVIEW.md",
+      "canonical_sha256": "f2e91a38e03faf3fb898aacfcef72d9835e6fb36e4a4cf480a83afe870881872",
+      "export_sha256": "f2e91a38e03faf3fb898aacfcef72d9835e6fb36e4a4cf480a83afe870881872",
+      "bytes": 4280,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/VERIFICATION.txt",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/VERIFICATION.txt",
+      "canonical_sha256": "d80a37b188ff78d3bdc2a3233fab654efafdbf94d3cbdbc3b7dc6b35d3e2a174",
+      "export_sha256": "61a99efab3ce37ce81aa4a3036b6c26d310a0054856f6705b48e54329cb928a0",
+      "bytes": 9023,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/artifact-manifest.json",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/artifact-manifest.json",
+      "canonical_sha256": "9bfece42a4e5f17bde8c4e71bbcf98af8b316bed86a66b5d71712c097fa9a2f7",
+      "export_sha256": "32468fa7b888b99664ba8287c1564f32b38cccb7506788fc8f14e973d5a8335b",
+      "bytes": 2614,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/coverage-matrix.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/coverage-matrix.md",
+      "canonical_sha256": "1a84b6ea257d999d2df298e97647089570c3bcd88afe7e6c0243b3fa944cc468",
+      "export_sha256": "1a84b6ea257d999d2df298e97647089570c3bcd88afe7e6c0243b3fa944cc468",
+      "bytes": 497709,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/implementation-plan.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/implementation-plan.md",
+      "canonical_sha256": "9544c576d0a981ebc880a860a1c7871aeae9ce2659b5b71465d0550477ed77f4",
+      "export_sha256": "9544c576d0a981ebc880a860a1c7871aeae9ce2659b5b71465d0550477ed77f4",
+      "bytes": 298179,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/plan.json",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/plan.json",
+      "canonical_sha256": "07dd6fec08bc945f70548a109b7a746507e79bfc0ced403da52a56231248e82f",
+      "export_sha256": "4ffe0a5f2f7c8b036a3f5ec425a72d1556a4f8acbc8488218362d79b9f7be038",
+      "bytes": 980707,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/quick-review.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/quick-review.md",
+      "canonical_sha256": "174e9dbd920ba8c047bbd3222da1d353a7c89c22a13c11e908d787efa6e41f66",
+      "export_sha256": "174e9dbd920ba8c047bbd3222da1d353a7c89c22a13c11e908d787efa6e41f66",
+      "bytes": 9396,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/review-evidence.json",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/review-evidence.json",
+      "canonical_sha256": "dff44d4c10b5020b27bacfcfaa6b4b8b8fc05e3ec78dc6f3e09e6eeafed45636",
+      "export_sha256": "17f91bbb724e4c0ed03d2949bba1ef2acc55349234612b0900a73cfdb561fb99",
+      "bytes": 13782,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/scenario-walkthroughs.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/scenario-walkthroughs.md",
+      "canonical_sha256": "70e896c0d4425f6fa39c3b39298b8a115e935683127b34d19f223b9f67b33fd0",
+      "export_sha256": "70e896c0d4425f6fa39c3b39298b8a115e935683127b34d19f223b9f67b33fd0",
+      "bytes": 35985,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/shared-and-dependencies.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/shared-and-dependencies.md",
+      "canonical_sha256": "024baf2290413085af07813853f2bb39bb5cdde32acfb837ba9bc3d73db3c79d",
+      "export_sha256": "024baf2290413085af07813853f2bb39bb5cdde32acfb837ba9bc3d73db3c79d",
+      "bytes": 12045,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-plan-v2/validation.json",
+      "destination": "docs/audit/business-gap-20261026/scenario-plan-v2/validation.json",
+      "canonical_sha256": "47e6bd0149ccbc198b0abecf626c943b69598362c2e73b23b86e7bf26afdd7fc",
+      "export_sha256": "001a6172e2a28f1800a6c9625be7cc640aa5d2f1efdcab4e0e9df26218b61aca",
+      "bytes": 219198,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/scenario-traceability-correction.md",
+      "destination": "docs/audit/business-gap-20261026/scenario-traceability-correction.md",
+      "canonical_sha256": "c3cd40737dc7d0b03a6af75f56f03b940079b2c6304828c4aa8576c8e706819f",
+      "export_sha256": "c3cd40737dc7d0b03a6af75f56f03b940079b2c6304828c4aa8576c8e706819f",
+      "bytes": 3663,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/security-research.md",
+      "destination": "docs/audit/business-gap-20261026/security-research.md",
+      "canonical_sha256": "f6ac8e2ebd0bf3a868af4f2dab04fa2c919d8e051fae4315e952b89fb75ff3f2",
+      "export_sha256": "147c3678d56ac987c42d7aa269af9d6510e2063adfa763c4ccd80c6e886ca83f",
+      "bytes": 9860,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/subscription-cross-behavior.md",
+      "destination": "docs/audit/business-gap-20261026/subscription-cross-behavior.md",
+      "canonical_sha256": "8ec78af7e579026817ec44bf43fafd4ad10bd09e0c9dec010a0fbece24420926",
+      "export_sha256": "37b3486b29f47f683915c7e8c210fa1de262a0b904851fd15de912ffaff4fe26",
+      "bytes": 18768,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/transfer-cards-competitor.md",
+      "destination": "docs/audit/business-gap-20261026/transfer-cards-competitor.md",
+      "canonical_sha256": "a342f85e6fc505d670daad68b2a46aef8a86da4c13476e8e659d78a2acbdf08b",
+      "export_sha256": "bc956bff9aa9ca3ff958ef7a008e1e406fae822b7fc3eb49530b9f17c07b8404",
+      "bytes": 17216,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/audit/business-gap-20261026/wealth-bills.md",
+      "destination": "docs/audit/business-gap-20261026/wealth-bills.md",
+      "canonical_sha256": "6c92f298a586d327f644b245346e9bc87da2598940c3748df842a548eaee773f",
+      "export_sha256": "77e4d94f1a2aed09f42162e17d08ba64a13ab3080c963be39c2357f5cc567928",
+      "bytes": 19492,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/business/README.md",
+      "destination": "docs/business/README.md",
+      "canonical_sha256": "672aa3f27ae82486ce8020aca23caf072ff4364262145bd391d76e23e926267a",
+      "export_sha256": "672aa3f27ae82486ce8020aca23caf072ff4364262145bd391d76e23e926267a",
+      "bytes": 1587,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/business/bills-v1.4.md",
+      "destination": "docs/business/bills-v1.4.md",
+      "canonical_sha256": "ad8e6462772d40b6adb620c14357f97f78fa1c3a1b050ba31ee859c6482bde7e",
+      "export_sha256": "ad8e6462772d40b6adb620c14357f97f78fa1c3a1b050ba31ee859c6482bde7e",
+      "bytes": 71392,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/cards-v1.2.md",
+      "destination": "docs/business/cards-v1.2.md",
+      "canonical_sha256": "9aa7a6609a307ee29810ae676442b9a22633dfcadf9f03bbb9de4bd837509179",
+      "export_sha256": "9aa7a6609a307ee29810ae676442b9a22633dfcadf9f03bbb9de4bd837509179",
+      "bytes": 51825,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/README.md",
+      "destination": "docs/business/final-20261026/README.md",
+      "canonical_sha256": "a967e7888b84c372d79c0627c0313fcc4e05927148f39e6f52583914f98a1c3a",
+      "export_sha256": "a967e7888b84c372d79c0627c0313fcc4e05927148f39e6f52583914f98a1c3a",
+      "bytes": 2545,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/business/final-20261026/behavioral-design-v1.0.md",
+      "destination": "docs/business/final-20261026/behavioral-design-v1.0.md",
+      "canonical_sha256": "c8439fa6b8a6b388999514ef50bd24984dcbe3b8426ddf22c9a4a80e9d709414",
+      "export_sha256": "c8439fa6b8a6b388999514ef50bd24984dcbe3b8426ddf22c9a4a80e9d709414",
+      "bytes": 5933,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/bills-v1.7.md",
+      "destination": "docs/business/final-20261026/bills-v1.7.md",
+      "canonical_sha256": "f9c8d3855b8747a5a70db9933a3a5288a9fe3c28717b9ef2045d94b4d3931d06",
+      "export_sha256": "f9c8d3855b8747a5a70db9933a3a5288a9fe3c28717b9ef2045d94b4d3931d06",
+      "bytes": 75547,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/cards-v1.5.md",
+      "destination": "docs/business/final-20261026/cards-v1.5.md",
+      "canonical_sha256": "7d7fe522d6f6daf6d5baca2666b2494e4e2786a2ccdf860806d13a0ff84b38d6",
+      "export_sha256": "7d7fe522d6f6daf6d5baca2666b2494e4e2786a2ccdf860806d13a0ff84b38d6",
+      "bytes": 55374,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/competitor-workflows.md",
+      "destination": "docs/business/final-20261026/competitor-workflows.md",
+      "canonical_sha256": "563620d7e1c710ee845c6dcb41b7d021eb47c1c6a821b0a5f5dae56ae250a0fd",
+      "export_sha256": "563620d7e1c710ee845c6dcb41b7d021eb47c1c6a821b0a5f5dae56ae250a0fd",
+      "bytes": 36685,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/cross-scenario-v1.3.md",
+      "destination": "docs/business/final-20261026/cross-scenario-v1.3.md",
+      "canonical_sha256": "236739c29c8315ea66a092b7651f61c2755c710f0c167ea4c48bacdb28270b74",
+      "export_sha256": "236739c29c8315ea66a092b7651f61c2755c710f0c167ea4c48bacdb28270b74",
+      "bytes": 43471,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/federated-learning-agent-debate.md",
+      "destination": "docs/business/final-20261026/federated-learning-agent-debate.md",
+      "canonical_sha256": "025f750cf1d31edc34bf2fcb25ab287ca2e852d09a761036a2435fc3ca6ab2c0",
+      "export_sha256": "025f750cf1d31edc34bf2fcb25ab287ca2e852d09a761036a2435fc3ca6ab2c0",
+      "bytes": 29559,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/security-v2.0.md",
+      "destination": "docs/business/final-20261026/security-v2.0.md",
+      "canonical_sha256": "ab9760840c5eba773c2cf7eacfbefc78c645629b9d3a6772c93821f2f1f5d363",
+      "export_sha256": "ab9760840c5eba773c2cf7eacfbefc78c645629b9d3a6772c93821f2f1f5d363",
+      "bytes": 13315,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/source_manifest.json",
+      "destination": "docs/business/final-20261026/source_manifest.json",
+      "canonical_sha256": "f5ba5429c59a9c9b5f204cbab6122072367a088b91e2a4cdb47b11bc99321d95",
+      "export_sha256": "544f73fe378ae91345c0ffa1c3d7906716b4129f242edd30649369ae190690bd",
+      "bytes": 4561,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/business/final-20261026/subscriptions-v1.5.md",
+      "destination": "docs/business/final-20261026/subscriptions-v1.5.md",
+      "canonical_sha256": "fa20fdcb9d9e887c09520192e53581f2971a0be93b3a50c0ae59b1247cf50510",
+      "export_sha256": "fa20fdcb9d9e887c09520192e53581f2971a0be93b3a50c0ae59b1247cf50510",
+      "bytes": 54137,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/transfer-v2.5.md",
+      "destination": "docs/business/final-20261026/transfer-v2.5.md",
+      "canonical_sha256": "0a64120bedd0ab9cb70fbbad2e93598de329ce9eeab5e9f8fc2c1ba268e5106d",
+      "export_sha256": "0a64120bedd0ab9cb70fbbad2e93598de329ce9eeab5e9f8fc2c1ba268e5106d",
+      "bytes": 55848,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/final-20261026/wealth-v1.8.md",
+      "destination": "docs/business/final-20261026/wealth-v1.8.md",
+      "canonical_sha256": "c55791c59d915f5076aa8e2714650663b94ee3b682648f350e95a8c17e8dcd34",
+      "export_sha256": "c55791c59d915f5076aa8e2714650663b94ee3b682648f350e95a8c17e8dcd34",
+      "bytes": 71510,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/source_manifest.json",
+      "destination": "docs/business/source_manifest.json",
+      "canonical_sha256": "07cb91bc537bbff41e1c9db810f9960cf45ae38e4ee13394a9f82a0e7197ce6e",
+      "export_sha256": "8657fa2bc99651e4ebb17007a3437dd8b392be4ead6204739a6dce92b0bc246f",
+      "bytes": 2020,
+      "mode": "publication copy; local paths redacted and links resolved"
+    },
+    {
+      "source": "docs/business/subscriptions-v1.2.md",
+      "destination": "docs/business/subscriptions-v1.2.md",
+      "canonical_sha256": "248c14b16e4cd681993e4f864cc64a620fe162a52f71c0e62351364f3ea58493",
+      "export_sha256": "248c14b16e4cd681993e4f864cc64a620fe162a52f71c0e62351364f3ea58493",
+      "bytes": 50380,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/transfer-v2.1.md",
+      "destination": "docs/business/transfer-v2.1.md",
+      "canonical_sha256": "4900ac1b9ae602957e192d368715af8cec139ff966a210dcd5acd3740e2acfd9",
+      "export_sha256": "4900ac1b9ae602957e192d368715af8cec139ff966a210dcd5acd3740e2acfd9",
+      "bytes": 51667,
+      "mode": "byte-identical source"
+    },
+    {
+      "source": "docs/business/wealth-v1.5.md",
+      "destination": "docs/business/wealth-v1.5.md",
+      "canonical_sha256": "86e680d8578f5c58ff314b3ddcc8809f580914d4a38bd11ad47602ad77468a65",
+      "export_sha256": "86e680d8578f5c58ff314b3ddcc8809f580914d4a38bd11ad47602ad77468a65",
+      "bytes": 65641,
+      "mode": "byte-identical source"
+    }
+  ],
+  "source_existing_missing_attachments": [
+    {
+      "from": "docs/business/final-20261026/federated-learning-agent-debate.md",
+      "link": "技术架构图·联邦学习与多Agent辩论.png"
+    }
+  ],
+  "local_material_links_converted": [
+    {
+      "from": "docs/ARCHITECTURE.md",
+      "target": "docs/ANIMATION_PIPELINE.md"
+    },
+    {
+      "from": "docs/ARCHITECTURE.md",
+      "target": "docs/handoff.md"
+    },
+    {
+      "from": "docs/BUSINESS_FLOWS.md",
+      "target": "docs/ANIMATION_MAPPING.md"
+    },
+    {
+      "from": "docs/CODE_INTEGRATION.md",
+      "target": "README.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "docs/FILE_AUDIT.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "docs/动画素材复用与缺口审计.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "docs/待补充参考素材清单.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "docs/handoff.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "05_动画参考裁剪/sheet-crops-20261022/README.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "docs/animation-catalog-20261022/README.md"
+    },
+    {
+      "from": "docs/CURRENT_STATUS.md",
+      "target": "docs/animation-catalog-20261022/validation.json"
+    },
+    {
+      "from": "docs/DECISIONS.md",
+      "target": "docs/ANIMATION_PIPELINE.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "README.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "AGENTS.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/ANIMATION_PIPELINE.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/ANIMATION_ASSETS.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/ANIMATION_MAPPING.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/动画素材复用与缺口审计.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/待补充参考素材清单.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/V2_PACKAGE.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/FILE_AUDIT.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/handoff.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "00_参考资料/微众金科大赛-筛选结果2.zip"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "00_参考资料/微众银行最新文档汇总.zip"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/audit/FILE_INVENTORY.tsv"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "微众银行｜76条任务流×企鹅动作×UI动效映射 V1.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "06_动画素材拆分/README.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "07_Godot绑定/README.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "07_Godot绑定/revisions/body-base-20261021/README.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "00_参考资料/最终动画生产清单 V2.zip"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/V2_PACKAGE.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "05_动画参考裁剪/sheet-crops-20261022/README.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/animation-catalog-20261022/illustrations.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/animation-catalog-20261022/business-flows.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/animation-catalog-20261022/other-scenes.md"
+    },
+    {
+      "from": "docs/DOC_INDEX.md",
+      "target": "docs/animation-catalog-20261022/README.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "docs/动画素材复用与缺口审计.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "docs/待补充参考素材清单.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "docs/ANIMATION_PIPELINE.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "docs/handoff.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "05_动画参考裁剪/sheet-crops-20261022/README.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "docs/animation-catalog-20261022/illustrations.md"
+    },
+    {
+      "from": "docs/TODO.md",
+      "target": "docs/animation-catalog-20261022/business-flows.md"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/MODIFIED_FILE.tar.gz"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/DIFF_FILE.patch"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/ROLLBACK.sh"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/MODIFIED_FILE.tar.gz"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/DIFF_FILE.patch"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/ROLLBACK.sh"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/review-ui-desktop.png"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/review-ui-fix-20261026/review-ui-mobile.png"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/MODIFIED_FILE.tar.gz"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/DIFF_FILE.patch"
+    },
+    {
+      "from": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/README.md",
+      "target": "docs/audit/business-gap-20261026/lite-implementation/voice-aa-fix-20261026/ROLLBACK.sh"
+    }
+  ],
+  "publication_broken_links": [],
+  "sensitive_token_findings": 0
+}

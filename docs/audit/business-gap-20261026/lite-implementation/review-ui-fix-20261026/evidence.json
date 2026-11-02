@@ -1,0 +1,16 @@
+{
+  "target": "LOCAL_PROJECT/code/webank-competition/voice-bank",
+  "backup": "LOCAL_AUXILIARY/backups/webank-review-ui-20261026-015853",
+  "modified": {
+    "components/workflow-panel.tsx": "d857ebed1c7ce8ada9c09aa788b059ae6774ae7b0e24ce1d60655af5c050ece2",
+    "app/review-lite/page.tsx": "f215d179ccc12396333bb2a2449d5e010c461ad83f3bde993efdd2786ba689ae",
+    "tests/browser/lite-review.cjs": "98497ded6e92e89219aa62e23bf955685c6dff29a4ff2d091dbd4f02911fc97d",
+    "docs/workflows/lite-1-20-review.md": "9f73df8349b1b54acbd1c561db15b57df1ac285a2dc05136a1bb40b44b82b8e5"
+  },
+  "baseline": {
+    "components/workflow-panel.tsx": "75bdbc5046267c7746b18070d18992c4256a0d68b6b171ea9d54f67e0f1197ef",
+    "app/review-lite/page.tsx": "48a7ff7efa46805aca15c544b6d49a3425b61f0e6822148a1841c33afef795ca",
+    "tests/browser/lite-review.cjs": "d7af3c75ce43a9d373f302cefdbd1226a6d2399d7cd2102f24e960bfb34319be",
+    "docs/workflows/lite-1-20-review.md": "b4ab4a23f137722d1b8bbef6ec1f04e39481a18fbcbef0cd72a4c6393c0bd37e"
+  }
+}

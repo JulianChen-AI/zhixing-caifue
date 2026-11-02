@@ -1,0 +1,47 @@
+[
+  {
+    "file": "wealth-v1.5.md",
+    "source_zip": "../../00_参考资料/微众金科大赛-筛选结果2.zip",
+    "member": "media/file/93d48a7b36b45927f1f4d87d.md",
+    "sha256": "86e680d8578f5c58ff314b3ddcc8809f580914d4a38bd11ad47602ad77468a65",
+    "same_as_screenshot_zip": true,
+    "extracted_on": "2026-10-21",
+    "policy": "read-only source snapshot; revisions require a new version"
+  },
+  {
+    "file": "transfer-v2.1.md",
+    "source_zip": "../../00_参考资料/微众金科大赛-筛选结果2.zip",
+    "member": "media/file/5f12b5c708d8a1cc6d5fdece.md",
+    "sha256": "4900ac1b9ae602957e192d368715af8cec139ff966a210dcd5acd3740e2acfd9",
+    "same_as_screenshot_zip": true,
+    "extracted_on": "2026-10-21",
+    "policy": "read-only source snapshot; revisions require a new version"
+  },
+  {
+    "file": "bills-v1.4.md",
+    "source_zip": "../../00_参考资料/微众金科大赛-筛选结果2.zip",
+    "member": "media/file/5b8793cc59ef15d6c04026cf.md",
+    "sha256": "ad8e6462772d40b6adb620c14357f97f78fa1c3a1b050ba31ee859c6482bde7e",
+    "same_as_screenshot_zip": true,
+    "extracted_on": "2026-10-21",
+    "policy": "read-only source snapshot; revisions require a new version"
+  },
+  {
+    "file": "subscriptions-v1.2.md",
+    "source_zip": "../../00_参考资料/微众金科大赛-筛选结果2.zip",
+    "member": "media/file/19588c4dae5ed6067dfab206.md",
+    "sha256": "248c14b16e4cd681993e4f864cc64a620fe162a52f71c0e62351364f3ea58493",
+    "same_as_screenshot_zip": true,
+    "extracted_on": "2026-10-21",
+    "policy": "read-only source snapshot; revisions require a new version"
+  },
+  {
+    "file": "cards-v1.2.md",
+    "source_zip": "../../00_参考资料/微众金科大赛-筛选结果2.zip",
+    "member": "media/file/ac95d94307df606918d4dcf8.md",
+    "sha256": "9aa7a6609a307ee29810ae676442b9a22633dfcadf9f03bbb9de4bd837509179",
+    "same_as_screenshot_zip": true,
+    "extracted_on": "2026-10-21",
+    "policy": "read-only source snapshot; revisions require a new version"
+  }
+]

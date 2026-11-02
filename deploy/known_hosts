@@ -1,0 +1,1 @@
+# 部署时写入 VPS 的 SSH 主机公钥：<VPS_TAILSCALE_IP> ssh-ed25519 <host-key>

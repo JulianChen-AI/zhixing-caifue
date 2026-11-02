@@ -1,0 +1,184 @@
+{
+  "scenario": "baseline",
+  "classification": {
+    "realQwenWebRTCProvider": true,
+    "liveFunctionCallChain": true,
+    "userInputChannel": "keyboard text entered through the live-session UI",
+    "validatesASR": false,
+    "humanMicrophoneTested": false,
+    "bankData": "synthetic sandbox only"
+  },
+  "serverConfigPresence": {
+    ".env": false,
+    ".env.local": false,
+    ".dev.vars": true
+  },
+  "provider": {
+    "liveConfigReported": true,
+    "sessionStatus": 201,
+    "sessionUpdated": true,
+    "errors": [],
+    "connectedLiveUi": true
+  },
+  "turns": [
+    {
+      "input": "三个人AA一百块钱，先把卡片给我看",
+      "inputChannel": "keyboard text injected after live Qwen WebRTC was connected",
+      "startedAt": "2026-10-26T10:13:01.911Z",
+      "before": {
+        "done": 0,
+        "calls": 0,
+        "requests": 0
+      },
+      "finalState": {
+        "status": 200,
+        "state": {
+          "revision": 0,
+          "view": "home",
+          "currentTaskIdPresent": false,
+          "currentWorkflow": null,
+          "workflowTaskCount": 0,
+          "workflowRecordCount": 16
+        }
+      },
+      "dom": {
+        "bankView": "home",
+        "workflowCardVisible": false,
+        "currentBusinessCardVisible": false,
+        "cardTitle": null,
+        "cardStatus": null,
+        "transcriptMessages": []
+      },
+      "modelCallCount": 1,
+      "bankRequestCount": 1,
+      "elapsedMs": 7755
+    }
+  ],
+  "eventTypes": [
+    "session.created",
+    "session.updated",
+    "conversation.item.created",
+    "response.created",
+    "response.output_item.added",
+    "conversation.item.created",
+    "response.content_part.added",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.output_item.added",
+    "conversation.item.created",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.delta",
+    "response.function_call_arguments.done",
+    "conversation.item.created",
+    "response.audio_transcript.done",
+    "response.audio.done",
+    "response.content_part.done",
+    "response.output_item.done",
+    "response.output_item.done",
+    "response.done",
+    "response.created",
+    "response.output_item.added",
+    "conversation.item.created",
+    "response.content_part.added",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta",
+    "response.audio_transcript.delta"
+  ],
+  "modelFunctionCalls": [
+    {
+      "id": "call_d194dfa9f2784f4abaccff54",
+      "name": "bank_function",
+      "arguments": "{\"operation\": \"run\", \"functionId\": \"TR05\", \"params\": {\"amount\": 100, \"participants\": 3}}"
+    }
+  ],
+  "bankRequests": [
+    {
+      "name": "bank_function",
+      "arguments": {
+        "operation": "run",
+        "functionId": "TR05",
+        "params": {
+          "amount": 100,
+          "participants": 3
+        }
+      },
+      "utterance": "三个人AA一百块钱，先把卡片给我看",
+      "historyCount": 1,
+      "revision": 0
+    }
+  ],
+  "bankResponses": [
+    {
+      "status": 400,
+      "error": "不支持的参数：amount。不能通过参数跳过检查。",
+      "state": null
+    }
+  ],
+  "browserErrorCount": 0,
+  "status": "completed",
+  "initialState": {
+    "status": 200,
+    "state": {
+      "revision": 0,
+      "view": "home",
+      "currentTaskIdPresent": false,
+      "currentWorkflow": null,
+      "workflowTaskCount": 0,
+      "workflowRecordCount": 16
+    }
+  },
+  "syntheticTranscripts": {
+    "user": [],
+    "assistant": [
+      "稍等，我这就把AA收款的卡片调出来给你看。",
+      "刚才那个参数没通过，我换个方式再帮你把卡片调出来。"
+    ]
+  },
+  "domFinal": {
+    "bankView": "home",
+    "workflowCardVisible": false,
+    "currentBusinessCardVisible": false,
+    "cardTitle": null,
+    "cardStatus": null,
+    "transcriptMessages": []
+  },
+  "finalState": {
+    "status": 200,
+    "state": {
+      "revision": 0,
+      "view": "home",
+      "currentTaskIdPresent": false,
+      "currentWorkflow": null,
+      "workflowTaskCount": 0,
+      "workflowRecordCount": 16
+    }
+  },
+  "cleanupObservation": {
+    "rtcStatesBeforeCleanup": [
+      "connected"
+    ],
+    "syntheticTracksBeforeCleanup": [
+      "live"
+    ],
+    "endSessionButtonClicked": true,
+    "browserClosed": true
+  }
+}

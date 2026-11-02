@@ -1,0 +1,999 @@
+{
+  "scenario": "audio-safe",
+  "classification": {
+    "realQwenWebRTCProvider": true,
+    "syntheticBankOnly": true,
+    "humanMicrophoneTested": false,
+    "textTurnsValidateASR": false,
+    "audioSafeFallbackIndependentOfStrictTranscription": true
+  },
+  "serverConfigPresence": {
+    ".env": false,
+    ".env.local": false,
+    ".dev.vars": true
+  },
+  "sessions": [
+    {
+      "name": "audio-safe-aa",
+      "provider": {
+        "liveConfigured": true,
+        "sessionStatus": 201,
+        "sessionUpdated": true,
+        "errors": [],
+        "connectedLiveUi": true,
+        "unexpectedErrorCount": 0
+      },
+      "initialState": {
+        "status": 200,
+        "state": {
+          "revision": 0,
+          "view": "home",
+          "currentWorkflow": null,
+          "workflowTaskCount": 0,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "finalState": {
+        "status": 200,
+        "state": {
+          "revision": 1,
+          "view": "workflow",
+          "currentWorkflow": {
+            "id": "eb729a8b-9197-4040-b363-480b3bcda48c",
+            "functionId": "TR05",
+            "title": "发起和管理 AA 收款",
+            "status": "review",
+            "params": {
+              "action": "create",
+              "total": 120,
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ]
+            },
+            "missing": [],
+            "resultPresent": false,
+            "resultKeys": [],
+            "result": null
+          },
+          "workflowTaskCount": 1,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "turns": [
+        {
+          "index": 0,
+          "input": "我们三个人AA，总共一百二十元，每人四十元。参与者是我、室友张三、房东张三。先把卡片给我看，不要提交。",
+          "inputChannel": "synthetic-audio",
+          "expectedFunctions": [
+            "TR05"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:58:25.887Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "syntheticAudio": {
+            "file": "LOCAL_AUXILIARY/webank-aa-voice-20261026/synthetic-1-meijia-1793011674727.wav",
+            "voice": "Meijia",
+            "bytes": 581798,
+            "sha256": "cd1ee42ce130f99f4b4f5a034cdeba6ead1bc294cb7ff77339adc04aef184823"
+          },
+          "wait": {
+            "elapsedMs": 19061,
+            "timedOut": false
+          },
+          "nameExact": true,
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "TR05",
+                "params": {
+                  "action": "create",
+                  "total": 120,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "TR05"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 1,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "eb729a8b-9197-4040-b363-480b3bcda48c",
+                "functionId": "TR05",
+                "title": "发起和管理 AA 收款",
+                "status": "review",
+                "params": {
+                  "action": "create",
+                  "total": 120,
+                  "participants": [
+                    "我",
+                    "室友张三",
+                    "房东张三"
+                  ]
+                },
+                "missing": [],
+                "resultPresent": false,
+                "resultKeys": [],
+                "result": null
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "发起和管理 AA 收款",
+              "cardStatus": "等待确认",
+              "reviewEntries": [
+                {
+                  "label": "操作",
+                  "value": "创建"
+                },
+                {
+                  "label": "AA 总额（元）",
+                  "value": "¥120.00"
+                },
+                {
+                  "label": "参与者",
+                  "value": "我、室友张三、房东张三"
+                }
+              ]
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "safeAvailability": {
+            "nameExact": true,
+            "taskStatus": "review",
+            "total": 120,
+            "participants": [
+              "我",
+              "室友张三",
+              "房东张三"
+            ],
+            "aaRecordCount": 0,
+            "cardVisible": true
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:58:57.038Z",
+          "assistantTranscripts": [
+            "卡片已经生成，目前只是草稿状态。总额是一百二十元，参与者是你、室友张三和房东张三。你核对一下信息，确认无误后我再帮你提交。"
+          ],
+          "actualAsrTranscripts": [
+            "我们三个人AA，总共一百二十元，每人四十元。参与者是我、室友张三、房东张三。先把卡片给我看，不要提交。"
+          ]
+        }
+      ],
+      "eventTypes": [
+        "session.created",
+        "session.updated",
+        "input_audio_buffer.speech_started",
+        "conversation.item.created",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "input_audio_buffer.speech_stopped",
+        "input_audio_buffer.committed",
+        "conversation.item.input_audio_transcription.completed",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done"
+      ],
+      "functionCalls": [
+        {
+          "id": "call_430fccba83c64773933299e9",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "create",
+              "total": 120,
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ]
+            }
+          }
+        }
+      ],
+      "bankRequests": [
+        {
+          "turnIndex": 0,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "TR05",
+            "params": {
+              "action": "create",
+              "total": 120,
+              "participants": [
+                "我",
+                "室友张三",
+                "房东张三"
+              ]
+            }
+          },
+          "utterance": "我们三个人AA，总共一百二十元，每人四十元。参与者是我、室友张三、房东张三。先把卡片给我看，不要提交。",
+          "historyCount": 1,
+          "revision": 0
+        }
+      ],
+      "bankResponses": [
+        {
+          "turnIndex": 0,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 1,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "eb729a8b-9197-4040-b363-480b3bcda48c",
+              "functionId": "TR05",
+              "title": "发起和管理 AA 收款",
+              "status": "review",
+              "params": {
+                "action": "create",
+                "total": 120,
+                "participants": [
+                  "我",
+                  "室友张三",
+                  "房东张三"
+                ]
+              },
+              "missing": [],
+              "resultPresent": false,
+              "resultKeys": [],
+              "result": null
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 1
+        }
+      ],
+      "browserErrorCount": 0,
+      "cleanup": {
+        "rtcStates": [
+          "closed"
+        ],
+        "syntheticTracks": [
+          "ended"
+        ]
+      },
+      "transcripts": {
+        "user": [
+          "我们三个人AA，总共一百二十元，每人四十元。参与者是我、室友张三、房东张三。先把卡片给我看，不要提交。"
+        ],
+        "assistant": [
+          "卡片已经生成，目前只是草稿状态。总额是一百二十元，参与者是你、室友张三和房东张三。你核对一下信息，确认无误后我再帮你提交。"
+        ]
+      }
+    },
+    {
+      "name": "audio-safe-read",
+      "provider": {
+        "liveConfigured": true,
+        "sessionStatus": 201,
+        "sessionUpdated": true,
+        "errors": [],
+        "connectedLiveUi": true,
+        "unexpectedErrorCount": 0
+      },
+      "initialState": {
+        "status": 200,
+        "state": {
+          "revision": 0,
+          "view": "home",
+          "currentWorkflow": null,
+          "workflowTaskCount": 0,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "finalState": {
+        "status": 200,
+        "state": {
+          "revision": 1,
+          "view": "workflow",
+          "currentWorkflow": {
+            "id": "47693f60-9f1b-4226-8a89-4bc2a12bce97",
+            "functionId": "BI01",
+            "title": "查询账单明细",
+            "status": "complete",
+            "params": {
+              "period": "2026-10"
+            },
+            "missing": [],
+            "resultPresent": true,
+            "resultKeys": [
+              "transactions",
+              "summary",
+              "coverage",
+              "asOf"
+            ],
+            "result": {
+              "kind": "object",
+              "keys": [
+                "transactions",
+                "summary",
+                "coverage",
+                "asOf"
+              ],
+              "summary": {
+                "period": "2026-10",
+                "grossExpenses": 11500,
+                "netExpenses": 10300,
+                "refunds": 1200,
+                "income": 0,
+                "count": 5
+              },
+              "transactions": {
+                "count": 5,
+                "items": [
+                  {
+                    "id": "txn-food",
+                    "amount": 3200
+                  },
+                  {
+                    "id": "txn-coffee",
+                    "amount": 2600
+                  },
+                  {
+                    "id": "txn-video",
+                    "amount": 2500
+                  },
+                  {
+                    "id": "txn-refund",
+                    "amount": 1200
+                  },
+                  {
+                    "id": "txn-double",
+                    "amount": 3200
+                  }
+                ]
+              }
+            }
+          },
+          "workflowTaskCount": 1,
+          "recordCounts": {
+            "transactions": 6,
+            "subscriptions": 3,
+            "products": 2,
+            "goals": 1,
+            "holdings": 1,
+            "cards": 3,
+            "orders": 0,
+            "rules": 0,
+            "reminders": 0,
+            "cancellations": 0,
+            "applications": 0,
+            "replacements": 0,
+            "bindings": 0,
+            "budgets": 0,
+            "contacts": 0,
+            "relations": 0,
+            "aa": 0,
+            "questionnaires": 0,
+            "education": 0,
+            "categories": 0
+          },
+          "aaRecords": []
+        }
+      },
+      "turns": [
+        {
+          "index": 0,
+          "input": "查看二零二六年十月账单。",
+          "inputChannel": "synthetic-audio",
+          "expectedFunctions": [
+            "BI01",
+            "BI02",
+            "BI06"
+          ],
+          "expectedOperation": "run",
+          "startedAt": "2026-10-26T10:58:59.291Z",
+          "assertions": [
+            "expected tool payload and state behavior observed",
+            "matching backend state and visible card observed"
+          ],
+          "syntheticAudio": {
+            "file": "LOCAL_AUXILIARY/webank-aa-voice-20261026/synthetic-2-meijia-1793011676163.wav",
+            "voice": "Meijia",
+            "bytes": 138018,
+            "sha256": "06df64afccf4b77f555c98f7e5dc1315ab0176e95038651652041801b81bbd30"
+          },
+          "wait": {
+            "elapsedMs": 25781,
+            "timedOut": false
+          },
+          "periodExact": true,
+          "modelFunctionCalls": [
+            {
+              "name": "bank_function",
+              "arguments": {
+                "operation": "run",
+                "functionId": "BI01",
+                "params": {
+                  "period": "2026-10"
+                }
+              }
+            }
+          ],
+          "actualFunctions": [
+            "BI01"
+          ],
+          "apiStatuses": [
+            {
+              "status": 200,
+              "error": null
+            }
+          ],
+          "observation": {
+            "state": {
+              "revision": 1,
+              "view": "workflow",
+              "currentWorkflow": {
+                "id": "47693f60-9f1b-4226-8a89-4bc2a12bce97",
+                "functionId": "BI01",
+                "title": "查询账单明细",
+                "status": "complete",
+                "params": {
+                  "period": "2026-10"
+                },
+                "missing": [],
+                "resultPresent": true,
+                "resultKeys": [
+                  "transactions",
+                  "summary",
+                  "coverage",
+                  "asOf"
+                ],
+                "result": {
+                  "kind": "object",
+                  "keys": [
+                    "transactions",
+                    "summary",
+                    "coverage",
+                    "asOf"
+                  ],
+                  "summary": {
+                    "period": "2026-10",
+                    "grossExpenses": 11500,
+                    "netExpenses": 10300,
+                    "refunds": 1200,
+                    "income": 0,
+                    "count": 5
+                  },
+                  "transactions": {
+                    "count": 5,
+                    "items": [
+                      {
+                        "id": "txn-food",
+                        "amount": 3200
+                      },
+                      {
+                        "id": "txn-coffee",
+                        "amount": 2600
+                      },
+                      {
+                        "id": "txn-video",
+                        "amount": 2500
+                      },
+                      {
+                        "id": "txn-refund",
+                        "amount": 1200
+                      },
+                      {
+                        "id": "txn-double",
+                        "amount": 3200
+                      }
+                    ]
+                  }
+                }
+              },
+              "workflowTaskCount": 1,
+              "recordCounts": {
+                "transactions": 6,
+                "subscriptions": 3,
+                "products": 2,
+                "goals": 1,
+                "holdings": 1,
+                "cards": 3,
+                "orders": 0,
+                "rules": 0,
+                "reminders": 0,
+                "cancellations": 0,
+                "applications": 0,
+                "replacements": 0,
+                "bindings": 0,
+                "budgets": 0,
+                "contacts": 0,
+                "relations": 0,
+                "aa": 0,
+                "questionnaires": 0,
+                "education": 0,
+                "categories": 0
+              },
+              "aaRecords": []
+            },
+            "dom": {
+              "bankView": "workflow",
+              "workflowCardVisible": true,
+              "currentBusinessCardVisible": false,
+              "cardTitle": "查询账单明细",
+              "cardStatus": "已返回结果",
+              "reviewEntries": []
+            },
+            "businessHashBefore": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d",
+            "businessHashAfter": "44edf272db95229cfbb62c21ffc57841f1277c1c53caa5edb594b6d6e98e791d"
+          },
+          "passed": true,
+          "completedAt": "2026-10-26T10:59:27.906Z",
+          "assistantTranscripts": [
+            "2026年10月的账单查到了，总支出一百一十五元，扣除十二元退款后净支出一百零三元。其中校园食堂有两笔三十二元的消费，有一笔被标记为疑似重复，另外还有一笔十六元的咖啡和一笔二十五元的视频会员订阅。"
+          ],
+          "actualAsrTranscripts": [
+            "查看二零二六年十月账单。"
+          ]
+        }
+      ],
+      "eventTypes": [
+        "session.created",
+        "session.updated",
+        "input_audio_buffer.speech_started",
+        "conversation.item.created",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "input_audio_buffer.speech_stopped",
+        "input_audio_buffer.committed",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.delta",
+        "conversation.item.input_audio_transcription.completed",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.output_item.done",
+        "response.done",
+        "conversation.item.created",
+        "response.created",
+        "response.output_item.added",
+        "conversation.item.created",
+        "response.content_part.added",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.delta",
+        "response.audio_transcript.done",
+        "response.audio.done",
+        "response.content_part.done",
+        "response.output_item.done",
+        "response.done"
+      ],
+      "functionCalls": [
+        {
+          "id": "call_d053f92810ac42948ebe4912",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "BI01",
+            "params": {
+              "period": "2026-10"
+            }
+          }
+        }
+      ],
+      "bankRequests": [
+        {
+          "turnIndex": 0,
+          "origin": "qwen-function-call",
+          "name": "bank_function",
+          "arguments": {
+            "operation": "run",
+            "functionId": "BI01",
+            "params": {
+              "period": "2026-10"
+            }
+          },
+          "utterance": "查看二零二六年十月账单。",
+          "historyCount": 1,
+          "revision": 0
+        }
+      ],
+      "bankResponses": [
+        {
+          "turnIndex": 0,
+          "status": 200,
+          "error": null,
+          "state": {
+            "revision": 1,
+            "view": "workflow",
+            "currentWorkflow": {
+              "id": "47693f60-9f1b-4226-8a89-4bc2a12bce97",
+              "functionId": "BI01",
+              "title": "查询账单明细",
+              "status": "complete",
+              "params": {
+                "period": "2026-10"
+              },
+              "missing": [],
+              "resultPresent": true,
+              "resultKeys": [
+                "transactions",
+                "summary",
+                "coverage",
+                "asOf"
+              ],
+              "result": {
+                "kind": "object",
+                "keys": [
+                  "transactions",
+                  "summary",
+                  "coverage",
+                  "asOf"
+                ],
+                "summary": {
+                  "period": "2026-10",
+                  "grossExpenses": 11500,
+                  "netExpenses": 10300,
+                  "refunds": 1200,
+                  "income": 0,
+                  "count": 5
+                },
+                "transactions": {
+                  "count": 5,
+                  "items": [
+                    {
+                      "id": "txn-food",
+                      "amount": 3200
+                    },
+                    {
+                      "id": "txn-coffee",
+                      "amount": 2600
+                    },
+                    {
+                      "id": "txn-video",
+                      "amount": 2500
+                    },
+                    {
+                      "id": "txn-refund",
+                      "amount": 1200
+                    },
+                    {
+                      "id": "txn-double",
+                      "amount": 3200
+                    }
+                  ]
+                }
+              }
+            },
+            "workflowTaskCount": 1,
+            "recordCounts": {
+              "transactions": 6,
+              "subscriptions": 3,
+              "products": 2,
+              "goals": 1,
+              "holdings": 1,
+              "cards": 3,
+              "orders": 0,
+              "rules": 0,
+              "reminders": 0,
+              "cancellations": 0,
+              "applications": 0,
+              "replacements": 0,
+              "bindings": 0,
+              "budgets": 0,
+              "contacts": 0,
+              "relations": 0,
+              "aa": 0,
+              "questionnaires": 0,
+              "education": 0,
+              "categories": 0
+            },
+            "aaRecords": []
+          },
+          "responseDoneCountAtReturn": 1
+        }
+      ],
+      "browserErrorCount": 0,
+      "cleanup": {
+        "rtcStates": [
+          "closed"
+        ],
+        "syntheticTracks": [
+          "ended"
+        ]
+      },
+      "transcripts": {
+        "user": [
+          "查看二零二六年十月账单。"
+        ],
+        "assistant": [
+          "2026年10月的账单查到了，总支出一百一十五元，扣除十二元退款后净支出一百零三元。其中校园食堂有两笔三十二元的消费，有一笔被标记为疑似重复，另外还有一笔十六元的咖啡和一笔二十五元的视频会员订阅。"
+        ]
+      }
+    }
+  ],
+  "status": "completed",
+  "audioSafeMode": {
+    "preservesStrictASRFailureScenario": true,
+    "nameExactIsMeasuredNotAssumed": true,
+    "readoutContinuesInIndependentSessionAfterAAFailure": true
+  },
+  "reusedSyntheticWavs": [
+    {
+      "file": "LOCAL_AUXILIARY/webank-aa-voice-20261026/synthetic-1-meijia-1793011674727.wav",
+      "voice": "Meijia",
+      "bytes": 581798,
+      "sha256": "cd1ee42ce130f99f4b4f5a034cdeba6ead1bc294cb7ff77339adc04aef184823"
+    },
+    {
+      "file": "LOCAL_AUXILIARY/webank-aa-voice-20261026/synthetic-2-meijia-1793011676163.wav",
+      "voice": "Meijia",
+      "bytes": 138018,
+      "sha256": "06df64afccf4b77f555c98f7e5dc1315ab0176e95038651652041801b81bbd30"
+    }
+  ],
+  "strictASRFailureReference": "LOCAL_AUXILIARY/webank-aa-voice-20261026/audio-2026-10-26T10-47-52-185Z.json"
+}

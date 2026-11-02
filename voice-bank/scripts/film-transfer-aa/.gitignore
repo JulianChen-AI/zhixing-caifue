@@ -1,0 +1,6 @@
+work/*
+!work/user-lines.json
+out/
+film/dist/
+film/assets/
+film/data/

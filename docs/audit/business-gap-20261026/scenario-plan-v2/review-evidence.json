@@ -1,0 +1,280 @@
+{
+  "reports": [
+    {
+      "file": "LOCAL_AUXILIARY/webank-scenario-plan-20261026/cross-review-by-cards.json",
+      "sha256": "db9d84d93bfa4ce2b6303408eb8576311df03c82d105808c7debdbbd36ab37e3",
+      "report": {
+        "reviewer": "cards_cross_plan",
+        "reviewed_files": [
+          "bills-subscriptions.json",
+          "root.json:Q03,Q08",
+          "cards-cross.json:生日及规则链"
+        ],
+        "checks": {
+          "bills_subscriptions_all_row_quotes": "52项来源引句逐项匹配通过",
+          "bills_subscriptions_all_headings": "两稿所有Markdown标题均有coverage",
+          "persona_and_stage": "小知/阿澈/栗子、研究生收入期；陷阱易感期/工具焦虑期/膨胀失控期各有数据与完整场景",
+          "pillars_redlines_innovation": "账单三支柱/三体验红线/三主线扩展及储备池，订阅三支柱/五体验红线/四创新含候选均有去向",
+          "demo_chain": "账单发现→订阅执行→观察闭环、What-if→规则、毕业叙事均有正常/拒绝分支",
+          "implementation_claim": "只读复核，不等同代码或端到端验证"
+        },
+        "findings": [
+          {
+            "id": "CC-REVIEW-01",
+            "severity": "low",
+            "blocking": false,
+            "keys": [
+              "S15"
+            ],
+            "issue": "订阅免疫力等级阈值已写data，但sources未直接列阈值行，容易误认自行设定。",
+            "sources": [
+              {
+                "file": "subscriptions-v1.5.md",
+                "start": 470,
+                "end": 470,
+                "quote": "-- 用户当前等级由 SUM(points) 计算：Lv.1=0-29 / Lv.2=30-79 / Lv.3=80-149 / Lv.4=150-249 / Lv.5=250+"
+              }
+            ],
+            "fix": "补470行作为S15来源；已通知稿件作者。"
+          },
+          {
+            "id": "CC-REVIEW-02",
+            "severity": "high",
+            "blocking": true,
+            "blocking_scope": "确认口径落地前阻塞Q08/X10相关实现，不阻塞下一版方案交付",
+            "keys": [
+              "Q08",
+              "X10",
+              "X16",
+              "X18",
+              "X19",
+              "X29",
+              "C12"
+            ],
+            "issue": "Q08拟E0任何普通写均手动，X10承诺创建+首跑后明确范围低风险循环免逐次确认；两者若机械同时实现会让规则自动化名存实亡。生日四确认可以现场点选，不必自动放行；点头仪式不能授权。CM-C08保护性先冻/同机秒解还要保留。",
+            "sources": [
+              {
+                "file": "security-v2.0.md",
+                "start": 114,
+                "end": 114,
+                "quote": "任何写操作的最终确认必须用手"
+              },
+              {
+                "file": "cross-scenario-v1.3.md",
+                "start": 137,
+                "end": 137,
+                "quote": "创建确认+首跑确认，之后免逐次确认"
+              },
+              {
+                "file": "cross-scenario-v1.3.md",
+                "start": 431,
+                "end": 431,
+                "quote": "四次确认全部现场呈现"
+              },
+              {
+                "file": "cards-v1.5.md",
+                "start": 382,
+                "end": 382,
+                "quote": "本机同设备可即时自助解冻"
+              }
+            ],
+            "fix": "集中登记待裁定：普通交互写/直接对外付款手动兜底；明确已授权低风险周期规则是否按跨场景细则例外，必须对用户透明且不扩作用域；保护性临冻按项目细则例外。不要称E0与规则细则原文已自洽。若保守Demo暂禁自动执行，应如实标X10为每次手动演示、非已实现规则自动化。"
+          },
+          {
+            "id": "CC-REVIEW-03",
+            "severity": "medium",
+            "blocking": false,
+            "keys": [
+              "Q03",
+              "X14",
+              "X15"
+            ],
+            "issue": "Q03已正确把模型输出链接与官方生态交接分开，不照抄仅微众域；但美团/Kimi未验证实际官方接入，不能因名字在白名单就称域名/签名已认证。",
+            "sources": [
+              {
+                "file": "security-v2.0.md",
+                "start": 61,
+                "end": 61,
+                "quote": "链接白名单（只允许微众域）"
+              },
+              {
+                "file": "security-v2.0.md",
+                "start": 145,
+                "end": 145,
+                "quote": "域名白名单 + 唤起前确认卡"
+              },
+              {
+                "file": "cross-scenario-v1.3.md",
+                "start": 476,
+                "end": 476,
+                "quote": "美团/Kimi 桌面助手联动在 Demo 中为沙箱模拟"
+              }
+            ],
+            "fix": "保留现Q03分域意图；首版用本地沙箱/已核官方入口，未知地址用OFFICIAL_URL槽并禁止跳转；真实App Links/Universal Links签名证明另核。"
+          }
+        ],
+        "summary": "账单订阅无阻塞级覆盖缺口；确认口径一项跨稿冲突需作为实施前集中裁定，不静默改变业务。"
+      }
+    },
+    {
+      "file": "LOCAL_AUXILIARY/webank-scenario-plan-20261026/cross-review-wealth-on-cards.json",
+      "sha256": "ac96da6cf83223921953c156affc4e35caeba56d9ded7beda2bf81602600d89d",
+      "report": {
+        "reviewer": "wealth_transfer_plan",
+        "reviewed_files": [
+          "cards-cross.json",
+          "root.json"
+        ],
+        "mode": "只读交叉审查，未修改对方草稿/源文档/代码，非运行验收",
+        "checks": [
+          {
+            "name": "精确引文",
+            "result": "通过",
+            "detail": "cards-cross全部行sources.quote均在其指定范围连续匹配原文；无伪造引用。"
+          },
+          {
+            "name": "原文标题",
+            "result": "通过",
+            "detail": "卡片51/51、跨场景42/42真实Markdown标题均有处置；排除代码块内注释标题。"
+          },
+          {
+            "name": "重点对照表",
+            "result": "通过",
+            "detail": "跨场景四问表55–66、七接力96–106、规则四类135–142、事件模板150–159逐行均有覆盖。"
+          },
+          {
+            "name": "卡片创新①–⑤",
+            "result": "通过",
+            "detail": "守护日志/额度年轮/冷静期自律三工具+紧急豁免/数字分卡+断粮/挂失仪式均有数据、最小实现和拒绝/失败验收；家庭共管C28明确候选。"
+          },
+          {
+            "name": "生日四确认与跨APP准备",
+            "result": "通过",
+            "detail": "X16–19保留四次不同作用域确认；美团X14本地模拟页/官方能力待核、KimiX15草稿协作明确未连接；300-227=73与参考方案297/余3区分。"
+          },
+          {
+            "name": "当前架构与现状",
+            "result": "通过",
+            "detail": "复用现有TaskPlan/workflow，不重建planner；虚拟卡仅沙箱，保护性冻结保留CM-C08特例，既有1–20不判全无。"
+          },
+          {
+            "name": "局部依赖",
+            "result": "通过",
+            "detail": "cards-cross本文件内键依赖无环；跨分域语义依赖需主稿合并后再全局校验。"
+          },
+          {
+            "name": "候选边界",
+            "result": "通过",
+            "detail": "C28家庭共管、X30多人链、X31–37七模板均未列首版承诺；没有把宿舍共享账本改称联邦学习。"
+          },
+          {
+            "name": "安全/研究边界",
+            "result": "有一处需补",
+            "detail": "root中大部分金融授权/联邦不在线阻塞/不宣称DP/无真实银行与原生能力的边界明确，但R10对照组不完整，见finding R-01。"
+          }
+        ],
+        "findings": [
+          {
+            "id": "R-01",
+            "severity": "medium",
+            "target": "root.json:R10",
+            "source": "federated-learning-agent-debate.md:157–168",
+            "issue": "原文要求单Agent、单Agent自我复核、多Agent独立投票、有界辩论四类对照；R10标题/数据仅列无辩论、单Agent+清单、三Agent，未明确独立投票与有界辩论是两个独立实验臂。",
+            "fix": "在data/implementation/acceptance显式列四臂，清单可作附加对照而非替代自我复核；同数据同预算分层比较。"
+          },
+          {
+            "id": "C-01",
+            "severity": "low",
+            "target": "cards-cross.json:meta.cost_legend",
+            "issue": "当前S0.25–1/M1–3/L3–6，与主稿约定S≤0.5/M0.5–2/L>2或专项不同，汇总会误导。",
+            "fix": "统一所有分域成本口径，或保留各组原始估计但主表统一再估，不能直接相加。"
+          },
+          {
+            "id": "P-01",
+            "severity": "note",
+            "target": "all drafts:first_batch",
+            "issue": "多组首批标记存在尚未完成的重成本依赖（如C19依赖C08/C09/C12，C27依赖C16），不能直接筛first_batch生成新的前20项。",
+            "fix": "首批标记只作收益/可演示候选；最终必须按完整场景依赖排序，明确必要共用能力和批准范围，不能为了20条裁断演示链。"
+          },
+          {
+            "id": "R-02",
+            "severity": "note",
+            "target": "root.json:R02–R04",
+            "source": "federated-learning-agent-debate.md:157–168",
+            "issue": "联邦原文对照包含本地、普通FedAvg、带保护聚合候选。草稿诚实标安全聚合/DP未实装，但实验臂仍应明列三者去向，避免把FedAvg模拟当已受保护聚合。",
+            "fix": "给带保护聚合候选独立状态/指标栏；未实施时明确缺项，不能宣称联邦全方案完成；本轮低成本展示不必强行上完整密码协议。"
+          }
+        ],
+        "supplemental_bills_check": {
+          "file": "bills-subscriptions.json",
+          "result": "52行精确短引全部匹配；账单65/65与订阅54/54标题覆盖；局部依赖无环；三订阅画像、账单两扩展/年度收尾/五储备均有去向。未修改对方草稿。"
+        }
+      }
+    },
+    {
+      "file": "LOCAL_AUXILIARY/webank-scenario-plan-20261026/final-review-bills.json",
+      "sha256": "4b21a800235f20c98d27f0fd7fb7e33639d11503fe279f87c7e61f4e7c989e81",
+      "report": {
+        "reviewer": "bills_subscriptions_plan",
+        "mode": "只读静态终审",
+        "reviewed_files": [
+          "LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/README.md",
+          "LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/quick-review.md",
+          "LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/shared-and-dependencies.md",
+          "LOCAL_PROJECT/docs/audit/business-gap-20261026/scenario-plan-v2/plan.json"
+        ],
+        "reviewed_hashes": {
+          "README.md": "f3059aa69d42fdb575f53104590aa018fe84af85a0d733d96e560e4f39521bc7",
+          "quick-review.md": "174e9dbd920ba8c047bbd3222da1d353a7c89c22a13c11e908d787efa6e41f66",
+          "shared-and-dependencies.md": "3243013897608ce7e3a761feadc4b060e402d8750072d3bc9192920c5af618de",
+          "plan.json": "9621cb80ad53cd81f85b01ed6e9f9b54c0600aaf241bbed9ec8a45fdfed1e473"
+        },
+        "result": "核心要求覆盖通过；无阻断级业务遗漏；发现一处应修正的功能ID定位错误",
+        "checks": {
+          "三Persona三阶段": true,
+          "三支柱体验红线": true,
+          "创新全部有去向": true,
+          "场景数据功能同批": true,
+          "候选身份不变": true,
+          "必要共享首档": true,
+          "现状不倒退": true,
+          "优先级守恒": true
+        },
+        "counts": {
+          "rows": 191,
+          "scenarios": 37,
+          "candidates": 20
+        },
+        "findings": [
+          {
+            "id": "FINAL-BS-01",
+            "severity": "P2",
+            "blocking": false,
+            "file": "implementation-plan.md / plan.json",
+            "key": "B13",
+            "field": "implementation",
+            "issue": "合并X01后的追加说明把BA-B06对应的当前功能写成BI04；BI04实际是异常扣款/退款核对，订阅周期发现与闲置询问是BI05。B13同字段前半句已正确使用BI05，存在同卡自相矛盾的代码定位。",
+            "evidence": {
+              "plan_text": "BA-B06/BI04结果动作携白名单字段进入SU04",
+              "current_code": "voice-bank/lib/workflows/catalog-data.json: BI04=核对异常扣款和退款；BI05=查找周期扣费和闲置订阅"
+            },
+            "suggested_fix": "将追加说明统一为“BA-B06/BI05结果动作携白名单字段进入SU04”，同步机器表和渲染实施卡；若追加来自分域X01也修其后续生成来源。"
+          }
+        ],
+        "limits": [
+          "未修改应用或方案交付文件；仅新建本审查记录。",
+          "未运行应用业务测试/浏览器/外部服务；不是191项实现验收。"
+        ]
+      }
+    }
+  ],
+  "post_review_corrections": [
+    "R10四实验臂明确",
+    "成本统一S/M/L且不重复累加",
+    "普通FedAvg与保护聚合状态分离",
+    "首批不机械截20/first_batch非执行范围",
+    "B13追加定位由BI04纠正为BI05",
+    "周期E0冲突明确登记",
+    "生日罐付款与时间冲突明确登记"
+  ]
+}

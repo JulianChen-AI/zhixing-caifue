@@ -1,0 +1,170 @@
+{
+  "model": "qwen3-tts-flash",
+  "clips": {
+    "s0-xz": {
+      "hash": "8858f7707d51fac4",
+      "voice": "Cherry",
+      "seconds": 4.121
+    },
+    "s0-nr": {
+      "hash": "4460ddff44bd0da5",
+      "voice": "Ethan",
+      "seconds": 8.201
+    },
+    "s1-xz-1": {
+      "hash": "ccfd13de83e3904f",
+      "voice": "Cherry",
+      "seconds": 3.166
+    },
+    "s1-gs-1": {
+      "hash": "b92b973c8d7fc70c",
+      "voice": "Serena",
+      "seconds": 5.821
+    },
+    "s1-xz-2": {
+      "hash": "969b0504318b3516",
+      "voice": "Cherry",
+      "seconds": 1.396
+    },
+    "s1-nr-1": {
+      "hash": "ac7c6b57689a1c95",
+      "voice": "Ethan",
+      "seconds": 4.108
+    },
+    "s1-xz-3": {
+      "hash": "aacf9b7cec7bd478",
+      "voice": "Cherry",
+      "seconds": 9.001
+    },
+    "s1-gs-2": {
+      "hash": "802e4c82e2210d21",
+      "voice": "Serena",
+      "seconds": 4.205
+    },
+    "s1-nr-2": {
+      "hash": "42dc95925eb1407b",
+      "voice": "Ethan",
+      "seconds": 5.474
+    },
+    "s2-xz-1": {
+      "hash": "bd072e9da55a25d7",
+      "voice": "Cherry",
+      "seconds": 2.356
+    },
+    "s2-gs-1": {
+      "hash": "6cd00e4080755b26",
+      "voice": "Serena",
+      "seconds": 9.321
+    },
+    "s2-nr-1": {
+      "hash": "92ea957a25ae96e8",
+      "voice": "Ethan",
+      "seconds": 13.319
+    },
+    "s2-gs-2": {
+      "hash": "8af3caf68a76122a",
+      "voice": "Serena",
+      "seconds": 6.901
+    },
+    "s2-nr-2": {
+      "hash": "23c5e3d3fd81a2e5",
+      "voice": "Ethan",
+      "seconds": 6.516
+    },
+    "s2-xz-2": {
+      "hash": "74a0f7757c2b5ef1",
+      "voice": "Cherry",
+      "seconds": 4.999
+    },
+    "s3-gs-1": {
+      "hash": "e83b5e9a08184524",
+      "voice": "Serena",
+      "seconds": 7.316
+    },
+    "s3-xz-1": {
+      "hash": "3bca45371d890541",
+      "voice": "Cherry",
+      "seconds": 2.607
+    },
+    "s3-nr-1": {
+      "hash": "28b335f344073eda",
+      "voice": "Ethan",
+      "seconds": 5.642
+    },
+    "s3-xz-2": {
+      "hash": "d4cc5823959335ff",
+      "voice": "Cherry",
+      "seconds": 3.16
+    },
+    "s4-nr-1": {
+      "hash": "496396d69493d867",
+      "voice": "Ethan",
+      "seconds": 7.878
+    },
+    "s5-xz-1": {
+      "hash": "8141f68c95ce4819",
+      "voice": "Cherry",
+      "seconds": 4.518
+    },
+    "s5-gs-1": {
+      "hash": "23bb48170b1d4964",
+      "voice": "Serena",
+      "seconds": 5.061
+    },
+    "s5-gs-2": {
+      "hash": "2bfad20f6dab17a8",
+      "voice": "Serena",
+      "seconds": 7.555
+    },
+    "s5-xz-2": {
+      "hash": "8ffc88acecf5e623",
+      "voice": "Cherry",
+      "seconds": 5.148
+    },
+    "s5-nr-1": {
+      "hash": "15d89df76d4ac4f8",
+      "voice": "Ethan",
+      "seconds": 7.001
+    },
+    "s5-xz-3": {
+      "hash": "bb376cfc9678f15e",
+      "voice": "Cherry",
+      "seconds": 3.065
+    },
+    "s5-gs-3": {
+      "hash": "a04088d4d45fbf50",
+      "voice": "Serena",
+      "seconds": 10.102
+    },
+    "s5-nr-2": {
+      "hash": "95316cec8a546da4",
+      "voice": "Ethan",
+      "seconds": 6.282
+    },
+    "s5-gs-4": {
+      "hash": "7568436da9280938",
+      "voice": "Serena",
+      "seconds": 7.474
+    },
+    "s6-nr-1": {
+      "hash": "866e70e936e8e9e2",
+      "voice": "Ethan",
+      "seconds": 10.684
+    },
+    "s7-xz-1": {
+      "hash": "44c43d2e3414153c",
+      "voice": "Cherry",
+      "seconds": 1.635
+    },
+    "s7-nr-1": {
+      "hash": "45631b3d7209c02e",
+      "voice": "Ethan",
+      "seconds": 9.791
+    },
+    "s7-nr-2": {
+      "hash": "35b27027f57e0749",
+      "voice": "Ethan",
+      "seconds": 5.555
+    }
+  }
+}

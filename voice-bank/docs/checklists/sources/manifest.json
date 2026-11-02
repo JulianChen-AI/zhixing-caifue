@@ -1,0 +1,33 @@
+{
+  "importedOn": "2026-10-22",
+  "documents": [
+    {
+      "id": "billing",
+      "originalName": "账单分析场景·设计文档(1).md",
+      "file": "docs/checklists/sources/billing.md",
+      "sha256": "ad8e6462772d40b6adb620c14357f97f78fa1c3a1b050ba31ee859c6482bde7e",
+      "lines": 745
+    },
+    {
+      "id": "subscription",
+      "originalName": "订阅代扣管理场景设计文档.md",
+      "file": "docs/checklists/sources/subscription.md",
+      "sha256": "248c14b16e4cd681993e4f864cc64a620fe162a52f71c0e62351364f3ea58493",
+      "lines": 604
+    },
+    {
+      "id": "transfer",
+      "originalName": "智能转账场景·设计文档(1).md",
+      "file": "docs/checklists/sources/transfer.md",
+      "sha256": "4900ac1b9ae602957e192d368715af8cec139ff966a210dcd5acd3740e2acfd9",
+      "lines": 625
+    },
+    {
+      "id": "investment",
+      "originalName": "理财操作场景·从需求到实现总报告(4).md",
+      "file": "docs/checklists/sources/investment.md",
+      "sha256": "86e680d8578f5c58ff314b3ddcc8809f580914d4a38bd11ad47602ad77468a65",
+      "lines": 797
+    }
+  ]
+}

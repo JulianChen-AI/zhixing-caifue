@@ -1,0 +1,10 @@
+import catalog from './catalog-data.json' with { type: 'json' };
+export type Scene = 'transfer' | 'billing' | 'subscription' | 'investment';
+export type Fact = string | number | boolean | null | undefined;
+export type SourceRef = { document: Scene; lines: number[] };
+export type CheckDefinition = { id: string; title: string; stage: string; field: string; op: string; value?: Fact; onFailure: string; question: string; sources: SourceRef[] };
+export type WorkflowDefinition = { id: string; scene: Scene; title: string; effect: string; intents: string[]; capability: string; version: string; sources: SourceRef[]; steps: CheckDefinition[] };
+export const POLICY_VERSION = catalog.policyVersion;
+export const DEMO_POLICY = catalog.demoPolicy;
+export const WORKFLOWS = catalog.workflows as WorkflowDefinition[];
+export const workflowById = (id: string) => WORKFLOWS.find(flow => flow.id === id);

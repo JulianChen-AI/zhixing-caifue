@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Preserve original document bytes for source manifest hashes.
+voice-bank/docs/checklists/sources/*.md -text
