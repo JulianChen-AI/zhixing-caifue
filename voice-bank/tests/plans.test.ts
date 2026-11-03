@@ -421,7 +421,9 @@ test('a checklist untouched for a while does not absorb a new request',()=>{
 });
 
 test('a new request does not join a checklist whose card is blocked, so the blocked card never comes back by itself',()=>{
- let s=app(initialState(),{type:'workflow',command:{operation:'run',functionId:'IN08',params:{productId:'fund-cash',accountId:'daily',amount:5000000},source:'card'}});const old=s.plan!.id;
+ // A valid assessment, so the card is blocked by the balance rather than by suitability.
+ const assessed=initialState();assessed.workflows!.riskProfile={level:3,answers:[3,3,3],validUntil:'2099-01-01T00:00:00.000Z'};
+ let s=app(assessed,{type:'workflow',command:{operation:'run',functionId:'IN08',params:{productId:'fund-cash',accountId:'daily',amount:5000000},source:'card'}});const old=s.plan!.id;
  const blocked=s.workflows!.tasks.find(t=>t.functionId==='IN08')!;assert.equal(blocked.status,'blocked');
  s=startApp(s,'CA01','先查看银行卡列表');
  assert.notEqual(s.plan!.id,old);assert.deepEqual(s.plan!.steps.map(x=>x.functionId),['CA01']);assert.equal(s.plan!.status,'complete');

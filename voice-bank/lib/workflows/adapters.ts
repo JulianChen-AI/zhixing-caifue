@@ -161,6 +161,22 @@ export function preflight(s:BankState,t:FlowTask){
  if(['SU03','IN14'].includes(id)&&p.notifyChannel&&p.notifyChannel!=='in_app')throw new WorkflowError('本沙箱只支持站内提醒。');
 }
 
+/**
+ * Suitability read before any amount is asked: without a valid formal assessment, or with a product above it,
+ * the purchase stops here instead of collecting fields it can never use. A level the user states in words is not an assessment.
+ */
+export function suitabilityStop(s:BankState,t:Pick<FlowTask,'functionId'|'params'>):string|undefined{
+ const a=String(t.params.action||'');
+ if(!(t.functionId==='IN08'||t.functionId==='IN13'&&['create','update'].includes(a)))return;
+ const profile=s.workflows?.riskProfile,valid=!!profile&&Date.parse(profile.validUntil)>=businessNow(s);
+ const product=t.params.productId?rows(s,'products').find(r=>r.id===t.params.productId):undefined;
+ if(!valid)return `买${product?.name||'理财产品'}前需要先完成有效的演示风险测评；口头说的测评结果不能代替正式测评。先带你做测评，做完再回到这笔购买。`;
+ if(product&&num(product,'risk')>profile!.level){
+  const fits=rows(s,'products').filter(r=>num(r,'risk')<=profile!.level).map(r=>`${r.name}（R${num(r,'risk')}）`);
+  return `你的测评是C${profile!.level}，${product.name}是R${num(product,'risk')}，风险高于测评结果，按适当性规则不能购买。${fits.length?'可以改选'+fits.join('、')+'，':''}或重新测评后再看。`;
+ }
+}
+
 const LOSS_POINTS=['净值会下跌，本金可能亏损；过去的收益不代表未来','申购、赎回和管理费用会吃掉一部分收益','急用钱时赎回要等到账，市场不好时可能被迫低价卖出','只用短期内不用的闲钱，先留够生活费和应急金'];
 /** Lesson plus the suitability reading. The lesson is voluntary; only the formal profile and the product rule decide eligibility. */
 function learnResult(s:BankState,p:Params){

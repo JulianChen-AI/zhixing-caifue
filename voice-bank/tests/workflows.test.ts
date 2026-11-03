@@ -72,7 +72,8 @@ test('card selection and fund product replies amend the existing checklist inste
  let s=act(initialState(),offlineWorkflow('冻结银行卡',initialState())!);const id=currentWorkflow(s)!.id;
  s=act(s,workflowTextAction(s,'日常卡')!);assert.equal(currentWorkflow(s)!.id,id);assert.equal(currentWorkflow(s)!.params.cardId,'card-daily');assert.equal(currentWorkflow(s)!.status,'review');
  assert.throws(()=>workflowTextAction(s,'确认解冻'));s=act(s,workflowTextAction(s,'确认冻结')!);assert.equal(currentWorkflow(s)!.status,'authenticate');
- let fund=run(initialState(),'IN08');const fundId=currentWorkflow(fund)!.id;fund=act(fund,workflowTextAction(fund,'演示债券基金')!);assert.equal(currentWorkflow(fund)!.id,fundId);assert.equal(currentWorkflow(fund)!.params.productId,'fund-bond');assert.ok(currentWorkflow(fund)!.missing.includes('amount'));
+ const assessed=initialState();assessed.workflows!.riskProfile={level:3,answers:[3,3,3],validUntil:'2099-01-01T00:00:00.000Z'};
+ let fund=run(assessed,'IN08');const fundId=currentWorkflow(fund)!.id;fund=act(fund,workflowTextAction(fund,'演示债券基金')!);assert.equal(currentWorkflow(fund)!.id,fundId);assert.equal(currentWorkflow(fund)!.params.productId,'fund-bond');assert.ok(currentWorkflow(fund)!.missing.includes('amount'));
 });
 
 test('four-layer catalog covers 54 unique functions and 85 unique logical tools; every reference resolves',()=>{

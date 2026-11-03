@@ -70,7 +70,8 @@ export async function POST(req: Request) {
         const history = (body.history || []).slice(-6).map(h => ({ user: h.user.slice(0, 300), reply: h.reply.slice(0, 200) }));
         const understood = await understandIntent(session.state, body.command, history, p, req.signal);
         // Nothing to change (a question or chat): show the reply without a new revision.
-        if (!understood.action) return Response.json({ state: { ...session.state, lastReply: understood.say } }, { headers: sessionHeaders(session, req) });
+        // sayOnly marks this reply as the answer itself, so the page does not show an open card's old message instead.
+        if (!understood.action) return Response.json({ state: { ...session.state, lastReply: understood.say, sayOnly: understood.say } }, { headers: sessionHeaders(session, req) });
         let n = 0;
         await applyIntent(understood, async a => { session.state = await commit(session, dispatchAction(session.state, a, body.command), session.state.revision, n++ ? `${body.requestId}:${n}` : body.requestId, body.sceneEpoch); });
         return Response.json({ state: session.state }, { headers: sessionHeaders(session, req) });

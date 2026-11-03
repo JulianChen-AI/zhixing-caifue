@@ -3,7 +3,7 @@ import type { BankAction, BankState } from '../bank/types.ts';
 import { ambiguousRecipients, contactsOf } from '../bank/recipients.ts';
 import { availableFunctions, functionById, toolById, UNSUPPORTED_FUNCTIONS, WORKFLOW_VERSION } from './catalog.ts';
 import { estimate, type EstimateItem } from './adapters.ts';
-import { ACTIONS, cents, executeBusiness, isWrite, needsAuth, preflight, queryBusiness, readTool, rows, settleOrders, step } from './adapters.ts';
+import { ACTIONS, cents, executeBusiness, isWrite, needsAuth, preflight, queryBusiness, readTool, rows, settleOrders, step, suitabilityStop } from './adapters.ts';
 import { validateVoiceDraft, FIELDS, LABELS, normalizedParams, requiredFields } from './fields.ts';
 import { acknowledgesReview } from './review.ts';
 import { initialFlowStore } from './seed.ts';
@@ -113,8 +113,17 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
  if(required.includes('accountId')&&t.params.accountId==null&&s.accounts.length===1){t.params.accountId=s.accounts[0].id;(t.fieldEvidence||={}).accountId={source:'calculation',quote:'当前只有一个付款账户，自动带入'};}
  // Risk wording stops a transfer before collecting the rest; it is never completed by asking more.
  if(['TR03','TR04'].includes(t.functionId)&&t.riskSignals?.length&&required.some(k=>t.params[k]==null||t.params[k]==='')){t.status='blocked';t.missing=[];t.message=`这笔涉及“${t.riskSignals.join('、')}”：向个人账户先付钱，不是平台订单付款。请先核实交易、收款信息和退还条件。本次转账没有提交，也没有扣款。`;return s;}
+ // An unsuitable purchase stops before its amount is asked; the message names the assessment so the prerequisite flow can offer it.
+ {const stop=suitabilityStop(s,t);if(stop){t.status='blocked';t.missing=[];t.message=stop;return s;}}
  t.missing=required.filter(k=>t.params[k]==null||t.params[k]===''||k==='answers'&&!completeAnswers(t.params[k])||Array.isArray(t.params[k])&&!(t.params[k]as unknown[]).length);
- if(t.missing.length){t.status='collecting';t.message='请补充'+t.missing.map(k=>LABELS[k]||k).join('、')+'。';if(t.functionId==='IN05'){const questions=questionnaire(t.params.answers),q=questions.find(q=>q.status==='missing')!;t.message=`已保存${questions.filter(q=>q.status==='filled').length}题。第${q.index}题：${q.title} ${q.choices.map(c=>c.value+'：'+c.label).join('；')}。`;}return s;}
+ // AA with a head count: names said so far are kept and only the missing ones are asked for.
+ const headcount=t.functionId==='TR05'&&t.params.action==='create'&&typeof t.params.headcount==='number'?t.params.headcount:0;
+ // The payer is the user: a head count with no names yet starts the list with “我”.
+ if(headcount&&!(Array.isArray(t.params.participants)&&(t.params.participants as unknown[]).length)){t.params.participants=['我'];(t.fieldEvidence||={}).participants={source:'calculation',quote:'AA 的付款人是你自己'};}
+ const named=Array.isArray(t.params.participants)?t.params.participants as string[]:[];
+ if(headcount&&named.length!==headcount&&!t.missing.includes('participants'))t.missing.push('participants');
+ if(t.missing.length){t.status='collecting';t.message='请补充'+t.missing.map(k=>LABELS[k]||k).join('、')+'。';
+  if(headcount&&t.missing.includes('participants'))t.message=named.length<headcount?`这次 AA 一共 ${headcount} 人，${named.length?`已记下${named.join('、')}，`:''}还差 ${headcount-named.length} 位，请说一下他们的称呼。`:`你说一共 ${headcount} 人，但名单里有 ${named.length} 位，请核对人数或名单。`;if(t.functionId==='IN05'){const questions=questionnaire(t.params.answers),q=questions.find(q=>q.status==='missing')!;t.message=`已保存${questions.filter(q=>q.status==='filled').length}题。第${q.index}题：${q.title} ${q.choices.map(c=>c.value+'：'+c.label).join('；')}。`;}return s;}
  try{
   step(t,'S07','白名单参数及后台事实检查',()=>preflight(s,t));
   if(t.functionId==='TR03'){

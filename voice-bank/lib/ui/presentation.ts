@@ -101,6 +101,7 @@ export function replyForState(state: BankState): string {
 /** Results of queries the checklist finished on the way to the current card, in the words the chat shows. */
 export const checklistResults = (state: BankState) => (state.plan?.announcements || []).filter(line => /”：/.test(line)).map(line => userMessage(line)).join('');
 function currentReply(state: BankState): string {
+  if (state.sayOnly) return userMessage(state.sayOnly);
   const task = state.view === 'workflow' ? state.workflows?.tasks.find(item => item.id === state.workflows?.currentTaskId) : undefined;
   if (task) {
     const message = workflowMessage(task);

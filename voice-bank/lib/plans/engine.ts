@@ -28,9 +28,10 @@ function log(p:TaskPlan,event:string,reason:string,stepId?:string){p.log=[...p.l
 type RecipientAsk={question:string;choices:string[]};
 /** A shared payee name drops the model's pick and returns the candidates to ask about. */
 function evidence(s:BankState,step:PlanStep,params:Params,text:string,source:'voice'|'card'):RecipientAsk|undefined{
- if(source!=='voice')return;
  const task=child(s,step)||({functionId:step.functionId,params:{}} as FlowTask);
  const named=()=>{const same=step.functionId==='TR03'&&params.recipientId==null&&!task.params.recipientId?ambiguousRecipients(text,s.accounts.map(a=>a.tail),contactsOf(s)):[];return same.length>1?{question:recipientChoiceQuestion(same),choices:same.map(c=>c.id)}:undefined;};
+ // Already-validated proposals (text mode) skip evidence checks, but a shared name still gets the named choice question.
+ if(source!=='voice')return named();
  try{assertVoiceEvidence(s,task,params,text);return named();}
  catch(error){
   if(step.functionId!=='TR03'||!(error instanceof WorkflowError)||error.field!=='recipientChoice')throw error;
@@ -249,6 +250,8 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   // by the user. Preserve those fields through the same parser and evidence
   // checks used by multi-step decomposition; proposed conflicting values still fail.
   const initialParams=cmd.functionId?normalizedParams(cmd.functionId,{...(cmd.source==='voice'?extractParams(text,cmd.functionId,s):{}),...cmd.params}):{};
+  // The AA head count is read from the user's own words on every entry, so text mode keeps “五个人” too.
+  if(cmd.functionId==='TR05'&&initialParams.headcount==null&&text){const said=extractParams(text,'TR05',s).headcount;if(said!=null)initialParams.headcount=said;}
   const incoming=cmd.functionId?{id:crypto.randomUUID(),layer:'double' as const,status:'collecting' as const,steps:[{id:adopted?.id||crypto.randomUUID(),kind:'workflow' as const,title:functionById(cmd.functionId)!.title,quote:text,functionId:cmd.functionId,params:adopted?.params||initialParams,...(adopted?{taskId:adopted.id}:{}),dependsOn:[],status:'pending' as const}],message:'正在安排任务。',createdAt:new Date().toISOString(),log:[]}:decompose(text,s,cmd.tasks||cmd.steps);
   if(existing?.monthly?.rentUnknown&&incoming.steps.some(x=>x.functionId==='TR03'))throw new WorkflowError('房租原订单结果待核对，不能另建转账；请先回查原订单。');
   const asks=new Map<string,RecipientAsk>();
@@ -270,6 +273,8 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   log(p,existing?'inserted':'created','已创建并保存所有业务实例，尚未执行后续任务。');s.view='workflow';s=pump(s,reducer);
   for(const [stepId,ask] of asks)askRecipient(s,s.plan?.steps.find(x=>x.id===stepId),ask);
   if(asideNote)s.lastReply=asideNote+s.lastReply;
+  // Asking to skip the review is answered, not obeyed: the card still needs the user's own confirmation.
+  if(/不用确认|无需确认|免确认|直接转|跳过(?:确认|核对|验证)|别让我确认/.test(text)&&s.plan?.steps.some(x=>x.functionId&&isWrite({functionId:x.functionId,params:x.params}))){const note='转账、扣款这类业务必须由你在卡片上核对确认，这一步不能跳过。',open=s.workflows?.tasks.find(t=>t.id===s.workflows?.currentTaskId);s.lastReply=note+s.lastReply;if(open&&!open.message.startsWith(note))open.message=note+open.message;}
  }else{
   const p=s.plan;if(!p)throw new WorkflowError('尚无任务清单，请先描述业务。');
   if(cmd.source==='voice'&&cmd.turnId)p.lastUserTurnId=cmd.turnId;

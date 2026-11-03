@@ -1,5 +1,6 @@
 'use client';
 import { createContext, Fragment, useContext, type ReactNode } from 'react';
+import { AssessmentPair, LessonNext } from './stop-cards';
 import { AlarmClock, ArrowRight, Ban, BookOpen, CalendarDays, Check, CreditCard, Goal, Landmark, Lightbulb, Lock, ShieldAlert, Snowflake, Sparkles, Target, TrendingUp, User } from 'lucide-react';
 import type { BankState } from '@/lib/bank/types';
 import type { FlowTask } from '@/lib/workflows/types';
@@ -289,7 +290,8 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
       const points = Array.isArray(row.points) ? row.points.map(text) : [], product = record(row.product);
       return <div className="viz-group">
         <div className="viz-learn"><BookOpen aria-hidden size={22}/><div><b>投教小课（自愿 · 可跳过）<span className="viz-learn-tag">不是购买门槛</span></b>{points.length ? <ol className="viz-learn-points">{points.map(point => <li key={point}>{point}</li>)}</ol> : <p>{text(row.content)}</p>}<small><Lightbulb aria-hidden size={13}/> 学不学都不改变风险测评；能否交易只看有效正式测评、机构适当性规则和产品规则</small></div></div>
-        {bank && product.id ? <InvestRisk bank={bank} task={{ functionId: 'IN08', params: { productId: product.id } }}/> : null}
+        {bank ? <AssessmentPair bank={bank} productId={product.id ? text(product.id) : undefined}/> : null}
+        <LessonNext assessed={row.profile != null}/>
       </div>;
     }
     case 'CA01': return Array.isArray(value) ? <div className="viz-plates">{rows.map(item => <CardPlate key={text(item.id)} card={item}/>)}</div> : null;

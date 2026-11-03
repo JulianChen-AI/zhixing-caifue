@@ -8,7 +8,7 @@ import { normalizeAdjustments, type AaItem } from './aa.ts';
 
 export const FIELDS: Record<string, string[]> = {
  TR01:['accountType'],TR02:['accountId'],TR03:['recipientId','accountId','amount','note','saveRecipient','receiptExport','archive'],
- TR04:['action','ruleId','recipientId','accountId','amount','schedule','note'],TR05:['action','sessionId','total','participants','adjustments','reminder'],
+ TR04:['action','ruleId','recipientId','accountId','amount','schedule','note'],TR05:['action','sessionId','total','headcount','participants','adjustments','reminder'],
  TR06:['transferId','period','recipientId','receiptExport'],TR07:['transferId'],TR08:['action','contactId','name','alias','phone'],TR09:['action','recordId','person','amount','relatedTransactionId'],
  BI01:['period','accountId','merchant','category'],BI02:['period','accountId','merchant','category','baseline','cashOrNet'],BI03:['transactionId','category','scope'],BI04:['transactionId','period','prepareEvidence'],BI05:['period'],
  BI06:['period','narrative','peerComparison','share'],BI07:['source','file'],BI08:['action','period','category','amount','items'],BI09:['category','savePerPeriod','periodCount','interestAssumption'],BI10:['action','ledgerId','members'],
@@ -20,7 +20,9 @@ export const FIELDS: Record<string, string[]> = {
  CA01:['status'],CA02:['cardId','includeSafetyHistory'],CA03:['action','applicationId','productType','purpose'],CA04:['action','cardId','limitType','amount'],CA05:['cardId','action'],CA06:['action','cardId'],
  CA07:['action','cardId','expiryReminder'],CA08:['action','cardId','replacementId'],CA09:['oldCardId','newCardId','bindingId','action'],CA10:['action','name'],CA11:['action','merchant','limit'],CA12:['action','cardId','amount'],
 };
-export const LABELS: Record<string,string> = {archive:'凭证归档到',accountId:'账户',recipientId:'收款人',amount:'金额（元）',note:'备注（可选）',name:'名称',target:'目标金额（元）',deadline:'截止日期',direction:'存入或取出',goalId:'目标储蓄',productId:'产品',productIds:'对比产品',holdingId:'持仓',orderId:'订单',cardId:'银行卡',subscriptionId:'订阅',transactionId:'交易',category:'类目',period:'统计期间',baseline:'比较期间',action:'操作',schedule:'周期说明',limitType:'额度类型',assessmentId:'问卷',answers:'演示问卷答案',scope:'更正范围',channel:'通道',cycle:'扣款周期',nextChargeAt:'下次扣款日',leadDays:'提前提醒天数',notifyChannel:'通知方式',ruleId:'资金规则',planId:'定投计划',reminderId:'提醒',transferId:'转账记录',sessionId:'AA 收款',total:'AA 总额（元）',participants:'参与者',adjustments:'分摊调整',incomeDates:'到账日',savePerPeriod:'每期节省（元）',periodCount:'期数',riskLevel:'最高产品风险级别',productType:'卡片类型',purpose:'用途',oldCardId:'旧卡',newCardId:'新卡',bindingId:'绑定项',contactId:'联系人',recordId:'往来记录',person:'往来对象',phone:'手机号',alias:'别名',remindAt:'提醒时间',threshold:'提醒阈值',topic:'学习主题'};
+export const LABELS: Record<string,string> = {headcount:'人数（含你）',archive:'凭证归档到',accountId:'账户',recipientId:'收款人',amount:'金额（元）',note:'备注（可选）',name:'名称',target:'目标金额（元）',deadline:'截止日期',direction:'存入或取出',goalId:'目标储蓄',productId:'产品',productIds:'对比产品',holdingId:'持仓',orderId:'订单',cardId:'银行卡',subscriptionId:'订阅',transactionId:'交易',category:'类目',period:'统计期间',baseline:'比较期间',action:'操作',schedule:'周期说明',limitType:'额度类型',assessmentId:'问卷',answers:'演示问卷答案',scope:'更正范围',channel:'通道',cycle:'扣款周期',nextChargeAt:'下次扣款日',leadDays:'提前提醒天数',notifyChannel:'通知方式',ruleId:'资金规则',planId:'定投计划',reminderId:'提醒',transferId:'转账记录',sessionId:'AA 收款',total:'AA 总额（元）',participants:'参与者',adjustments:'分摊调整',incomeDates:'到账日',savePerPeriod:'每期节省（元）',periodCount:'期数',riskLevel:'最高产品风险级别',productType:'卡片类型',purpose:'用途',oldCardId:'旧卡',newCardId:'新卡',bindingId:'绑定项',contactId:'联系人',recordId:'往来记录',person:'往来对象',phone:'手机号',alias:'别名',remindAt:'提醒时间',threshold:'提醒阈值',topic:'学习主题'};
+// Billing filters (merchant, category, period) have their own text check with a query-specific message.
+const TEXT_KEYS=new Set(['archive','note','name','schedule','deadline','topic','narrative','file','label','query','reason']);
 export function normalizedParams(id:string, input:Params):Params {
  const allowed=FIELDS[id]||[];const p:Params={};
  for(const [k,v]of Object.entries(input)){
@@ -28,6 +30,9 @@ export function normalizedParams(id:string, input:Params):Params {
   if(v===undefined)continue;
   if(k==='adjustments'){p[k]=normalizeAdjustments(v);continue;}
   if(k==='items'){p[k]=normalizeEstimate(v);continue;}
+  // A model's false for a free-text field means “not given” (null still clears it); any other non-text value is rejected.
+  if(TEXT_KEYS.has(k)&&typeof v!=='string'&&v!==null){if(v===false)continue;throw new WorkflowError('“'+(LABELS[k]||k)+'”只接受文字。',400,k);}
+  if(k==='headcount'){const n=Number(v);if(!Number.isInteger(n)||n<2||n>20)throw new WorkflowError('AA人数须为 2 至 20 的整数（含你自己）。',400,'headcount');p[k]=n;continue;}
   if(k==='participants'){
    if(!Array.isArray(v)||v.length>20||!v.every(x=>typeof x==='string'&&x.trim()))throw new WorkflowError('AA参与者必须是用户明确给出的姓名或称呼字符串数组；只知道人数时省略participants并补问，不要猜联系人。');
    p[k]=v.map(x=>(x as string).trim());
@@ -147,12 +152,20 @@ export function assertVoiceEvidence(state:BankState,task:Pick<FlowTask,'function
    if(!expected||!Array.isArray(value)||value.length!==3||value.some((v,i)=>v!==expected[i]))throw new WorkflowError('测评答案必须来自本轮明确作答；保留其他题已保存的答案，不代答或清空。');
    continue;
   }
+  // A head count is only taken from a number the user said next to 人/位.
+  if(key==='headcount'){
+   if(task.params[key]===value)continue;
+   const said=[...text.matchAll(/(\d+|[一二两三四五六七八九十]+)\s*(?:个)?(?:人|位)/g)].map(m=>countNumber(m[1]));
+   if(said.includes(Number(value)))continue;
+   throw new WorkflowError('AA人数需要用户明确说出。',400,'headcount');
+  }
   if(key==='participants'){
    const previous=Array.isArray(task.params.participants)?task.params.participants as string[]:[];
    const replacing=/换成|替换为|只(?:保留|留)|仅(?:保留|留)|(?:参与者|成员|名单).{0,6}(?:改|换|删|去掉|删除)/.test(text);
    const escape=(name:string)=>name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
    const negated=(name:string)=>{const safe=escape(name);return new RegExp(`(?:不(?:要|用|选|算|含|包括)|别(?:要|选|算)|去掉|删掉|删除|排除|移除|取消|不再).{0,5}${safe}|${safe}.{0,5}(?:不参加|不加入|不算|退出|不含)|${safe}\\s*(?:换成|改为|改成)`).test(text);};
-   const named=(name:string)=>text.includes(name)&&!negated(name),carried=(name:string)=>previous.includes(name)&&!negated(name)&&!replacing;
+   // “我” is the payer the user speaks for; the rest must be named.
+   const named=(name:string)=>(name==='我'||text.includes(name))&&!negated(name),carried=(name:string)=>previous.includes(name)&&!negated(name)&&!replacing;
    if(!Array.isArray(value)||value.some(v=>typeof v!=='string'||!(named(v)||carried(v))))throw new WorkflowError('AA参与者只能使用本轮明确新增或已收集且未被否定的姓名/称呼；只知道人数时省略participants，不得猜联系人。',400,'participants');
    continue;
   }

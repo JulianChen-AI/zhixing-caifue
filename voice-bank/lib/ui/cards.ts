@@ -40,6 +40,8 @@ export function cardHead(bank: BankState, task: FlowTask): CardHeadView {
     if (id === 'TR04' || id === 'IN13') return { title: `规则确认页 · ${name}`, icon: 'shield', badge: { label: '创建需强认证', tone: 'wait' } };
     return { title: `确认：${name}`, icon: 'shield', badge: WAIT_MANUAL };
   }
+  if (status === 'blocked' && (id === 'TR03' || id === 'TR04') && task.riskSignals?.length) return { title: '这笔转账已拦下', icon: 'alert', badge: { label: '未转出 · 未扣款', tone: 'risk' } };
+  if (status === 'blocked' && (id === 'IN08' || id === 'IN13') && /测评/.test(task.message)) return { title: '购买前的适当性检查', icon: 'alert', badge: { label: '暂不能购买', tone: 'risk' } };
   if (status === 'collecting' && id === 'TR03' && task.recipientChoices?.length) {
     const first = contactsOf(bank).find(contact => contact.id === task.recipientChoices![0]);
     return { title: `找到 ${task.recipientChoices.length} 位“${first?.name || '收款人'}”`, icon: 'search', badge: { label: params.recipientId ? '已由你选择' : '无默认选中 · 请你选择', tone: params.recipientId ? 'ok' : 'wait' } };

@@ -17,6 +17,7 @@ import { ACTION_LABELS as actionLabel } from '@/lib/workflows/review';
 import { businessTitle, fieldLabels, resultMessage, unavailableFields, userMessage, workflowMessage } from '@/lib/ui/presentation';
 import { changedFields, localDate, reviewEntries, taskIdentity } from '@/lib/ui/business';
 import { CancelTask } from './cancel-task';
+import { FraudStop, SuitabilityStop } from './stop-cards';
 import { cardHead, reviewNotes } from '@/lib/ui/cards';
 import { contactsOf } from '@/lib/bank/recipients';
 
@@ -187,7 +188,8 @@ export function BusinessResult({functionId,value,bank}:{functionId:string;value:
  if(functionId==='IN07')return <ProductComparison value={value}/>;
  if(functionId==='BI06')return <MonthlyReport value={value}/>;
  const viz=businessViz(functionId,value,bank);
- if(viz)return <div className="viz-result">{viz}<GuideSteps value={value}/><Notes value={value}/><details className="result-details"><summary>查看全部字段</summary><WorkflowResult value={value}/></details></div>;
+ // A lesson already shows everything it holds; its raw fields (主题、测评结果“未知”) would only repeat it.
+ if(viz)return <div className="viz-result">{viz}<GuideSteps value={value}/><Notes value={value}/>{functionId!=='IN15'&&<details className="result-details"><summary>查看全部字段</summary><WorkflowResult value={value}/></details>}</div>;
  return <div className="viz-result"><GuideSteps value={value}/><WorkflowResult value={value}/></div>;
 }
 
@@ -216,6 +218,13 @@ export function WorkflowOutcome({bank,task,busy,onRun}:{bank:BankState;task:Flow
 }
 
 type PanelProps={bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>;serial?:boolean;catalog?:boolean;onClose?:()=>void};
+/** What an AA draft already holds, so a head count and a carve-out the user said are visible before the names are complete. */
+function AaDraftNote({task}:{task:FlowTask}){
+ const p=task.params,named=Array.isArray(p.participants)?p.participants as string[]:[],items=Array.isArray(p.adjustments)?p.adjustments as {label:string;amount:number;participants:string[]}[]:[];
+ const parts=[typeof p.total==='number'?`总额 ¥${p.total}`:'',typeof p.headcount==='number'?`共 ${p.headcount} 人`:'',named.length?`已记下：${named.join('、')}`:'',...items.map(item=>`${item.label} ¥${item.amount} 由${item.participants.join('、')}分摊`)].filter(Boolean);
+ return parts.length?<ul className="aa-draft-note" aria-label="已记下的分摊信息">{parts.map(part=><li key={part}>{part}</li>)}</ul>:null;
+}
+
 /** The header exit for an open card. With other unfinished checklist items the user picks this item or the whole list. */
 export function TaskCancel({bank,task,busy,onAction}:{bank:BankState;task:FlowTask;busy:boolean;onAction:(action:BankAction)=>Promise<void>}){
  if(!['collecting','review','authenticate','blocked'].includes(task.status))return null;
@@ -272,7 +281,7 @@ function WorkflowPanelState({bank,busy,onAction,serial=false,catalog=false,onClo
   // 记录类字段没有可选项时，不让用户手填内部编号。
   if(/Id$/.test(key))return <div key={key} className="flow-field"><span>{caption}</span><p className="note-line">暂无可选记录</p></div>;
   return <label key={key} className="flow-field">{caption}
-   <input aria-label={label} value={listText[key]??(Array.isArray(draft[key])?(draft[key]as unknown[]).join('，'):String(draft[key]??''))} placeholder={key==='period'?(required.includes(key)?'例如 2026-11':'例如 2026-10，留空为全部期间'):key==='merchant'?'商户名称，留空为全部商户':key==='deadline'?'例如 2027-06-01':key==='participants'?'参与者姓名，用逗号分隔':''} onChange={event=>{const list=['participants','incomeDates'].includes(key);if(list)setListText(previous=>({...previous,[key]:event.target.value}));change(key,list?event.target.value.split(/[，,]/).map(value=>value.trim()).filter(Boolean):key==='note'&&event.target.value===''?null:event.target.value);}}/></label>;
+   <input aria-label={label} value={listText[key]??(Array.isArray(draft[key])?(draft[key]as unknown[]).join('，'):typeof draft[key]==='boolean'||typeof draft[key]==='object'?'':String(draft[key]??''))} placeholder={key==='period'?(required.includes(key)?'例如 2026-11':'例如 2026-10，留空为全部期间'):key==='merchant'?'商户名称，留空为全部商户':key==='deadline'?'例如 2027-06-01':key==='participants'?'参与者姓名，用逗号分隔':''} onChange={event=>{const list=['participants','incomeDates'].includes(key);if(list)setListText(previous=>({...previous,[key]:event.target.value}));change(key,list?event.target.value.split(/[，,]/).map(value=>value.trim()).filter(Boolean):key==='note'&&event.target.value===''?null:event.target.value);}}/></label>;
  };
  const editable=task&&!(task.functionId==='IN05'&&task.params.action==='status')&&!['authenticate','cancelled','unsupported','external'].includes(task.status)&&!(task.status==='complete'&&isWrite(task));
  const primaryQueryFields=task&&['BI01','BI02'].includes(task.functionId)?['period','merchant','category','accountId']:[];
@@ -285,11 +294,14 @@ function WorkflowPanelState({bank,busy,onAction,serial=false,catalog=false,onClo
   const keys=visibleFields.filter(key=>required.includes(key)||primaryQueryFields.includes(key)||Object.hasOwn(task.params,key));
   const editing=pane==='edit'||task.status==='collecting';
   const discard=()=>{setDraft(task.params);setListText({});setDirty(false);setPane('main');};
+  const fraudStop=task.status==='blocked'&&['TR03','TR04'].includes(task.functionId)&&!!task.riskSignals?.length;
+  const suitabilityBlock=task.status==='blocked'&&['IN08','IN13'].includes(task.functionId)&&/测评/.test(task.message);
   return <section className="business-card workflow-card serial-card" aria-label="功能办理卡片" data-status={task.status}>
    <CardHead head={pane==='preview'?{title:'办理预览',icon:'file'}:cardHead(bank,task)}>{pane==='main'&&<TaskCancel bank={bank} task={task} busy={busy} onAction={onAction}/>}<button className="text-button" disabled={busy} onClick={()=>pane!=='main'?discard():void onAction({type:'home'})}>{pane==='edit'?'放弃修改':pane==='preview'?'返回核对':'收起'}</button></CardHead>
    {pane==='main'&&isWrite(task)&&['collecting','review','authenticate','complete'].includes(task.status)&&<ProcessSteps label="办理步骤" steps={writeSteps(task.status,needsAuth(task))}/>}
    {task.queryClarification&&<p className="card-description" role="status">{task.queryClarification.message}</p>}
    {pane==='preview'?<WorkflowOutcome bank={bank} task={task}/>:editing?<>
+    {task.functionId==='TR05'&&task.params.action==='create'&&<AaDraftNote task={task}/>}
     <form className="flow-editor" onSubmit={event=>{event.preventDefault();event.currentTarget.querySelector('input')?.blur();void save();}}><fieldset disabled={busy} className="flow-fields"><div className="flow-form">{keys.map(key=><div key={key} data-missing={task.missing.includes(key)}>{field(key)}</div>)}</div>{optionalFields.length>0&&<details className="flow-optional"><summary>更多选项</summary><div className="flow-form">{optionalFields.map(field)}</div></details>}</fieldset><button className="primary-button" disabled={busy||!dirty}>{task.status==='collecting'?'继续':'保存修改'}</button></form>
     {dirty&&task.status==='review'&&<p className="unsaved-note" role="status">修改尚未保存，请保存后重新核对。</p>}
    </>:task.status==='review'?<>
@@ -301,9 +313,9 @@ function WorkflowPanelState({bank,busy,onAction,serial=false,catalog=false,onClo
     <InvestDisclosure bank={bank} task={task} acknowledged={riskAck} onAcknowledge={setRiskAck}/>
     <div className="card-actions"><button className="text-button" disabled={busy} onClick={()=>setPane('edit')}>修改信息</button>{task.result!=null&&!(task.functionId==='TR05'&&task.params.action==='create')&&<button className="text-button" onClick={()=>setPane('preview')}>查看预览</button>}<button className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button><button className="primary-button" disabled={busy||dirty||task.functionId==='IN08'&&!riskAck} onClick={()=>void command({operation:'confirm',taskId:task.id,token:task.reviewToken!})}>{task.functionId==='TR05'&&task.params.action==='create'?'手动确认名单与分摊':needsAuth(task)?'手动确认并认证':'手动确认'}</button></div>
    </>:task.status==='authenticate'?<><ReviewViz bank={bank} task={task}/><WorkflowSummary bank={bank} task={task} compact/><form onSubmit={event=>{event.preventDefault();event.currentTarget.querySelector('input')?.blur();void command({operation:'authenticate',taskId:task.id,token:task.verificationId!,code});}}><label className="flow-field">验证码<input aria-label="功能演示验证码" inputMode="numeric" autoComplete="off" maxLength={6} value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,''))}/></label><p className="auth-note">演示验证码：123456。演示环境不采集真实密码或验证码；对话中也不会索要认证凭证。</p><div className="card-actions"><button className="primary-button" disabled={busy||code.length!==6}>验证并办理</button></div></form><div className="serial-actions"><button type="button" className="text-button" disabled={busy} onClick={()=>void command({operation:'amend',taskId:task.id,params:{}})}>返回核对</button><button type="button" className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button></div></>:<>
-    {description&&(task.result==null||/待|尚未|申请|商户/.test(description))&&<p className="card-description">{description}</p>}
+    {description&&!fraudStop&&(task.result==null||/待|尚未|申请|商户/.test(description))&&<p className="card-description">{description}</p>}
     {task.result!=null&&<WorkflowOutcome bank={bank} task={task} busy={busy} onRun={(id,params)=>void run(id,params)}/>}
-    {task.status==='blocked'?<div className="serial-actions"><button className="secondary-button" disabled={busy} onClick={()=>setPane('edit')}>修改信息</button><button className="secondary-button" disabled={busy} onClick={()=>void command({operation:'resume',taskId:task.id})}>重试</button><button className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button></div>:<div className="card-actions">{editable&&<button className="text-button" disabled={busy} onClick={()=>setPane('edit')}>调整查询</button>}<button className="primary-button" disabled={busy} onClick={()=>void onAction({type:'home'})}>完成</button></div>}
+    {fraudStop?<FraudStop task={task} busy={busy} onAction={onAction}/>:suitabilityBlock?<SuitabilityStop bank={bank} task={task} busy={busy} onAction={onAction} onEdit={()=>setPane('edit')}/>:task.status==='blocked'?<div className="serial-actions"><button className="secondary-button" disabled={busy} onClick={()=>setPane('edit')}>修改信息</button><button className="secondary-button" disabled={busy} onClick={()=>void command({operation:'resume',taskId:task.id})}>重试</button><button className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button></div>:<div className="card-actions">{editable&&<button className="text-button" disabled={busy} onClick={()=>setPane('edit')}>调整查询</button>}<button className="primary-button" disabled={busy} onClick={()=>void onAction({type:'home'})}>完成</button></div>}
    </>}
    {!!task.limitations?.length&&<details className="flow-limitations"><summary>未完成事项</summary><ul>{task.limitations.map(reason=><li key={reason}>{userMessage(reason)}</li>)}</ul></details>}
   </section>;

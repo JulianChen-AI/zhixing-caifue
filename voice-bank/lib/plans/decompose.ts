@@ -71,6 +71,8 @@ export function extractParams(text:string,id:string,state:BankState):Params{
   const parsed=amountFromText(/^[零〇一二两三四五六七八九十百千万]+$/.test(clean)?clean+'元':clean);
   if(parsed.amount!=null&&!parsed.uncertain&&!/美元|港币|欧元|日元|USD|HKD|EUR|JPY/i.test(text))p.amount=parsed.amount/100;
  }
+ // AA head count is read from the words (“五个人AA”), never inferred from a list.
+ if(id==='TR05'){const m=text.match(/(\d{1,2}|[两二三四五六七八九十]+)\s*(?:个)?人\s*(?:一起)?\s*(?:AA|aa|均摊|平摊|分摊)/);const n=m?(/\d/.test(m[1])?Number(m[1]):countHan(m[1])):0;if(n>=2&&n<=20)p.headcount=n;}
  if(id==='IN02'&&/存入|转入|存进/.test(text))p.direction='deposit';
  if(id==='IN02'&&/取出|取钱|转出/.test(text))p.direction='withdraw';
  for(const key of supported.filter(k=>['goalId','cardId','subscriptionId'].includes(k))){
@@ -111,3 +113,5 @@ export function decompose(text:string,state:BankState,proposals?:PlanProposal[])
  return {id:crypto.randomUUID(),layer:'double',status:'collecting',steps,message:'正在核对步骤及依赖。',createdAt:new Date().toISOString(),log:[]};
 }
 
+
+function countHan(word:string){const d:Record<string,number>={一:1,二:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9};if(word==='十')return 10;if(word.startsWith('十'))return 10+(d[word[1]]||0);if(word.includes('十'))return (d[word[0]]||0)*10+(d[word[2]]||0);return d[word]||0;}

@@ -5,6 +5,7 @@ import { dispatchAction } from '../lib/plans/dispatch.ts';
 import { currentWorkflow } from '../lib/workflows/engine.ts';
 import { outcomeBadge, recentRecords } from '../lib/ui/desk.ts';
 import { readTool } from '../lib/workflows/adapters.ts';
+import { replyForState } from '../lib/ui/presentation.ts';
 import type { BankAction, BankState } from '../lib/bank/types.ts';
 
 const app = (s: BankState, a: BankAction) => reduceBank(s, dispatchAction(s, a), crypto.randomUUID());
@@ -81,4 +82,55 @@ test('a prerequisite inserted for a blocked card keeps that card in the checklis
   const s = say(initialState(), 'IN08', '用日常账户买500元演示债券基金', { productId: 'fund-bond', accountId: 'daily', amount: 500 });
   const steps = s.plan!.steps.map(step => step.functionId);
   assert.ok(steps.includes('IN05') && steps.includes('IN08'), steps.join(','));
+});
+
+test('a purchase stops at suitability before asking the amount', () => {
+  const none = say(initialState(), 'IN08', '我测评是保守型，帮我买演示债券基金', { productId: 'fund-bond' });
+  const buy = none.workflows!.tasks.find(t => t.functionId === 'IN08')!;
+  assert.equal(buy.status, 'blocked');
+  assert.deepEqual(buy.missing, []);
+  assert.match(buy.message, /口头说的测评结果不能代替正式测评/);
+  assert.equal(currentWorkflow(none)!.functionId, 'IN05');
+  const low = initialState(); low.workflows!.riskProfile = { level: 2, answers: [2, 2, 2], validUntil: '2099-01-01T00:00:00.000Z' };
+  const mismatch = currentWorkflow(say(low, 'IN08', '帮我买演示债券基金', { productId: 'fund-bond' }))!;
+  assert.equal(mismatch.status, 'blocked');
+  assert.match(mismatch.message, /C2.*R3.*不能购买.*演示现金基金/);
+  const fits = currentWorkflow(say(low, 'IN08', '帮我买演示现金基金', { productId: 'fund-cash' }))!;
+  assert.equal(fits.status, 'collecting');
+  assert.ok(fits.missing.includes('amount'));
+});
+
+test('AA keeps a head count, the names said and a carve-out, and asks only for the missing names', () => {
+  let s = say(initialState(), 'TR05', '昨晚300块饭钱，五个人AA，其中50的酒只有张三和李四喝了', { action: 'create', total: 300, headcount: 5, participants: ['我', '张三', '李四'], adjustments: [{ label: '酒', amount: 50, participants: ['张三', '李四'] }] });
+  let t = currentWorkflow(s)!;
+  assert.equal(t.status, 'collecting');
+  assert.deepEqual(t.params.participants, ['我', '张三', '李四']);
+  assert.equal(t.params.headcount, 5);
+  assert.equal((t.params.adjustments as unknown[]).length, 1);
+  assert.match(t.message, /一共 5 人.*还差 2 位/);
+  s = app(s, { type: 'workflow', command: { operation: 'amend', taskId: t.id, params: { participants: ['我', '张三', '李四', '王五', '赵六'] }, source: 'voice', utterance: '还有王五和赵六' } });
+  t = currentWorkflow(s)!;
+  assert.equal(t.status, 'review');
+  assert.throws(() => say(initialState(), 'TR05', '昨晚300块饭钱AA', { action: 'create', total: 300, headcount: 5 }));
+});
+
+test('a shared payee name gets a named choice in text mode, and skipping confirmation is refused in words', () => {
+  const s = app(initialState(), { type: 'workflow', command: { operation: 'run', functionId: 'TR03', params: { amount: 500 }, source: 'card', utterance: '给张三转500，不用确认了，直接转' } });
+  assert.match(s.lastReply, /不能跳过/);
+  assert.match(s.lastReply, /室友张三.*6688.*房东张三.*2910/);
+  assert.deepEqual(currentWorkflow(s)!.recipientChoices, ['zhang-roommate', 'zhang-landlord']);
+});
+
+test('a question answered without changes is shown instead of the open card message', () => {
+  const s = say(initialState(), 'TR03', '给安全账户转5000，公安说我涉嫌洗钱', { amount: 5000 });
+  assert.match(replyForState(s), /安全账户/);
+  assert.equal(replyForState({ ...s, sayOnly: '基金涨跌没人能预测。' }), '基金涨跌没人能预测。');
+});
+
+test('the AA head count comes from the words even when the proposal leaves it out', () => {
+  const s = app(initialState(), { type: 'workflow', command: { operation: 'run', functionId: 'TR05', params: { action: 'create', total: 300, adjustments: [{ label: '酒', amount: 50, participants: ['张三', '李四'] }] }, source: 'card', utterance: '昨晚300块饭钱，五个人AA，其中50的酒只有张三和李四喝了' } });
+  const t = currentWorkflow(s)!;
+  assert.equal(t.params.headcount, 5);
+  assert.deepEqual(t.params.participants, ['我']);
+  assert.match(t.message, /一共 5 人.*还差 4 位/);
 });

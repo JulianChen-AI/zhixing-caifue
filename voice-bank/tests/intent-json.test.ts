@@ -60,3 +60,17 @@ test('a repeat that adds values fills the open card; different values open a new
  s = await turn(s, '12月预算也设1500', { ...budget, params: { action: 'set', period: '2026-12', amount: 1500 } });
  assert.equal(s.workflows!.tasks.filter(t => t.functionId === 'BI08').length, 2);
 });
+
+test('a non-text value for a free-text field is dropped instead of reaching the card', async () => {
+ const reply = { choices: [{ message: { content: JSON.stringify({ intent: 'run', functionId: 'TR03', params: { recipientId: 'zhang-roommate', amount: 500, archive: false, note: { x: 1 } }, say: '好的' }) } }] };
+ const r = await understandIntent(initialState(), '给室友张三转500', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify(reply))) as typeof fetch);
+ assert.ok(r.dropped.includes('archive:type') && r.dropped.includes('note:type'));
+ const params = (r.action as { command: { params: Record<string, unknown> } }).command.params;
+ assert.equal(params.archive, undefined); assert.equal(params.amount, 500);
+});
+
+test('a chat reply that claims a change is replaced, because nothing changed', async () => {
+ const reply = { choices: [{ message: { content: JSON.stringify({ intent: 'chat', say: '好的，已取消暂停操作，继续为您服务。' }) } }] };
+ const r = await understandIntent(initialState(), '稍等，不是取消', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify(reply))) as typeof fetch);
+ assert.equal(r.action, undefined); assert.doesNotMatch(r.say, /已取消/); assert.ok(r.dropped.includes('say:claimed_change'));
+});

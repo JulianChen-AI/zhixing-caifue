@@ -30,7 +30,7 @@ const functions = (Array.isArray(catalog) ? catalog : (catalog as { functions: {
 
 const SYSTEM = `你是知行银行的意图理解模块。读用户本轮原话和对话上下文，只输出一个JSON对象，不执行任何业务。
 {"intent":"run|amend|confirm|cancel|plan|open_saved|resume|ask|chat","functionId":"功能编号","taskId":"要修改/确认/取消的任务id","params":{},"steps":[{"functionId":"","params":{},"quote":"对应原话片段"}],"say":"给用户的一句话"}
-- run：新办一项业务或做一次查询（查询、统计、解释产品也用run）。amend：补充或修改当前任务的字段（回答追问、改口）。confirm：用户明确确认当前核对卡。cancel：用户明确说不办了，如“结束这个业务”“不弄了”“退出”“先这样吧”“放弃”；“停”“等一下”“别取消”“不要取消”“不是要结束”都不是cancel。当前任务被拦下（status=blocked）后用户问别的事，按新的问题处理，不要复述拦截说明。
+- run：新办一项业务或做一次查询（查询、统计、解释产品也用run）。amend：补充或修改当前任务的字段（回答追问、改口）。confirm：用户明确确认当前核对卡。cancel：用户明确说不办了，如“结束这个业务”“不弄了”“退出”“先这样吧”“放弃”；“停”“等一下”“别取消”“不要取消”“不是要结束”都不是cancel。同一句里放弃后又提了别的要求（“算了不转了，帮我查下余额”“不弄了，看看订阅”）用run办新要求，系统会先取消当前任务。当前任务被拦下（status=blocked）后用户问别的事，按新的问题处理，不要复述拦截说明。
 - plan：一句话里有两项及以上业务（“到时候提醒我”“顺便列出…”也各算一项），按顺序放进steps（每项functionId+params+quote），不要只办第一项；各quote逐字摘自原话，按顺序首尾相接覆盖整句，不删不改。例如“冻结尾号8021的卡，退掉的会员费转进储蓄目标”是两项：CA06与IN02。
 - 钱转进/存进自己的储蓄目标（如“转1000进旅游储蓄”）是IN02（单次）或IN04（已有目标的自动储蓄安排：action=update，goalId，amount=每期转入金额而不是target，schedule），不是TR03/TR04；TR03/TR04只用于转给联系人。“每月存400到目标账户，连续三个月”是IN04 action=update，goalId取records里唯一的目标，amount=400，schedule写原话“每月，连续三个月”，不要把期数填进deadline。问“给某人转过钱吗/转账记录”是TR06。单独的“到时候提醒我”是提醒（IN14），不是IN04或TR04。open_saved：用户要看已保存的工资/月度安排及依据（savedPlans）。resume：用户说继续刚才暂停的安排或任务。
 - ask：缺信息又无法建任务时追问。chat：纯闲聊，以及与银行账户无关、functions里也没有的事（买电影票、订餐、购物等），say说明暂不支持；functions里有的功能（含导入外部账单）仍用run。理财知识、风险、怎么亏这类问题用run+IN15或相关查询功能，不用chat。
@@ -60,6 +60,8 @@ export async function applyIntent(r: IntentResult, commit: (action: BankAction) 
 // The mic or the realtime model can hand our own announcement back as a user turn; replaying it would open business nobody asked for.
 const bare = (text: string) => text.replace(/[\s\p{P}\p{S}]/gu, '').toLowerCase();
 // Only lines that are unmistakably ours count, so a user restating the review summary still goes through.
+/** Words that report a change; a chat or question turn has made none. */
+const CLAIMED = /已(?:经)?(?:取消|修改|改为|改成|设置|设好|提交|冻结|解冻|挂失|保存|创建|开通|转账|转出|发起|完成|办好|恢复|暂停)|办好了|改好了|取消好了/;
 const OWN = /现在办理|继续办理|已完成|已取消|已放下|已填信息保留|请补充|请核对|进度已保留|没办完/;
 export function echoesAssistant(s: BankState, utterance: string, history: { reply: string }[] = []) {
  const said = bare(utterance);
@@ -97,6 +99,7 @@ export async function understandIntent(s: BankState, utterance: string, history:
  return { intent, ...result, fallback };
 }
 
+export const TEXT_FIELDS = new Set(['archive', 'note', 'name', 'merchant', 'category', 'period', 'baseline', 'schedule', 'deadline', 'topic', 'narrative', 'file', 'label', 'query', 'reason']);
 const MONEY = ['amount', 'target', 'balance', 'value', 'cost', 'limit'];
 const KEEP = ['id', 'name', 'tail', 'status', 'merchant', 'category', 'date', 'kind', 'accountId', 'productId', 'risk', 'type', 'channel', 'cycle', 'nextChargeAt', 'deadline', 'restriction', 'suspectedDuplicate', 'originalId', 'recipientId', 'note', 'createdAt', ...MONEY];
 /** Business objects the model may refer to, by id, with amounts shown in yuan like its own output. */
@@ -133,7 +136,8 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
  // A transfer request in a scam script still opens its card, so the engine's fraud stop blocks and records it whatever the model chose to say.
  if ((intent.intent === 'ask' || intent.intent === 'chat') && /转/.test(utterance) && new RegExp(FRAUD_WORDS.source).test(utterance))
   intent = { ...intent, intent: 'run', functionId: 'TR03', params: intent.params || {} };
- if (intent.intent === 'ask' || intent.intent === 'chat') return { dropped, say };
+ // A reply that changes nothing must not sound as if it did (“已取消暂停操作”); the card keeps the real state.
+ if (intent.intent === 'ask' || intent.intent === 'chat') return CLAIMED.test(say) ? { dropped: [...dropped, 'say:claimed_change'], say: '好的，当前进度保留，没有做任何改动。' } : { dropped, say };
  // Asking for this month's arrangement opens the saved plan read-only, whatever the model made of the rest of the sentence.
  if (!['confirm', 'cancel'].includes(intent.intent) && isMonthlyRequest(utterance) && savedMonthlyPlans(s).length)
   return { action: { type: 'plan', command: { operation: 'open_saved', source: 'card', utterance } }, dropped, say: '先看数据范围和计划，现在还没有执行任何付款或申购。' };
@@ -208,11 +212,14 @@ function clean(s: BankState, functionId: string, input: Record<string, unknown> 
   // With several cards, “my card is lost” names none of them; a card the user never named is a guess, so ask.
   if (key === 'cardId' && !cardNamed(s, String(value), heard)) { dropped.push('cardId:unnamed'); continue; }
   if (key === 'deadline' && !/^\d{4}-\d{2}-\d{2}$/.test(String(value))) { dropped.push(key); continue; }
+  // Free-text fields take text only; a model's `false` or `{}` must not end up typed into a card field.
+  if (TEXT_FIELDS.has(key) && typeof value !== 'string') { dropped.push(key + ':type'); continue; }
   if (['amount', 'total'].includes(key) && !(typeof value === 'number' && value > 0)) { dropped.push(key); continue; }
   if (key === 'action' && ACTIONS[functionId] && !ACTIONS[functionId].includes(String(value))) { dropped.push(key); continue; }
   // Every participant must be the user, a known contact or a name the user said; a made-up placeholder voids the list.
   // A stated headcount that the list does not match is a doubt to ask about, never a split to draft.
-  if (key === 'participants' && Array.isArray(value) && headcount(heard) != null && headcount(heard) !== value.length) { dropped.push('participants:count'); continue; }
+  // With headcount also proposed, a shorter list is the names said so far, and the card asks for the rest.
+  if (key === 'participants' && Array.isArray(value) && headcount(heard) != null && headcount(heard) !== value.length && !(input?.headcount === headcount(heard) && value.length < headcount(heard)!)) { dropped.push('participants:count'); continue; }
   if (key === 'participants' && !(Array.isArray(value) && value.every(name => typeof name === 'string' && (name === '我' || heard.includes(name) || contactsOf(s).some(c => c.name === name))))) { dropped.push('participants:unheard'); continue; }
   params[key] = value;
  }
