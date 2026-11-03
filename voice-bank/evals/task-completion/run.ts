@@ -5,7 +5,9 @@
 //            and stall recovery, opt-in with --live (see voice-session.ts).
 // All run in memory through the same dispatch and reducer the routes commit through; nothing is persisted.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { initialState, reduceBank } from '../../lib/bank/engine.ts';
+import { initialState, normalizeState, reduceBank } from '../../lib/bank/engine.ts';
+import { replyForState } from '../../lib/ui/presentation.ts';
+import { currentWorkflow } from '../../lib/workflows/engine.ts';
 import type { BankAction, BankState } from '../../lib/bank/types.ts';
 import { contactsOf } from '../../lib/bank/recipients.ts';
 import { businessDay } from '../../lib/demo/clock.ts';
@@ -131,6 +133,27 @@ async function jsonTurn(state: BankState, text: string, thread: string, turn: Tu
  return s;
 }
 
+/**
+ * A turn the user takes on the card rather than in words: 【卡片】确认 / 认证 / 取消, or 【刷新】 for a page reload
+ * (the stored state is serialised and normalised again). These go straight to the engine, as the page's buttons do.
+ */
+export const CARD_TURN = /^【(?:卡片|刷新)】/;
+function cardTurn(s: BankState, text: string, turn: Turn): BankState {
+ if (text === '【刷新】') { turn.delegation = 'reload'; s = normalizeState(JSON.parse(JSON.stringify(s)) as BankState); }
+ else {
+  const t = currentWorkflow(s), what = text.replace('【卡片】', '');
+  if (!t) throw new Error('卡片轮没有可操作的当前任务');
+  const command = what === '确认' ? { operation: 'confirm' as const, taskId: t.id, token: t.reviewToken || undefined }
+   : what === '认证' ? { operation: 'authenticate' as const, taskId: t.id, token: t.verificationId || undefined, code: '123456' }
+   : what === '取消' ? { operation: 'cancel' as const, taskId: t.id } : null;
+  if (!command) throw new Error('未知的卡片操作：' + what);
+  turn.delegation = 'card';
+  s = reduceBank(s, { type: 'workflow', command: { ...command, source: 'card' } } as BankAction, crypto.randomUUID());
+ }
+ turn.summary = replyForState(s);
+ return s;
+}
+
 function clarified(s: BankState, asked: boolean) {
  const f = focus(s), plan = s.plan;
  return asked || f?.status === 'collecting' || (f?.choices || 0) > 1 || s.routing?.outcome === 'clarify'
@@ -139,8 +162,9 @@ function clarified(s: BankState, asked: boolean) {
 
 async function runCase(c: EvalCase, attempt: number) {
  let s = start(c);
- const before = effectPrint(s), turns: Turn[] = [], spoken = c.turns.map(heard);
- if (driver === 'voice') {
+ const before = effectPrint(s), turns: Turn[] = [], spoken = c.turns.map(t => CARD_TURN.test(t) ? t : heard(t));
+ if (driver === 'voice' && c.turns.some(t => CARD_TURN.test(t))) turns.push({ text: c.turns[0], ms: 0, error: '语音驱动不支持卡片轮', interruptions: [] });
+ else if (driver === 'voice') {
   try {
    const run = await runVoiceCase(s, spoken, provider!, { audioVoice: input === 'audio' ? voice : undefined, tag: `${c.id}-a${attempt}` });
    s = run.state;
@@ -149,7 +173,7 @@ async function runCase(c: EvalCase, attempt: number) {
  } else for (const [i, text] of spoken.entries()) {
   const turn: Turn = { text, ms: 0 }, t0 = performance.now(), focusBefore = JSON.stringify(focus(s));
   // Like the live client, history is the latest user transcripts including this one.
-  try { s = driver === 'rules' ? rulesTurn(s, text) : driver === 'json' ? await jsonTurn(s, text, `${c.id}-a${attempt}`, turn) : await delegateTurn(s, text, spoken.slice(0, i + 1), turn); }
+  try { s = CARD_TURN.test(text) ? cardTurn(s, text, turn) : driver === 'rules' ? rulesTurn(s, text) : driver === 'json' ? await jsonTurn(s, text, `${c.id}-a${attempt}`, turn) : await delegateTurn(s, text, spoken.slice(0, i + 1), turn); }
   catch (error) { turn.error = error instanceof Error ? error.message : String(error); }
   turn.ms = Math.round(performance.now() - t0);
   // Saying a change happened while the card did not move is a false claim, whatever the words.

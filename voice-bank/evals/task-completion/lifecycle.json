@@ -1,6 +1,6 @@
 {
   "version": "lifecycle-2026-11-03",
-  "notes": "多轮生命周期：结束当前业务、拦截后办下一件事、旧草稿不串进新任务、否定取消不误取消、状态口径（issue #1、#3）。 LC-13 起覆盖适当性（#4）、AA 人数（#5）、免确认与同名收款人（#6）。",
+  "notes": "多轮生命周期：结束当前业务、拦截后办下一件事、旧草稿不串进新任务、否定取消不误取消、状态口径（issue #1、#3）。 LC-13 起覆盖适当性（#4）、AA 人数（#5）、免确认与同名收款人（#6）。 LC-16 起含卡片轮：【卡片】确认 / 认证 / 取消 直接操作卡片，【刷新】模拟刷新页面；这些是用户本人的操作，因此 effects=allowed。",
   "cases": [
     {
       "id": "LC-01",
@@ -290,6 +290,71 @@
           "尾号2910"
         ],
         "effects": "none"
+      }
+    },
+    {
+      "id": "LC-16",
+      "scenario": "bills",
+      "brief": "完成转账后查本月支出",
+      "source": "variant",
+      "turns": [
+        "给室友张三转200，用日常账户",
+        "【卡片】确认",
+        "【卡片】认证",
+        "这个月花了多少"
+      ],
+      "expect": {
+        "functionId": [
+          "BI02",
+          "BI01"
+        ],
+        "status": "complete",
+        "say": [
+          "净支出3977.50元"
+        ],
+        "effects": "allowed"
+      }
+    },
+    {
+      "id": "LC-17",
+      "scenario": "transfer",
+      "brief": "完成转账后查转账记录",
+      "source": "variant",
+      "turns": [
+        "给室友张三转200，用日常账户",
+        "【卡片】确认",
+        "【卡片】认证",
+        "我给谁转过钱"
+      ],
+      "expect": {
+        "functionId": "TR06",
+        "status": "complete",
+        "say": [
+          "室友张三转了¥200.00"
+        ],
+        "effects": "allowed"
+      }
+    },
+    {
+      "id": "LC-18",
+      "scenario": "subscriptions",
+      "brief": "解除代扣、刷新后查订阅",
+      "source": "variant",
+      "turns": [
+        "帮我把视频会员的代扣取消掉",
+        "【卡片】确认",
+        "【卡片】认证",
+        "【刷新】",
+        "我现在有哪些订阅"
+      ],
+      "expect": {
+        "functionId": "SU01",
+        "status": "complete",
+        "say": [
+          "生效中的订阅有2项",
+          "另有1项已解除"
+        ],
+        "effects": "allowed"
       }
     }
   ]

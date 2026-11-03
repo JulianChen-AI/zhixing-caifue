@@ -254,3 +254,31 @@ npm run eval:tasks      # 任务完成率评测集（98 条，覆盖六场景与
 | 28 题 | 56/56 | — |
 
 所有评测集都没有误执行和虚假完成声明。TR-13（AA 先说人数后补名单）单独跑 6/6。单元测试 615/615，类型检查通过。浏览器里抽查了查卡和转账核对的回复。
+
+## 评测补充：卡片操作与多轮生命周期（2026-11-03）
+
+对应 [#9](https://github.com/JulianChen-AI/zhixing-caifue/issues/9)。
+
+- **卡片轮**：评测用例里可以写 `【卡片】确认`、`【卡片】认证`、`【卡片】取消` 和 `【刷新】`。这几轮直接走卡片按钮对应的操作，不经过模型；`【刷新】` 会把状态序列化后重新载入，模拟刷新页面。因为是用户本人的操作，这类用例标 `effects: allowed`，不算误执行。
+- **`lifecycle.json` 共 18 条**：
+  - 结束说法、拦截后办下一件事、换业务、否定取消、取消后查订阅；
+  - 适当性、AA 人数、免确认与同名收款人；
+  - LC-16：完成转账后查本月支出，净支出从 ¥3,777.50 变为 ¥3,977.50；
+  - LC-17：完成转账后查转账记录，第一笔就是刚转的 ¥200；
+  - LC-18：解除代扣、刷新后查订阅，显示“已解除 1 项”。
+- **按真实日期运行**：`--clock=now`。
+
+| 运行方式（qwen-plus） | 结果 |
+|---|---|
+| 固定日期 2026-10-25，跑 2 遍 | 36/36 |
+| 真实日期，跑 1 遍 | 17/18 |
+
+真实日期下唯一没过的是 LC-16：它核对的是固定日期下的精确金额，换成当天的数据，金额本来就会不同。
+
+运行命令：
+
+```sh
+cd voice-bank
+node --experimental-transform-types evals/task-completion/run.ts --driver=json --live --cases=lifecycle --repeat=2
+node --experimental-transform-types evals/task-completion/run.ts --driver=json --live --cases=lifecycle --clock=now
+```
