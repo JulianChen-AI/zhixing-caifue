@@ -19,20 +19,27 @@ export function outcomeBadge(bank: BankState, task: Pick<FlowTask, 'functionId' 
   const result = resultStatus(task.result);
   if (result.status === 'unknown') return { label: '结果待核对', tone: 'wait' };
   if (result.status === 'failed') return { label: '失败 · 未划款', tone: 'risk' };
+  if ((result.status === 'pending' || result.businessStage === 'accepted') && task.functionId === 'SU04') return { label: '取消待核对', tone: 'wait' };
   if (result.status === 'pending' || result.businessStage === 'accepted') return { label: '已受理 · 待结算', tone: 'pending' };
   switch (task.status) {
     case 'complete':
       if (!isWrite(task)) return { label: '已查询', tone: 'info' };
+      // Name the business result, so a finished cancellation never reads like an abandoned task.
+      if (task.functionId === 'SU04') return { label: '代扣已解除', tone: 'ok' };
+      if (task.functionId === 'SU06') return { label: '代扣已恢复', tone: 'ok' };
+      if (task.functionId === 'CA06') return task.params.action === 'unfreeze' ? { label: '已解冻', tone: 'ok' } : { label: '已临时冻结', tone: 'ok' };
+      if (task.functionId === 'CA07') return { label: '已挂失', tone: 'ok' };
       if (task.functionId === 'TR03') return bank.receipts.some(r => r.taskId === task.legacyTaskId) ? { label: '已转出', tone: 'ok' } : { label: '已返回结果', tone: 'ok' };
       return { label: '已完成', tone: 'ok' };
     case 'review': return { label: '待你确认', tone: 'active' };
     case 'authenticate': return { label: '待验证身份', tone: 'active' };
     case 'collecting': return { label: '待补充', tone: 'active' };
     case 'queued': return { label: '等待前序', tone: 'muted' };
-    case 'external': return { label: '待你处理', tone: 'pending' };
+    case 'external': return task.functionId === 'SU04' ? { label: '需到平台处理', tone: 'pending' } : { label: '待你处理', tone: 'pending' };
     case 'blocked': return { label: '暂无法办理', tone: 'risk' };
     case 'unsupported': return { label: '暂不可用', tone: 'muted' };
-    case 'cancelled': return { label: '已取消', tone: 'muted' };
+    // The task was dropped before submission: nothing happened, which is not the same as a business being cancelled.
+    case 'cancelled': return { label: '未办理', tone: 'muted' };
   }
   return { label: '待办理', tone: 'muted' };
 }
@@ -65,7 +72,8 @@ export type RecordRow = { id: string; title: string; detail: string; badge: Badg
  */
 export function recentRecords(bank: BankState, limit = 6): RecordRow[] {
   const all = bank.workflows?.tasks || [];
-  const tasks = all.filter(task => isWrite(task) && (task.status === 'cancelled' || ['complete', 'external', 'blocked'].includes(task.status) && task.result != null));
+  // Only what came back from a submission; drafts dropped before submission are not receipts.
+  const tasks = all.filter(task => isWrite(task) && ['complete', 'external', 'blocked'].includes(task.status) && task.result != null);
   const rows: RecordRow[] = tasks.map(task => {
     const identity = taskIdentity(bank, task), result = resultStatus(task.result) as { id?: unknown; originalTransferId?: unknown; createdAt?: unknown };
     const receipt = task.functionId === 'TR03' ? bank.receipts.find(r => r.taskId === task.legacyTaskId) : undefined;

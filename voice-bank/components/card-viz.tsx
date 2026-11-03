@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, Fragment, useContext, type ReactNode } from 'react';
 import { AlarmClock, ArrowRight, Ban, BookOpen, CalendarDays, Check, CreditCard, Goal, Landmark, Lightbulb, Lock, ShieldAlert, Snowflake, Sparkles, Target, TrendingUp, User } from 'lucide-react';
 import type { BankState } from '@/lib/bank/types';
 import type { FlowTask } from '@/lib/workflows/types';
@@ -135,26 +135,32 @@ export function AccountsViz({ accounts }: { accounts: Record<string, unknown>[] 
   </div>;
 }
 
+const subGroup = (item: Record<string, unknown>) => item.status === 'cancelled' ? 2 : item.cancellationPending === true || item.externalPending === true ? 1 : 0;
+const SUB_GROUPS = ['生效中', '取消处理中', '已解除'];
 function SubscriptionRows({ rows }: { rows: Record<string, unknown>[] }) {
   const follow = useContext(FollowUp);
-  return <ul className="viz-subs">{rows.map(item => <li key={text(item.id)}>
+  // Grouped by state so a cancelled or pending mandate never sits among the active ones.
+  const sorted = [...rows].sort((a, b) => subGroup(a) - subGroup(b)), grouped = new Set(sorted.map(subGroup)).size > 1;
+  return <ul className="viz-subs">{sorted.map((item, index) => <Fragment key={text(item.id)}>{grouped && (index === 0 || subGroup(item) !== subGroup(sorted[index - 1])) ? <li className="viz-subs-group" aria-hidden>{SUB_GROUPS[subGroup(item)]}</li> : null}<li>
     <Avatar name={text(item.name)}/>
     <div className="viz-subs-main"><b>{text(item.name)}</b><small>{[cycle(item.cycle), item.nextChargeAt ? `下次 ${text(item.nextChargeAt)}` : ''].filter(Boolean).join(' · ')}</small></div>
     <span className="viz-subs-tags">
       <Chip badge={item.channel === 'bank' ? { label: '银行代扣', tone: 'info' } : { label: '外部平台', tone: 'muted' }}/>
       {item.protected === true && <Chip badge={{ label: '保护类', tone: 'wait' }}/>}
       {item.status === 'cancelled' && <Chip badge={{ label: '银行协议已解除', tone: 'muted' }}/>}
+      {item.cancellationPending === true && <Chip badge={{ label: '取消待核对', tone: 'wait' }}/>}
+      {item.externalPending === true && <Chip badge={{ label: '待你在平台完成取消', tone: 'pending' }}/>}
     </span>
     <strong>{yuan(num(item.amount))}</strong>
-    {follow && item.status === 'active' && item.protected !== true && <button className="pill-button" onClick={() => follow('SU04', { subscriptionId: item.id })}>不再使用 · 看处理路径</button>}
-  </li>)}</ul>;
+    {follow && item.status === 'active' && item.protected !== true && !subGroup(item) && <button className="pill-button" onClick={() => follow('SU04', { subscriptionId: item.id })}>不再使用 · 看处理路径</button>}
+  </li></Fragment>)}</ul>;
 }
 export function SubscriptionRadar({ rows, inference }: { rows: Record<string, unknown>[]; inference?: string }) {
   if (!rows.length) return <EmptyViz title="没有查到订阅" note="这里只显示已授权范围内的周期扣费。"/>;
   const active = rows.filter(item => item.status === 'active' && item.cycle === 'monthly');
   const month = active.reduce((sum, item) => sum + num(item.amount), 0);
   return <div className="viz-group">
-    <Kpis items={[{ label: '每月固定支出（已知）', value: yuan(month), lead: true }, { label: '进行中', value: `${rows.filter(item => item.status === 'active').length} 项` }]}/>
+    <Kpis items={[{ label: '每月固定支出（生效中）', value: yuan(month), lead: true }, { label: '生效中', value: `${rows.filter(item => item.status === 'active').length} 项` }, ...(rows.some(item => item.status === 'cancelled') ? [{ label: '已解除', value: `${rows.filter(item => item.status === 'cancelled').length} 项` }] : [])]}/>
     <StackBar label="每月扣费构成" rows={active.map(item => ({ label: text(item.name), value: num(item.amount) }))}/>
     <SubscriptionRows rows={rows}/>
     {inference && <p className="note-line">{inference}</p>}

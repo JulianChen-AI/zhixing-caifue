@@ -72,7 +72,7 @@ export function dispatchAction(s:BankState,action:BankAction,text='',turnId?:str
  const c=a.command,utterance=c.utterance||text||'',id=c.functionId!;
  if(c.source==='voice')assertFunctionIntent(utterance,id);
  // Same business continuing a saved draft must not create a duplicate task.
- if(step?.functionId===id&&!/新建|创建|另一笔|重新开始|新的一份/.test(utterance)&&!(id==='IN05'&&c.params?.action==='status'))return {type:'workflow',command:{operation:Object.keys(c.params||{}).length?'amend':'resume',taskId:step.taskId,params:c.params,source:c.source,utterance,turnId:c.turnId||turnId}};
+ if(step?.functionId===id&&s.workflows?.tasks.find(t=>t.id===step.taskId)?.status!=='blocked'&&!/新建|创建|另一笔|重新开始|新的一份/.test(utterance)&&!(id==='IN05'&&c.params?.action==='status'))return {type:'workflow',command:{operation:Object.keys(c.params||{}).length?'amend':'resume',taskId:step.taskId,params:c.params,source:c.source,utterance,turnId:c.turnId||turnId}};
  const complex=c.source==='voice'&&isComplexRequest(utterance,s);
  return {type:'plan',command:{operation:p?'interrupt':'create',source:c.source==='card'?'card':'voice',utterance:utterance||id,turnId:c.turnId||turnId,...(!complex?{functionId:id,params:c.params||{}}:{})}};
 }

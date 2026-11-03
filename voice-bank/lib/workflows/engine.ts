@@ -219,9 +219,9 @@ export function reduceWorkflow(previous:BankState,cmd:WorkflowCommand,requestId:
    if(task.params.recipientId)delete current(s,task.id)!.recipientChoices;
   }else if(cmd.operation==='cancel'){
    if(['complete','external'].includes(task.status))throw new WorkflowError('业务已提交/完成；取消对话不会撤回该结果。');
-   if(cmd.source==='voice'&&(!/取消|不办|别.*办|不转|别转/.test(cmd.utterance||'')||/不(?:要|用|必)?取消|别.{0,6}取消|不要不办|不要不转/.test(cmd.utterance||'')))throw new WorkflowError('需要明确取消当前业务，否定取消的表达不会执行取消。');
+   if(cmd.source==='voice'&&(!/取消|不办|别.*办|不转|别转|结束(?!日期|时间)|停止|退出|不弄了|不做了|先这样|放弃|算了|不要了|换一个|换个业务/.test(cmd.utterance||'')||/不(?:要|用|必)?(?:取消|结束|退出|放弃)|别.{0,6}(?:取消|结束|退出|放弃)|不是要(?:取消|结束|退出|放弃)|不要不办|不要不转/.test(cmd.utterance||'')))throw new WorkflowError('需要明确取消当前业务，否定取消的表达不会执行取消。');
    if(task.functionId==='TR03'&&s.task?.id===task.legacyTaskId&&s.task&&!['complete','cancelled'].includes(s.task.step))s=legacy(s,{type:'cancel'},'flow-cancel-'+crypto.randomUUID());
-   task=current(s,task.id)!;invalidate(task);task.status='cancelled';task.message='未完成的任务已取消；已完成业务保留。';
+   task=current(s,task.id)!;invalidate(task);task.status='cancelled';task.message='这项业务没有提交，已放下；没有扣款或改动，已完成的业务不受影响。';
   }else if(cmd.operation==='confirm'){
    if(cmd.source==='voice'&&!acknowledgesReview(cmd.utterance||''))throw new WorkflowError('请核对卡片后确认；有修改先更新草稿。');
    if(cmd.source==='voice')validateVoiceDraft(s,task,task.params,cmd.utterance||'');

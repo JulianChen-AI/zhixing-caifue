@@ -20,7 +20,7 @@ import { isComplexRequest } from '../../lib/plans/decompose.ts';
 import { offlineWorkflow, workflowTextAction } from '../../lib/workflows/offline.ts';
 import { runDelegation, qwenCompletion } from '../../lib/voice/delegation.ts';
 import { voiceSettings } from '../../lib/voice/qwen-protocol.ts';
-import { caseFile, CLAIMS_CHANGE, effectPrint, focus, grade, planView, riskFlagged, SCENARIOS, WAIT_ONLY, type EvalCase } from './grade.ts';
+import { openTasks, caseFile, CLAIMS_CHANGE, effectPrint, focus, grade, planView, riskFlagged, SCENARIOS, WAIT_ONLY, type EvalCase } from './grade.ts';
 import { runVoiceCase, type Interruption } from './voice-session.ts';
 import { jsonAgent } from './json-agent.ts';
 import { speechKey, type SpeechCache } from './speech.ts';
@@ -34,7 +34,8 @@ const here = new URL('.', import.meta.url);
 const caseSet = args.cases || 'cases';
 // tricky-dev / tricky-holdout: hard phrasings added 2026-11-02; fixes are tuned on dev only, holdout is run once.
 // prompts28: the 28 demo prompts handed to judges.
-if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout', 'prompts28'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev、tricky-holdout 或 prompts28');
+// lifecycle: multi-turn exits, blocks and follow-up requests (issues #1, #3, #9).
+if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout', 'prompts28', 'lifecycle'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev、tricky-holdout、prompts28 或 lifecycle');
 // --clock=now runs default-scene cases on data anchored at today, as a live session sees it.
 const clockNow = args.clock === 'now';
 const file = caseFile.parse(JSON.parse(readFileSync(new URL(`${caseSet}.json`, here), 'utf8')));
@@ -157,7 +158,7 @@ async function runCase(c: EvalCase, attempt: number) {
  }
  for (const t of turns) t.interruptions = breaks(t);
  const asked = !!turns.at(-1)?.asked;
- const outcome = { focus: focus(s), plan: planView(s), clarified: clarified(s, asked), effectsChanged: effectPrint(s) !== before, riskFlagged: riskFlagged(s), reply: turns.at(-1)?.summary || (driver === 'rules' ? s.lastReply : '') };
+ const outcome = { focus: focus(s), plan: planView(s), clarified: clarified(s, asked), effectsChanged: effectPrint(s) !== before, riskFlagged: riskFlagged(s), open: openTasks(s), reply: turns.at(-1)?.summary || (driver === 'rules' ? s.lastReply : '') };
  const graded = grade(c, outcome);
  return { id: c.id, attempt, scenario: c.scenario, brief: c.brief, source: c.source, scene: c.scene || 'default', ...graded,
   final: { functionId: outcome.focus?.functionId ?? null, status: outcome.focus?.status ?? null, params: outcome.focus?.params ?? null, plan: outcome.plan, message: (outcome.focus?.message || s.lastReply || '').slice(0, 160) },

@@ -20,6 +20,9 @@ const branch = z.object({
  say: z.array(z.string().min(1)).min(1).optional(),
  // Ordered plan steps; an inner list accepts any one of its functions. [] only requires a plan.
  plan: z.array(oneOrMany(z.string().regex(/^[A-Z]{2}\d{2}$/))).optional(),
+ // Lifecycle: these functions must not linger as an open task or plan step; the reply must not contain these phrases.
+ stale: z.array(z.string().regex(/^[A-Z]{2}\d{2}$/)).min(1).optional(),
+ sayNot: z.array(z.string().min(1)).min(1).optional(),
 }).strict();
 const expectation = branch.extend({ anyOf: z.array(branch).min(2).optional(), effects: z.enum(['none', 'allowed']).optional() }).strict();
 export const evalCase = z.object({
@@ -67,7 +70,14 @@ function same(actual: unknown, expected: unknown): boolean {
  return norm(actual) === norm(expected);
 }
 
-export type Outcome = { focus: Focus; plan: PlanView; clarified: boolean; effectsChanged: boolean; riskFlagged?: boolean; reply?: string };
+export type Outcome = { focus: Focus; plan: PlanView; clarified: boolean; effectsChanged: boolean; riskFlagged?: boolean; reply?: string; open?: string[] };
+
+/** What still hangs on the user: blocked tasks and unfinished steps of the active checklist. A draft set aside under 未完成业务 does not count. */
+export function openTasks(s: BankState) {
+ const current = s.workflows?.currentTaskId;
+ return [...(s.workflows?.tasks || []).filter(t => t.id !== current && t.status === 'blocked').map(t => t.functionId),
+  ...(s.plan && !['complete', 'cancelled'].includes(s.plan.status) ? s.plan.steps.filter(x => x.taskId !== current && !['complete', 'cancelled'].includes(x.status)).map(x => x.functionId || '') : [])];
+}
 
 /** A reply that says a change happened. Reads ("已查询") are not claims of a change. */
 export const CLAIMS_CHANGE = /已(?:经)?(?:取消|修改|改为|改成|将|设置|设好|提交|冻结|解冻|挂失|保存|登记|创建|建立|开通|转账|转出|发起|完成|办好|为您(?:办理|取消|冻结|挂失|设置|修改))|办好了|改好了|取消好了/;
@@ -90,6 +100,8 @@ function checkBranch(b: Branch, o: Outcome): string[] {
  if (b.missing) for (const k of b.missing) if (!f?.missing.includes(k)) why.push(`应追问 ${k}`);
  if (b.clarify && !o.clarified) why.push('应先澄清，但没有追问');
  if (b.riskFlagged && !o.riskFlagged) why.push('应识别诈骗风险话术，但没有标记');
+ if (b.stale) for (const id of b.stale) if ((o.open || []).includes(id)) why.push(`${id} 应已结束，却仍挂在任务清单里`);
+ if (b.sayNot) for (const bad of b.sayNot) if (comparable(o.reply || '').includes(comparable(bad))) why.push(`答复不应包含“${bad}”`);
  if (b.say) for (const fact of b.say) if (!comparable(o.reply || '').includes(comparable(fact))) why.push(`答复应包含“${fact}”`);
  if (b.plan) {
   if (!o.plan || !o.plan.steps.length) why.push('应生成多步计划，实际没有');

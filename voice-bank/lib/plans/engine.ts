@@ -64,6 +64,31 @@ function waitingExternal(s:BankState,t:FlowTask){
  return t.status==='external';
 }
 const unfinished=(x:PlanStep)=>!['complete','cancelled'].includes(x.status);
+/**
+ * A new request does not queue behind a one-item checklist whose card was never submitted. A blocked card ends;
+ * an unfinished draft is set aside under 未完成业务 (answers kept, resumable) when the new request changes something
+ * too. A quick question ("先查下余额") still returns to the draft, and multi-item checklists keep their order.
+ */
+const INSERT_FIRST=/先插|插一个|插个|顺便|等会儿?(?:再)?继续|回头(?:再)?继续|办完再继续|中间先/;
+function setAsideLoneDraft(s:BankState,cmd:PlanCommand,reducer:Reducer):{state:BankState;note:string}|undefined{
+ const p=s.plan;if(!p||p.monthly||terminal(p))return;
+ const open=p.steps.filter(unfinished);if(open.length!==1||open[0].kind!=='workflow')return;
+ const task=child(s,open[0]);if(!task||!['collecting','review','blocked'].includes(task.status))return;
+ const incoming=cmd.tasks?.map(t=>({functionId:t.functionId,params:t.params||{}}))||(cmd.functionId?[{functionId:cmd.functionId,params:cmd.params||{}}]:[]);
+ // A prerequisite (测评 before 申购, 挂失 before 补卡) is inserted on purpose so the blocked card can continue after it.
+ if(!incoming.length||cmd.adoptTaskId||cmd.prerequisite)return;
+ const drop=(note:string)=>{
+  const state=reducer(s,{type:'workflow',command:{operation:'cancel',taskId:task.id,source:'card'}},'drop-draft-'+crypto.randomUUID());
+  state.plan!.steps.find(x=>x.id===open[0].id)!.status='cancelled';state.plan!.status='cancelled';state.plan!.currentTaskId=undefined;
+  return {state,note};
+ };
+ if(task.status==='blocked')return drop('');
+ // Saying so ("先插一个…", "顺便…", "等会继续") keeps the old behaviour: the new business runs first, then the draft returns.
+ if(!incoming.some(t=>isWrite(t))||incoming.some(t=>t.functionId===task.functionId)||INSERT_FIRST.test(cmd.utterance||''))return;
+ // The transfer engine keeps one open transfer at a time, so an unsubmitted transfer is dropped rather than parked.
+ if(task.functionId==='TR03')return drop(`上一笔“${task.title}”还没提交，已放下，没有扣款。`);
+ return {state:s,note:`上一项“${task.title}”还没提交，已先放到“未完成业务”，需要时可以继续。`};
+}
 function focus(s:BankState,entry?:PlanStep){
  s.plan!.currentTaskId=entry?.taskId||entry?.id;
  if(entry?.taskId)s.workflows!.currentTaskId=entry.taskId;
@@ -200,7 +225,7 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   if(s.plan?.monthly&&!known.includes(s.plan.id))s.lastReply='先看数据范围和计划，现在还没有执行任何付款或申购。'+(clause?'已按模板列出各项，并追加本周聚餐预算草稿（不付款、不冻结）。':'已按模板列出各项。')+'先保障必要支出，每项都能修改或删除。';
   return s;
  }
- let s=structuredClone(previous);flattenPlan(s);s.revision++;if(s.plan)s.plan.announcements=[];
+ let s=structuredClone(previous);flattenPlan(s);s.revision++;if(s.plan)s.plan.announcements=[];let asideNote='';
  // A checklist left untouched for a while is no longer this conversation's: a new request starts its own and the old tasks wait under 未完成业务.
  let existing=activePlan(s);
  // A user's new request joins the checklist only while they are filling its current card (so a quick question
@@ -210,6 +235,7 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   const at=currentPlanStep(s),task=at&&child(s,at);
   if(Date.now()-Date.parse(existing.log.at(-1)?.at||existing.createdAt)>STALE_PLAN_MS||!task||!['collecting','review','queued'].includes(task.status))existing=undefined;
  }
+ if(cmd.operation==='create'||cmd.operation==='interrupt'){const aside=setAsideLoneDraft(s,cmd,reducer);if(aside){s=aside.state;existing=undefined;asideNote=aside.note;}}
  if(cmd.planId&&s.plan&&cmd.planId!==s.plan.id)throw new WorkflowError('任务清单已更新，请读取最新状态。',409);
  if(cmd.operation==='create'||cmd.operation==='interrupt'){
   if(existing&&cmd.operation==='create')throw new WorkflowError('已有任务清单，请插入新业务或继续当前任务。');
@@ -243,6 +269,7 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   materialize(s,p,cmd.source,incoming.steps);p.lastUserTurnId=cmd.turnId||id;p.summaryTurnIds=[...new Set([...(p.summaryTurnIds||[]),p.lastUserTurnId])];
   log(p,existing?'inserted':'created','已创建并保存所有业务实例，尚未执行后续任务。');s.view='workflow';s=pump(s,reducer);
   for(const [stepId,ask] of asks)askRecipient(s,s.plan?.steps.find(x=>x.id===stepId),ask);
+  if(asideNote)s.lastReply=asideNote+s.lastReply;
  }else{
   const p=s.plan;if(!p)throw new WorkflowError('尚无任务清单，请先描述业务。');
   if(cmd.source==='voice'&&cmd.turnId)p.lastUserTurnId=cmd.turnId;
@@ -257,7 +284,7 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   if(cmd.operation==='pause'){p.status='paused';p.message='任务已暂停，已填字段和当前任务保留。';log(p,'paused',p.message);}
   else if(cmd.operation==='cancel'){
    if(p.monthly?.rentUnknown&&(!targetId||p.steps.some(x=>(x.id===targetId||x.taskId===targetId)&&x.functionId==='TR03')))throw new WorkflowError('房租原订单结果待核对，不能通过取消清单抹去或重付。');
-   if(cmd.source==='voice'&&(!/取消|不办|算了/.test(cmd.utterance||'')||/不(?:要|用|必)?取消|别.{0,6}取消|不要不办|不要算了/.test(cmd.utterance||'')))throw new WorkflowError('请明确是否取消剩余任务。');
+   if(cmd.source==='voice'&&(!/取消|不办|算了|结束(?!日期|时间)|停止|退出|不弄了|不做了|先这样|放弃/.test(cmd.utterance||'')||/不(?:要|用|必)?(?:取消|结束|退出|放弃)|别.{0,6}(?:取消|结束|退出|放弃)|不是要(?:取消|结束|退出|放弃)|不要不办|不要算了/.test(cmd.utterance||'')))throw new WorkflowError('请明确是否取消剩余任务。');
    const all=!targetId&&(cmd.source==='card'||/取消(?:全部|所有|剩余|整份|整个|整张)|取消.*(?:全部|所有|剩余)(?:任务|步骤|业务)|^(?:不办了|算了)/.test(cmd.utterance||''));
    let entries=p.steps.filter(unfinished);
    if(!all){
@@ -272,7 +299,7 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
     // Leave the active entry pending until pump observes the cancelled child and restores the next task.
     if(all||entry.id!==currentPlanStep(s)?.id||!task)s.plan!.steps.find(x=>x.id===entry.id)!.status='cancelled';
    }
-   if(all){s.plan!.status='cancelled';s.plan!.currentTaskId=undefined;s.plan!.message='剩余任务已取消，已提交业务不会撤回。';}
+   if(all){s.plan!.status='cancelled';s.plan!.currentTaskId=undefined;s.plan!.message='剩余任务没有提交，已放下；已提交的业务不会撤回。';}
    else{s=pump(s,reducer);}
   }else if(cmd.operation==='amend'){
    const paused=p.status==='paused';let entry=p.steps.find(x=>x.id===targetId||x.taskId===targetId)||(!targetId?currentPlanStep(s):undefined);

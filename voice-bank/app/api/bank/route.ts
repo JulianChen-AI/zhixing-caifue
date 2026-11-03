@@ -26,7 +26,7 @@ const actionSchema = z.discriminatedUnion("type", [
   z.object({type:z.literal('advance_clock'),to:z.string().min(1).max(40)}).strict(),
   z.object({ type: z.literal("cancel") }), z.object({ type: z.literal("reset") }), z.object({ type: z.literal("home") }),
 ]);
-const requestSchema = z.object({ requestId: z.string().min(8).max(100), revision: z.number().int().nonnegative(), sceneEpoch: z.string().uuid().optional(), command: z.string().trim().min(1).max(2000).optional(), mode: z.enum(["live", "demo"]).optional(), action: actionSchema.optional(), tool:toolCall.optional(), recovery:recoveryInput.optional() }).strict();
+const requestSchema = z.object({ requestId: z.string().min(8).max(100), revision: z.number().int().nonnegative(), sceneEpoch: z.string().uuid().optional(), command: z.string().trim().min(1).max(2000).optional(), history: z.array(z.object({ user: z.string().max(2000), reply: z.string().max(2000) })).max(20).optional(), mode: z.enum(["live", "demo"]).optional(), action: actionSchema.optional(), tool:toolCall.optional(), recovery:recoveryInput.optional() }).strict();
 export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   try { const session = await loadSession(req); return Response.json({ state: session.state, liveConfigured: configured() }, { headers: sessionHeaders(session, req) }); }
@@ -66,7 +66,9 @@ export async function POST(req: Request) {
       if (session.state.revision !== body.revision) throw new BankError("办理内容已更新，请重试。", 409);
       const p = provider();
       if (p.ready && p.intent === 'json') {
-        const understood = await understandIntent(session.state, body.command, [], p, req.signal);
+        // Earlier turns on screen resolve "这张卡/那笔"; they inform understanding only, never authorize anything.
+        const history = (body.history || []).slice(-6).map(h => ({ user: h.user.slice(0, 300), reply: h.reply.slice(0, 200) }));
+        const understood = await understandIntent(session.state, body.command, history, p, req.signal);
         // Nothing to change (a question or chat): show the reply without a new revision.
         if (!understood.action) return Response.json({ state: { ...session.state, lastReply: understood.say } }, { headers: sessionHeaders(session, req) });
         let n = 0;

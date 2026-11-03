@@ -336,3 +336,22 @@ body{font-variant-numeric:tabular-nums}
 *::-webkit-scrollbar-thumb{background:#e1e6ed;border-radius:6px}
 *::-webkit-scrollbar-thumb:hover{background:#c9d2dc}
 .chat-feed,.desk-goose{scrollbar-gutter:stable}
+/* Cancel the business in progress: a header button, an inline confirmation, and the collapsed bar. */
+.serial-app .business-card{position:relative}
+.serial-app .text-button.cancel-task{width:auto;padding:0;min-height:28px;color:var(--muted);gap:4px;font-weight:450}
+.serial-app .text-button.cancel-task:hover{color:var(--risk)}
+.cancel-confirm{position:absolute;z-index:6;top:58px;right:16px;width:min(340px,calc(100% - 32px));white-space:normal;overflow-wrap:anywhere;background:var(--sheet);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px -12px #1d2b4a33;padding:14px 16px;text-align:left}
+.cancel-confirm p{font-size:13px;line-height:1.6;color:var(--ink);margin:0 0 12px;white-space:normal}
+@media (max-width:560px){.cancel-confirm{left:12px;right:12px;width:auto}}
+.cancel-confirm-actions{display:flex;flex-direction:column;gap:8px}
+.cancel-confirm-actions .text-button{padding:6px 0 0}
+.danger-button{border:0;border-radius:14px;background:var(--risk);color:#fff;width:100%;padding:12px 14px;font-size:13px;font-weight:550}
+.danger-button:hover{filter:brightness(.94)}
+.pending-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;width:min(100%,460px);margin:6px auto 0;padding:10px 14px;border:1px solid var(--line);border-radius:16px;background:var(--sheet)}
+.pending-bar-title{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--ink);min-width:0;flex-wrap:wrap}
+.pending-bar-title b{font-size:11px;font-weight:550;color:var(--wait);background:var(--wait-soft);border-radius:8px;padding:2px 7px}
+.pending-bar-title small{font-size:11px;color:var(--muted)}
+.pending-bar-actions{display:flex;align-items:center;gap:14px}
+.serial-app .pending-bar-actions .text-button{width:auto;padding:0;min-height:28px}
+.pending-bar .cancel-confirm{top:calc(100% + 6px);right:0}
+.viz-subs li.viz-subs-group{display:block;padding:10px 0 2px;border:0;font-size:11px;font-weight:550;color:var(--muted);letter-spacing:.04em}

@@ -69,7 +69,8 @@ const READERS:Record<string,(s:BankState,p:Params)=>unknown>={
  T03:(s,p)=>contactsOf(s).filter(c=>!p.query||[c.name,c.label,c.id].some(x=>x.includes(String(p.query)))).map(({id,name,label,tail})=>({id,name,label,tail})),
  B01:(s,p)=>{const scope=billingScope(s,p),summary=aggregate(s,p);return {scope,transactions:filtered(s,p),summary,spokenSummary:billingSpeech(scope,summary),coverage:'合成本行流水与本会话执行记录，不含未导入的外部账户',asOf:now(s)};},
  B03:(s,p)=>{const scope=billingScope(s,p),current=aggregate(s,p),transactions=filtered(s,p),inferred=transactions.filter(r=>r.kind==='expense'&&r.classificationSource!=='user-confirmed'),baseline=p.baseline?aggregate(s,{...p,period:p.baseline}):undefined;return {scope,current,transactions,spokenSummary:billingSpeech(scope,current)+(baseline?' 比较期：'+billingSpeech(billingScope(s,{...p,period:p.baseline}),baseline):'')+(inferred.length?` 其中${inferred.length}笔的类别是按商户推断的，不代表实际商品；可以看明细或纠正分类。`:''),...(baseline?{baseline}:{})};},
- D02:(s,p)=>rows(s,'subscriptions').filter(r=>(!p.subscriptionId||r.id===p.subscriptionId)&&(!p.channel||r.channel===p.channel)&&(!p.status||r.status===p.status)),
+ // A platform cancellation the user was guided through stays active until the provider confirms; mark it so it is not mistaken for untouched.
+ D02:(s,p)=>rows(s,'subscriptions').filter(r=>(!p.subscriptionId||r.id===p.subscriptionId)&&(!p.channel||r.channel===p.channel)&&(!p.status||r.status===p.status)).map(r=>rows(s,'cancellations').some(c=>c.subscriptionId===r.id&&c.status==='external_pending')&&r.status==='active'?{...r,externalPending:true}:r),
  I06:s=>s.workflows!.riskProfile,
  I07:(s,p)=>rows(s,'products').filter(r=>(!p.productId||r.id===p.productId)&&(!p.riskLevel||Number(r.risk)<=Number(p.riskLevel))&&(!p.type||r.type===p.type)).map(productDetail),
  C01:(s,p)=>p.cardId?cardDetail(s,getRow(s,'cards',p.cardId)):rows(s,'cards').filter(r=>!p.status||r.status===p.status).map(({id,name,tail,status})=>({id,name,tail,status})),

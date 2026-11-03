@@ -5,7 +5,7 @@ import type { PlanStep } from '@/lib/plans/types';
 import {BusinessResult} from './workflow-panel';
 import {FlowSelect} from './flow-select';
 
-const labels:Record<string,string>={pending:'待办理',collecting:'补充信息',review:'待确认',authenticate:'验证身份',complete:'已完成',blocked:'暂无法办理',external:'待你处理',cancelled:'已取消'};
+const labels:Record<string,string>={pending:'待办理',collecting:'补充信息',review:'待确认',authenticate:'验证身份',complete:'已完成',blocked:'暂无法办理',external:'待你处理',cancelled:'未办理'};
 export function PlanPanel({bank,busy,onAction}:{bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>}){
  const p=bank.plan;if(!p)return null;
  if(p.steps.length===1&&p.steps[0].kind==='workflow')return null;

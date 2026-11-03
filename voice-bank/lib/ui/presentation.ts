@@ -44,7 +44,7 @@ export function workflowMessage(task: FlowTask): string {
     return '';
   }
   if (task.status === 'authenticate') return '';
-  if (task.status === 'cancelled') return '已取消。';
+  if (task.status === 'cancelled') return '这项业务没有提交，已放下；没有扣款或改动。';
   if (task.status === 'queued') return '等待前面的业务完成。';
   if (task.status === 'unsupported') return '暂不支持这项业务。';
   if (task.status === 'external') return '请到服务商的订阅管理页面关闭续费。';

@@ -8,7 +8,7 @@ import {FlowSelect} from './flow-select';
 
 type Props={bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>};
 const money=(n:number)=>(n/100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
-const labels:Record<string,string>={pending:'未执行',queued:'未执行',collecting:'待补充',review:'待确认',authenticate:'待演示认证',complete:'已返回结果',blocked:'失败 / 暂停',external:'待核对',cancelled:'已取消'};
+const labels:Record<string,string>={pending:'未执行',queued:'未执行',collecting:'待补充',review:'待确认',authenticate:'待演示认证',complete:'已返回结果',blocked:'失败 / 暂停',external:'待核对',cancelled:'未办理'};
 /** A saved template is visibly distinct from a payment and each inner authorization. */
 export function MonthlyPlan({bank,busy,onAction}:Props){
  const p=bank.plan;if(!p?.monthly)return null;

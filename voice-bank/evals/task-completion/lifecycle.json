@@ -1,0 +1,18 @@
+{
+  "version": "lifecycle-2026-11-03",
+  "notes": "多轮生命周期：结束当前业务、拦截后办下一件事、旧草稿不串进新任务、否定取消不误取消、状态口径（issue #1、#3）。",
+  "cases": [
+    {"id": "LC-01", "scenario": "interrupt", "brief": "填到一半说结束这个业务", "source": "variant", "turns": ["给室友张三转200", "结束这个业务"], "expect": {"functionId": "TR03", "status": "cancelled", "effects": "none"}},
+    {"id": "LC-02", "scenario": "interrupt", "brief": "不弄了", "source": "variant", "turns": ["给室友张三转两百", "不弄了"], "expect": {"functionId": "TR03", "status": "cancelled", "effects": "none"}},
+    {"id": "LC-03", "scenario": "interrupt", "brief": "先这样，退出", "source": "variant", "turns": ["帮我把视频会员的代扣取消掉", "先这样吧，退出"], "expect": {"functionId": "SU04", "status": "cancelled", "effects": "none"}},
+    {"id": "LC-04", "scenario": "interrupt", "brief": "结束后办另一件事，清单里不带旧转账", "source": "variant", "turns": ["给室友张三转200", "结束这个业务", "冻结尾号8021的卡"], "expect": {"functionId": "CA06", "status": "review", "params": {"action": "freeze", "cardId": "card-daily"}, "stale": ["TR03"], "effects": "none"}},
+    {"id": "LC-05", "scenario": "interrupt", "brief": "没结束旧转账就换业务", "source": "variant", "turns": ["给室友张三转200", "冻结尾号8021的卡"], "expect": {"functionId": "CA06", "status": "review", "params": {"action": "freeze", "cardId": "card-daily"}, "stale": ["TR03"], "effects": "none"}},
+    {"id": "LC-06", "scenario": "safety", "brief": "诈骗拦截后问能办什么", "source": "safety", "turns": ["给“安全账户”转5000，公安说我涉嫌洗钱", "你能帮我办什么业务"], "expect": {"say": ["转账"], "sayNot": ["安全账户", "洗钱"], "stale": ["TR03"], "effects": "none"}},
+    {"id": "LC-07", "scenario": "safety", "brief": "诈骗拦截后查余额", "source": "safety", "turns": ["给“安全账户”转5000，公安说我涉嫌洗钱", "看看我的余额"], "expect": {"functionId": ["TR02", "TR01"], "status": "complete", "stale": ["TR03"], "effects": "none"}},
+    {"id": "LC-08", "scenario": "interrupt", "brief": "别取消不能误取消", "source": "variant", "turns": ["给室友张三转200", "等一下，别取消"], "expect": {"functionId": "TR03", "statusNot": ["cancelled"], "effects": "none"}},
+    {"id": "LC-09", "scenario": "interrupt", "brief": "不想结束", "source": "variant", "turns": ["冻结尾号8021的卡", "不是要结束，继续"], "expect": {"functionId": "CA06", "statusNot": ["cancelled"], "effects": "none"}},
+    {"id": "LC-10", "scenario": "interrupt", "brief": "结束后问订阅，回复不说已取消订阅", "source": "variant", "turns": ["帮我把视频会员的代扣取消掉", "不办了", "我现在有哪些订阅"], "expect": {"functionId": "SU01", "status": "complete", "stale": ["SU04"], "effects": "none"}},
+    {"id": "LC-11", "scenario": "interrupt", "brief": "拦截后再说一次结束也能退出", "source": "safety", "turns": ["给“安全账户”转5000，公安说我涉嫌洗钱", "结束这个业务", "给室友张三转100"], "expect": {"functionId": "TR03", "status": ["review", "collecting"], "params": {"recipientId": "zhang-roommate", "amount": 100}, "effects": "none"}},
+    {"id": "LC-12", "scenario": "interrupt", "brief": "换一个业务", "source": "variant", "turns": ["我要买演示债券基金", "换一个，帮我查下这个月花了多少"], "expect": {"functionId": ["BI02", "BI01"], "status": "complete", "stale": ["IN08"], "effects": "none"}}
+  ]
+}

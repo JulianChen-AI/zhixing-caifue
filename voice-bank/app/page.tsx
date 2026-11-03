@@ -22,6 +22,7 @@ import { SerialStage, TaskHistory, ConversationHistory } from '@/components/seri
 import {MonthlyPlan} from '@/components/monthly-plan';
 import {useWideLayout,ChatFeed,TaskMap,RecordList} from '@/components/desk';
 import {CardHead,Row} from '@/components/card-kit';
+import {CancelTask,PendingBar} from '@/components/cancel-task';
 import {AccountsViz,MoneyFlow,yuan} from '@/components/card-viz';
 import {cardHead} from '@/lib/ui/cards';
 import { explicitLiveCommand,explicitWorkflowConfirmation,explicitWorkflowCancellation } from '@/lib/workflows/offline';
@@ -200,11 +201,13 @@ export default function Home() {
     if (origin === "text" && modeRef.current === "live" && voice.current) {if(voice.current.readOnly){await voice.current.stop();await reconnectForInput.current(text);}else voice.current.userText(text); return null; }
     const turn = ++generation.current; pending.current?.abort(); const controller = new AbortController(); pending.current = controller;
     stopSpeech(); setBusy(true); setPhase("thinking"); setError(""); setVerifiedReply('');
+    // Earlier turns let "这张卡/那笔" point at what was just discussed; only words already on screen are sent.
+    const history:{user:string;reply:string}[]=[];for(const m of transcriptRef.current){if(m.speaker==='user')history.push({user:m.text.slice(0,300),reply:''});else if(history.length&&!history.at(-1)!.reply)history.at(-1)!.reply=m.text.slice(0,200);}
     if (origin === "text") addMessage("user", text);
     if (modeRef.current === "idle") { modeRef.current = "demo"; setMode("demo"); }
     try {
       const previous=bankRef.current;
-      const state = await request({ command: text, mode: modeRef.current === "live" ? "live" : "demo" }, controller.signal);
+      const state = await request({ command: text, history: history.slice(-6), mode: modeRef.current === "live" ? "live" : "demo" }, controller.signal);
       if (turn !== generation.current) return null;
       presentState(previous,state);
       if (origin === "text") {
@@ -466,7 +469,7 @@ export default function Home() {
   const businessCaption = showCard ? cardCaption(bank, caption) : caption;
 
   const legacyCard = (showCard && bank && bank.view!=='workflow' && <section className="business-card" aria-label="当前办理卡片" key={bank.view === "transfer" && task?.step === "authenticate" ? task.verificationId : bank.view}>
-      <CardHead head={bank.view === "balance" ? {title:"你的账户",icon:"wallet"} : task?.step === "complete" ? {title:"转账回执",icon:"receipt",badge:{label:"模拟回执",tone:"sim"}} : task?.step === "cancelled" ? {title:"转账已取消",icon:"file",badge:{label:"已取消",tone:"muted"}} : task?.step === "authenticate" ? {title:"演示认证 · 转账",icon:"lock",badge:{label:"模拟认证",tone:"info"}} : task?.step === "recipient" ? {title:"你想转给哪一位？",icon:"search",badge:{label:"无默认选中 · 请你选择",tone:"wait"}} : {title:"转账确认页",icon:"shield",badge:{label:"待你手动确认",tone:"wait"}}}><button className="icon-button" onClick={() => void runAction({ type: "home" })} aria-label="收起卡片" disabled={busy}><ChevronDown size={20}/></button></CardHead>
+      <CardHead head={bank.view === "balance" ? {title:"你的账户",icon:"wallet"} : task?.step === "complete" ? {title:"转账回执",icon:"receipt",badge:{label:"模拟回执",tone:"sim"}} : task?.step === "cancelled" ? {title:"转账已取消",icon:"file",badge:{label:"已取消",tone:"muted"}} : task?.step === "authenticate" ? {title:"演示认证 · 转账",icon:"lock",badge:{label:"模拟认证",tone:"info"}} : task?.step === "recipient" ? {title:"你想转给哪一位？",icon:"search",badge:{label:"无默认选中 · 请你选择",tone:"wait"}} : {title:"转账确认页",icon:"shield",badge:{label:"待你手动确认",tone:"wait"}}}>{task&&!["complete","cancelled"].includes(task.step)&&bank.view==="transfer"&&<CancelTask busy={busy} ask={["review","authenticate"].includes(task.step)} summary={`“转账${contact?` · ${contact.label}${contact.name}`:""}${task.amount!=null?` ¥${money(task.amount)}`:""}”`} choices={[{label:"放弃办理",primary:true,run:()=>void runAction({type:"cancel"})}]}/>}<button className="icon-button" onClick={() => void runAction({ type: "home" })} aria-label="收起卡片" disabled={busy}><ChevronDown size={20}/></button></CardHead>
       {bank.view === "balance" ? <><AccountsViz accounts={bank.accounts}/>{bank.receipts.length > 0 && <div className="recent-transfer"><CheckCheck size={17}/><span>最近一笔转出 ¥{money(bank.receipts[0].amount)}</span></div>}{activeTask ? <button className="primary-button" onClick={() => void runCommand("继续这笔")} disabled={busy}>继续这笔转账<ArrowUpRight size={17}/></button> : <button className="primary-button" onClick={() => void runCommand("我要转账")} disabled={busy}>发起转账<ArrowUpRight size={17}/></button>}</>
       : task?.step === "recipient" ? <>{task?.amountNeedsConfirmation&&<p className="card-description">{userMessage(bank.lastReply)}</p>}<div className="choice-list">{contacts.map(c => <button key={c.id} className="cand" onClick={() => void runAction({ type: "select_recipient", recipientId: c.id })} disabled={busy}><span className="cand-radio"/><b>{c.name}</b><span>{c.label}</span><small>{c.bank} · 尾号 {c.tail}</small></button>)}</div><p className="note-line">联系人备注只用于辨认，不代替账户核验</p></>
       : task?.step === "review" || task?.step === "details" ? <>
@@ -500,7 +503,7 @@ export default function Home() {
   const centerView = <>
     <div aria-label="演示场景状态" role="status">{bank?.sceneId&&bank.sceneId!=='default'?`${bank.sceneId} · ${SCENE_MANIFEST.find(item=>item.id===bank.sceneId)?.label||''} · 模拟数据 · 模拟时间 ${businessDay(bank)}（北京时间）`:'默认演示 · 模拟数据 · 系统时间'}</div>
     {sceneNotice&&<p role="status">{sceneNotice}</p>}
-    <section className="conversation" aria-label="语音银行">{!wide&&gooseView}<div className="hero-copy">{!wide&&statusLine}{!stageActive&&<h1>今天想办点什么？</h1>}</div>{!stageActive&&<div className="welcome-actions"><div className="suggestions">{['给张三转五百元','看看我的余额'].map(sample=><button key={sample} disabled={!bank} onClick={()=>void runCommand(sample)}>{sample}</button>)}</div><div className="welcome-navigation"><button className="text-button" onClick={()=>setDrawer('businesses')}>更多业务</button>{pendingTasks.length>0&&<button className="text-button" onClick={()=>setDrawer('tasks')}>继续未完成业务</button>}</div></div>}</section>
+    <section className="conversation" aria-label="语音银行">{!wide&&gooseView}<div className="hero-copy">{!wide&&statusLine}{!stageActive&&<h1>今天想办点什么？</h1>}</div>{!stageActive&&<div className="welcome-actions"><div className="suggestions">{['给张三转五百元','看看我的余额'].map(sample=><button key={sample} disabled={!bank} onClick={()=>void runCommand(sample)}>{sample}</button>)}</div><div className="welcome-navigation"><button className="text-button" onClick={()=>setDrawer('businesses')}>更多业务</button>{pendingTasks.length>0&&bank&&<PendingBar bank={bank} tasks={pendingTasks} busy={busy} onAction={runAction} onAll={()=>setDrawer('tasks')}/>}</div></div>}</section>
     {!wide&&!stageActive&&caption&&<p className="latest-caption" aria-live="polite">{caption}</p>}
     {showCard&&!drawer&&businessCaption&&(businessCaption.length>160?<details className="reply-details"><summary>查看回复</summary><p>{businessCaption}</p></details>:<p className="business-caption" aria-live="polite">{businessCaption}</p>)}
     {wide&&stageActive&&<div className="desk-title card-column-title">业务卡片<small>金额、分摊、授权与状态由确定性规则计算</small></div>}

@@ -261,7 +261,7 @@ test('a temporary query completes and returns to the exact saved checklist witho
 });
 test('unfinished inserted work can be selected, restored and cancelled across reloads',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');s=amendApp(s,{answers:[3,0,0]},'第一题选三');const root=s.plan!.id,risk=flow(s).id;
- s=startApp(s,'IN01','创建储蓄目标读书计划2000元',{name:'读书计划',target:2000});const temporary=s.plan!.id,goal=flow(s).id;
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划2000元',{name:'读书计划',target:2000});const temporary=s.plan!.id,goal=flow(s).id;
  s=app(s,resumeAction(s,'继续原来的风险测评')!);assert.equal(s.plan!.id,root);assert.equal(flow(s).id,risk);assert.equal(temporary,root);assert.ok(s.plan!.taskIds!.includes(goal));
  s=JSON.parse(JSON.stringify(s));s=app(s,{type:'workflow',command:{operation:'resume',taskId:goal,source:'card'}});
  assert.equal(s.plan!.id,temporary);assert.equal(flow(s).id,goal);assert.equal(flow(s).params.target,2000);assert.equal(s.plan!.returnTo,undefined);assert.equal(s.plan!.id,root);
@@ -270,7 +270,7 @@ test('unfinished inserted work can be selected, restored and cancelled across re
 });
 test('inserted tasks finish in queue order and an explicitly paused original stays paused',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');const root=s.plan!.id;
- s=plan(s,{operation:'pause',planId:root});s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});const middle=s.plan!.id,goal=flow(s).id;
+ s=plan(s,{operation:'pause',planId:root});s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});const middle=s.plan!.id,goal=flow(s).id;
  s=startApp(s,'CA01','先查看银行卡列表');assert.equal(s.plan!.id,middle);assert.equal(flow(s).id,goal);
  s=app(s,{type:'workflow',command:{operation:'cancel',taskId:goal,source:'card'}});assert.equal(s.plan!.id,root);assert.equal(s.plan!.status,'paused');assert.match(s.lastReply,/仍暂停/);
 });
@@ -293,7 +293,7 @@ test('automatic task switching does not reuse a confirmation for another write a
 });
 test('explicit task recovery bypasses model draft repair and never writes preserved answers',async()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');s=amendApp(s,{answers:[3,0,0]},'第一题选三');const root=s.plan!.id;
- s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});
  const a=await recoverDraft(s,{utterance:'继续原来的风险测评',reason:'no_call',turnId:'return-turn'}, {base:'invalid',planner:'x'},undefined,async()=>{throw Error('must not need Flash for an unambiguous saved task');});
  s=app(s,a!);assert.equal(s.plan!.id,root);assert.deepEqual(flow(s).params.answers,[3,0,0]);
  const noop=recoveryAction(s,{utterance:'保留第一题答案',reason:'no_call',turnId:'noop'}, {operation:'amend',taskId:flow(s).id,params:{answers:[3,0,0]}})!;
@@ -330,13 +330,13 @@ test('a run continuing the same business cannot replace the original partially f
 });
 test('a grounded edit selects its saved task atomically while another draft is active',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');s=amendApp(s,{answers:[3,0,0]},'第一题选三');const id=flow(s).id;
- s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
  s=app(s,{type:'workflow',command:{operation:'amend',taskId:id,params:{answers:[3,2,0]},source:'voice',utterance:'第二题选二'}});
  assert.equal(flow(s).id,id);assert.deepEqual(flow(s).params.answers,[3,2,0]);assert.ok(s.plan!.taskIds!.includes(goal));
 });
 test('unfinished inserted work runs next after completion and survives another query',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');const root=s.plan!.id;
- s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
  s=app(s,resumeAction(s,'继续原来的风险测评')!);s=amendApp(s,{answers:[3,2,1]},'三题答案是3、2、1');s=confirm(s);assert.equal(s.plan!.status,'running');assert.equal(flow(s).id,goal);
  s=startApp(s,'CA01','查看银行卡列表');assert.equal(s.plan!.id,root);s=app(s,{type:'workflow',command:{operation:'resume',taskId:goal,source:'card'}});
  assert.equal(flow(s).id,goal);assert.equal(flow(s).params.name,'读书计划');assert.equal(s.workflows!.records.questionnaires.length,1);
@@ -357,8 +357,8 @@ test('an inserted goal uses its deadline as a deadline, never an unsupported bil
 });
 test('multiple inserted tasks stay in one queue and are selectable across reloads',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');const root=s.plan!.id,risk=flow(s).id;
- s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
- s=startApp(s,'CA06','准备冻结日常借记卡',{action:'freeze',cardId:'card-daily'});const card=flow(s).id;
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
+ s=startApp(s,'CA06','顺便准备冻结日常借记卡',{action:'freeze',cardId:'card-daily'});const card=flow(s).id;
  for(const taskId of [goal,risk,card]){s=JSON.parse(JSON.stringify(s));s=app(s,{type:'workflow',command:{operation:'resume',taskId,source:'card'}});assert.equal(flow(s).id,taskId);assert.equal(s.plan!.id,root);}
  s=app(s,{type:'workflow',command:{operation:'cancel',taskId:card,source:'card'}});assert.equal(flow(s).id,risk);
  assert.equal(s.workflows!.records.cards.find(c=>c.id==='card-daily')!.status,'active');assert.equal(s.plan!.returnTo,undefined);
@@ -394,7 +394,7 @@ test('verbatim model clauses may include original ordering words',()=>{
 
 test('cancelling one task through Plan cannot silently cancel the entire queue',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');const risk=flow(s).id;
- s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
  s=plan(s,{operation:'cancel',taskId:goal,utterance:'取消这份读书计划草稿'});assert.equal(flow(s).id,risk);assert.equal(s.workflows!.tasks.find(t=>t.id===goal)!.status,'cancelled');assert.equal(flow(s).status,'collecting');
  assert.throws(()=>plan(s,{operation:'cancel',taskId:crypto.randomUUID(),utterance:'取消这项'}));
 });
@@ -408,7 +408,7 @@ test('editing a queued ratio task saves a fixed override without changing identi
 
 test('a targeted answer uses that task saved answers while another draft is current',()=>{
  let s=startApp(initialState(),'IN05','开始做风险测评');s=amendApp(s,{answers:[3,0,0]},'第一题选三');const risk=flow(s).id;
- s=startApp(s,'IN01','创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
+ s=startApp(s,'IN01','先插一个：创建储蓄目标读书计划',{name:'读书计划'});const goal=flow(s).id;
  s=plan(s,{operation:'amend',taskId:risk,utterance:'第二题选二'});assert.equal(flow(s).id,risk);assert.deepEqual(flow(s).params.answers,[3,2,0]);assert.equal(s.workflows!.tasks.find(t=>t.id===goal)!.status,'collecting');
 });
 

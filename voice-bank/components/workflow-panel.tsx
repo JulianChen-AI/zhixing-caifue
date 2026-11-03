@@ -15,11 +15,12 @@ import { choices, FIELDS, LABELS, requiredFields } from '@/lib/workflows/fields'
 import type { FlowTask, Params, WorkflowCommand } from '@/lib/workflows/types';
 import { ACTION_LABELS as actionLabel } from '@/lib/workflows/review';
 import { businessTitle, fieldLabels, resultMessage, unavailableFields, userMessage, workflowMessage } from '@/lib/ui/presentation';
-import { changedFields, localDate, reviewEntries } from '@/lib/ui/business';
+import { changedFields, localDate, reviewEntries, taskIdentity } from '@/lib/ui/business';
+import { CancelTask } from './cancel-task';
 import { cardHead, reviewNotes } from '@/lib/ui/cards';
 import { contactsOf } from '@/lib/bank/recipients';
 
-const statusLabel:Record<string,string>={collecting:'补充信息',review:'待确认',authenticate:'验证身份',complete:'办理结果',cancelled:'已取消',blocked:'暂无法办理',unsupported:'暂不可用',external:'待你处理'};
+const statusLabel:Record<string,string>={collecting:'补充信息',review:'待确认',authenticate:'验证身份',complete:'办理结果',cancelled:'未办理',blocked:'暂无法办理',unsupported:'暂不可用',external:'待你处理'};
 const resultLabels:Record<string,string>={grossExpenses:'支出合计（退款前）',netExpenses:'净支出（已扣退款）',expenseCount:'消费笔数',refundCount:'退款笔数',countBasis:'笔数口径',autoSave:'自动转存',monthlyAmount:'每月计划金额',reservedCost:'对应成本',protected:'保护类代扣',confirmed:'条目已确认',issuer:'发卡机构',replacementId:'补卡申请',lostAt:'挂失时间',settledAt:'结算时间',relatedId:'关联业务',originalId:'原交易',suspectedDuplicate:'疑似重复',id:'编号',taskId:'任务',functionId:'功能',title:'名称',name:'名称',tail:'尾号',accountId:'账户',amount:'金额',balance:'余额',target:'目标金额',remaining:'剩余目标',progress:'完成比例',value:'市值',cost:'成本',profit:'收益',period:'期间',category:'类别',merchant:'商户',date:'日期',kind:'类型',status:'状态',restriction:'限制类型',limit:'交易限额',channel:'通道',cycle:'周期',nextChargeAt:'下次扣款日',benefitUntil:'权益截止',coverage:'数据范围',source:'来源',asOf:'数据时间',basis:'统计口径',expenses:'净支出',refunds:'退款',income:'收入',count:'笔数',current:'本期',baseline:'比较期',summary:'统计',notice:'说明',message:'说明',guide:'操作指引',assumption:'计算假设',total:'总额',periodCount:'期数',subscriptions:'订阅',transactions:'交易明细',cancellations:'取消记录',actual:'实际记录',projectedMonthlyReduction:'预计每月少支出',risk:'产品风险级别',feeRate:'演示费率',price:'合成单位价格',type:'产品类型',liquidity:'流动性',synthetic:'合成数据',level:'演示风险级别',validUntil:'有效期',answers:'答案',direction:'资金方向',moved:'移动金额',calendar:'扣款日历',protection:'保护范围',explanation:'说明',canSelfUnlock:'是否可自助解除',createdAt:'创建时间',productId:'产品',holdingId:'持仓',goalId:'目标',schedule:'周期',authorizedAt:'授权时间',delivery:'交付范围',execution:'执行范围',participants:'参与者',budgets:'预算',spending:'当前支出',content:'内容',topic:'主题',assessmentChanged:'是否改变测评',bindings:'绑定项',sourceType:'来源',narrative:'叙事',peerComparison:'群体参照'};
 const values:Record<string,string>={daily:'日常账户',savings:'储蓄账户',active:'正常/已开启',frozen:'临时冻结',lost:'正式挂失',restricted:'受限制',none:'无',risk:'保护性风控',judicial:'司法限制',pending:'已受理，待确认',settled:'已结算',cancelled:'已取消',bank_cancelled:'银行协议已解除',external_pending:'外部待办，尚未核验',bank:'银行直连',platform:'外部平台',monthly:'每月',yearly:'每年',received:'已收件，待审核',requested:'已申请',subscribe:'申购',redeem:'赎回',expense:'支出',refund:'退款',internal_transfer:'自有账户间转移',investment:'理财资金',deposit:'存入',withdraw:'取出',paused:'已暂停',awaiting_participants:'等待参与者确认',manually_reconciled:'用户手动核销',activated:'已激活'};
 Object.assign(resultLabels,{reading:'字段取值',deadline:'截止日期',months:'估算期数',planBasis:'月供重算口径',cancellationPolicy:'撤单演示口径',cancelUntil:'撤单截止时间',periodType:'报告类型',periodSource:'期间来源',periodNotice:'期间说明',comparison:'同口径比较',baselinePeriod:'比较期间',changePercent:'变化幅度',unavailableReason:'无法比较的原因',insights:'可复核洞察',rule:'规则',text:'结论',evidence:'计算依据',label:'项目',reason:'说明',use:'适用用途',nextStep:'下一步',classificationSource:'分类依据',confidence:'分类置信度',needsCategoryConfirmation:'是否待确认类别',businessStage:'业务阶段',estimatedArrivalAt:'预计到账日',calendarNotice:'工作日口径',feeNotice:'费用说明',fees:'费用分项',rate:'费率',worstCase:'最坏情形',riskNotice:'风险提示',differences:'差异',missing:'缺失字段',comparedFields:'比较字段',field:'字段',values:'各产品取值',productName:'产品名称',managementFee:'管理费',custodyFee:'托管费',recommendedPath:'建议路径',recommendedPaths:'可选路径',paths:'办理路径',purpose:'用途',readOnly:'只读指引',materials:'准备材料',officialSteps:'官方核实步骤',responsibilityNotice:'责任说明',nextActions:'后续操作',merchantSubscriptionState:'商户订阅状态',bankAgreementState:'银行协议状态',chargeState:'扣款状态',executionState:'执行状态',executionNotice:'执行范围',netAmount:'预计净额',fee:'费用',changeAmount:'净支出变化',baselineNetExpenses:'比较期净支出',categoryBreakdown:'分类净支出',feeRate:'合成交易费率'});
@@ -215,6 +216,16 @@ export function WorkflowOutcome({bank,task,busy,onRun}:{bank:BankState;task:Flow
 }
 
 type PanelProps={bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>;serial?:boolean;catalog?:boolean;onClose?:()=>void};
+/** The header exit for an open card. With other unfinished checklist items the user picks this item or the whole list. */
+export function TaskCancel({bank,task,busy,onAction}:{bank:BankState;task:FlowTask;busy:boolean;onAction:(action:BankAction)=>Promise<void>}){
+ if(!['collecting','review','authenticate','blocked'].includes(task.status))return null;
+ const others=(bank.plan&&!['complete','cancelled'].includes(bank.plan.status)?bank.plan.steps.filter(step=>step.taskId!==task.id&&!['complete','cancelled'].includes(step.status)).length:0);
+ const one=()=>void onAction({type:'workflow',command:{operation:'cancel',taskId:task.id,source:'card'}});
+ const choices=others?[{label:'只取消这一项',run:one,primary:true},{label:`结束整份清单（还有${others}项）`,run:()=>void onAction({type:'plan',command:{operation:'cancel',source:'card'}})}]:[{label:'放弃办理',run:one,primary:true}];
+ const who=taskIdentity(bank,task);
+ return <CancelTask busy={busy} ask={['review','authenticate'].includes(task.status)||others>0} summary={`“${who.title}${who.detail?`（${who.detail}）`:''}”`} choices={choices}/>;
+}
+
 export function WorkflowPanel(props:PanelProps){
  const task=!props.catalog&&props.bank.view==='workflow'?currentWorkflow(props.bank):undefined;
  return <WorkflowPanelState key={task?[task.id,task.reviewToken,task.verificationId,task.status,JSON.stringify(task.params)].join(':'):'launcher'} {...props}/>;
@@ -275,7 +286,7 @@ function WorkflowPanelState({bank,busy,onAction,serial=false,catalog=false,onClo
   const editing=pane==='edit'||task.status==='collecting';
   const discard=()=>{setDraft(task.params);setListText({});setDirty(false);setPane('main');};
   return <section className="business-card workflow-card serial-card" aria-label="功能办理卡片" data-status={task.status}>
-   <CardHead head={pane==='preview'?{title:'办理预览',icon:'file'}:cardHead(bank,task)}><button className="text-button" disabled={busy} onClick={()=>pane!=='main'?discard():void onAction({type:'home'})}>{pane==='edit'?'放弃修改':pane==='preview'?'返回核对':'收起'}</button></CardHead>
+   <CardHead head={pane==='preview'?{title:'办理预览',icon:'file'}:cardHead(bank,task)}>{pane==='main'&&<TaskCancel bank={bank} task={task} busy={busy} onAction={onAction}/>}<button className="text-button" disabled={busy} onClick={()=>pane!=='main'?discard():void onAction({type:'home'})}>{pane==='edit'?'放弃修改':pane==='preview'?'返回核对':'收起'}</button></CardHead>
    {pane==='main'&&isWrite(task)&&['collecting','review','authenticate','complete'].includes(task.status)&&<ProcessSteps label="办理步骤" steps={writeSteps(task.status,needsAuth(task))}/>}
    {task.queryClarification&&<p className="card-description" role="status">{task.queryClarification.message}</p>}
    {pane==='preview'?<WorkflowOutcome bank={bank} task={task}/>:editing?<>
