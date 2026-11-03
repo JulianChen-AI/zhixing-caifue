@@ -3,7 +3,7 @@ import type { BankState } from '../bank/types.ts';
 import type { Params, FlowTask, Row } from './types.ts';
 import { WorkflowError } from './types.ts';
 import { cardCandidates } from '../bank/cards.ts';
-import {isBillingQuery,parseBillingQuery} from './billing-query.ts';
+import {isBillingQuery,parseBillingQuery,PERIOD} from './billing-query.ts';
 import { normalizeAdjustments, type AaItem } from './aa.ts';
 
 export const FIELDS: Record<string, string[]> = {
@@ -53,7 +53,7 @@ export function normalizedParams(id:string, input:Params):Params {
  for(const k of ['deadline','nextChargeAt','remindAt'])if(p[k]&&(!Number.isFinite(Date.parse(String(p[k])))||new Date(String(p[k])).toISOString().slice(0,10)!==String(p[k]).slice(0,10)))throw new WorkflowError('日期不存在或格式不正确。');
  if(['BI01','BI02'].includes(id)){
   for(const key of ['period','baseline','accountId','merchant','category'])if(p[key]!=null&&typeof p[key]!=='string')throw new WorkflowError('查询条件需填写文本或选择具体选项。',400,key);
-  for(const key of ['period','baseline'])if(p[key]&&!/^\d{4}(?:-(?:0[1-9]|1[0-2]))?$/.test(String(p[key])))throw new WorkflowError('统计期间请填写有效年份或月份，例如 2026-10。',400,key);
+  for(const key of ['period','baseline'])if(p[key]&&!PERIOD.test(String(p[key])))throw new WorkflowError('统计期间请填写有效年份或月份，例如 2026-10。',400,key);
  }
  return p;
 }

@@ -347,3 +347,11 @@ section[aria-label=月报摘要]>p{margin:0}
 /* Bound tiles keep large amounts inside */
 .viz-limits .viz-kpis b{font-size:clamp(14px,3.4cqi,19px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .monthly-basis dt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.monthly-basis .desk-chip{font-size:11px;white-space:nowrap}
+
+/* Dense ranges (a month of days) shrink to the card: no label widths, no horizontal overflow. */
+.viz-columns{max-width:100%;overflow:hidden}
+.viz-columns>div{width:100%;min-width:0}
+.viz-columns.is-dense>div{gap:1px}
+.viz-columns.is-dense>div>div{max-width:none}
+.viz-columns.is-dense>div>div small{overflow:visible;max-width:none;min-height:14px;font-size:10px}
+.viz-group,.viz-result,.viz-group>*,.viz-result>*{min-width:0}

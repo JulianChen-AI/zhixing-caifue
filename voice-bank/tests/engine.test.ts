@@ -62,3 +62,15 @@ test("demo commands handle Chinese numbers and keep small talk separate", () => 
   assert.equal(demoIntent("确认", prepared()).kind, "help");
 });
 
+
+test("spoken jiao and fen are parsed after the yuan", async () => {
+  const { amountFromText } = await import("../lib/checklists/routing.ts");
+  const cases: [string, number | null][] = [["五十块零五毛", 5050], ["五十块五", 5050], ["五十元零五分", 5005], ["三块八毛五", 385], ["给李四转五毛", 50], ["转50块2个人分", 5000], ["两百块", 20000]];
+  for (const [text, cents] of cases) assert.equal(amountFromText(text).amount, cents, text);
+});
+
+test("shortened spoken amounts take the next unit down", async () => {
+  const { amountFromText } = await import("../lib/checklists/routing.ts");
+  const cases: [string, number][] = [["转一千二", 120000], ["给李四转两百五", 25000], ["转一千零二元", 100200], ["两万五千块", 2500000], ["一百零五块", 10500]];
+  for (const [text, cents] of cases) assert.equal(amountFromText(text).amount, cents, text);
+});

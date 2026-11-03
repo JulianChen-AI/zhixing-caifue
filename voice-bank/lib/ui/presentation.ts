@@ -60,7 +60,9 @@ export function workflowMessage(task: FlowTask): string {
   if (['BI01', 'BI02', 'BI06'].includes(task.functionId)) {
     const summary = object(result.summary || result.current);
     const guessed = Array.isArray(result.transactions) ? result.transactions.map(object).filter(row => row.kind === 'expense' && row.classificationSource !== 'user-confirmed').length : 0;
-    if (typeof summary.netExpenses === 'number') return `净支出 ${amount(summary.netExpenses)}，退款 ${amount(summary.refunds)}。${guessed ? '类别是按已授权流水的商户推断的，不代表实际商品，也不含未接入的平台。你可以看明细或纠正分类。' : ''}`;
+    // Lead with the period, so two answers in a row (上上周五、这周三) are told apart.
+    const when = String(object(result.scope).label || '').split(' · ')[0];
+    if (typeof summary.netExpenses === 'number') return `${when ? when + '：' : ''}净支出 ${amount(summary.netExpenses)}，退款 ${amount(summary.refunds)}。${guessed ? '类别是按已授权流水的商户推断的，不代表实际商品，也不含未接入的平台。你可以看明细或纠正分类。' : ''}`;
   }
   if (task.functionId === 'IN05') {
     if (result.assessmentState === 'not_found') return '你还没有完成风险测评。';
@@ -127,7 +129,7 @@ export function cardCaption(state: BankState | null, text: string) {
 /** Fields requiring unavailable services are not offered as usable controls. */
 export const unavailableFields = new Set([
   'receiptExport', 'peerComparison', 'share', 'includeSafetyHistory', 'verifyReminder', 'evidenceExport',
-  'prepareEvidence', 'includeProjection', 'reserveReminder', 'expiryReminder', 'interestAssumption',
+  'prepareEvidence', 'reserveReminder', 'expiryReminder', 'interestAssumption',
   'adjustments', 'reminder', 'narrative', 'cashOrNet', 'includeProjected', 'autoSave', 'accountType',
 ]);
 

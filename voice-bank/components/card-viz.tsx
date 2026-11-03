@@ -69,9 +69,11 @@ export function RankBars({ rows, label }: { rows: { label: string; value: number
 export function Columns({ rows, label }: { rows: { key: string; tick: string; value: number; tip: string; emphasis?: boolean }[]; label: string }) {
   const largest = Math.max(1, ...rows.map(row => Math.abs(row.value)));
   const anyNegative = rows.some(row => row.value < 0);
-  return <figure className={`viz-columns ${anyNegative ? 'has-negative' : ''}`} aria-label={label}><figcaption>{label}</figcaption><div>{rows.map(row => <div key={row.key} data-tip={row.tip}>
+  // Long ranges keep every bar but label only every few days, so the chart always fits its card.
+  const every = Math.max(1, Math.ceil(rows.length / 8));
+  return <figure className={`viz-columns ${anyNegative ? 'has-negative' : ''} ${rows.length > 12 ? 'is-dense' : ''}`} aria-label={label}><figcaption>{label}</figcaption><div>{rows.map((row, index) => <div key={row.key} data-tip={row.tip} title={row.tip}>
     <span className="viz-col-plot"><i className={`${row.value < 0 ? 'is-negative' : ''} ${row.emphasis ? 'is-emphasis' : ''}`} style={{ height: `${Math.max(Math.abs(row.value) / largest * 100, 2)}%` }}/></span>
-    <small>{row.tick}</small>
+    <small aria-hidden={index % every !== 0}>{index % every === 0 || index === rows.length - 1 ? row.tick : ''}</small>
   </div>)}</div></figure>;
 }
 

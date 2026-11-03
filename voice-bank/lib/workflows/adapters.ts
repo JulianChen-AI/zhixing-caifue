@@ -4,7 +4,7 @@ import { contactsOf } from '../bank/recipients.ts';
 import { availableBalance } from '../bank/accounts.ts';
 import type { FlowTask, Params, Row } from './types.ts';
 import { WorkflowError } from './types.ts';
-import {billingScope,billingSpeech} from './billing-query.ts';
+import {billingScope,billingSpeech,inBillingPeriod,PERIOD} from './billing-query.ts';
 import { goalPlan, replanGoalRules, assertCancellation, cancellationDeadline, assertAaLimit, appendTransaction, monthlyReport } from './business-lite.ts';
 import { standingLimits } from './limits.ts';
 import { aaShares, reminderDrafts, type AaItem } from './aa.ts';
@@ -28,10 +28,25 @@ function record(s:BankState,amount:number,accountId:string,kind:string,merchant:
  return appendTransaction(s,{id:uuid('txn'),date:s.demoClock == null ? now(s).slice(0,10) : businessDay(s),amount,accountId,kind,merchant,relatedId,category,source:'沙箱执行记录'});
 }
 function filtered(s:BankState,p:Params){
- const period=p.period==null?'':String(p.period);if(period&&!/^\d{4}(?:-\d{2})?$/.test(period))throw new WorkflowError('统计期间请用 2026-10 或 2026。');
- return rows(s,'transactions').filter(r=>(!period||String(r.date).startsWith(period))&&(!p.accountId||r.accountId===p.accountId)&&(!p.merchant||String(r.merchant).includes(String(p.merchant)))&&(!p.category||r.category===p.category));
+ const period=p.period==null?'':String(p.period);if(period&&!PERIOD.test(period))throw new WorkflowError('统计期间请用 2026-10、2026 或具体日期。');
+ return rows(s,'transactions').filter(r=>inBillingPeriod(String(r.date),period)&&(!p.accountId||r.accountId===p.accountId)&&(!p.merchant||String(r.merchant).includes(String(p.merchant)))&&(!p.category||r.category===p.category));
 }
 function aggregate(s:BankState,p:Params){const list=filtered(s,p),expense=list.filter(r=>r.kind==='expense').reduce((n,r)=>n+num(r,'amount'),0),refund=list.filter(r=>r.kind==='refund').reduce((n,r)=>n+num(r,'amount'),0),income=list.filter(r=>r.kind==='income').reduce((n,r)=>n+num(r,'amount'),0);return {grossExpenses:expense,netExpenses:expense-refund,refunds:refund,income,count:list.length,expenseCount:list.filter(r=>r.kind==='expense').length,refundCount:list.filter(r=>r.kind==='refund').length,countBasis:'交易笔数包括退款，并非全部为消费',period:p.period||'全部合成记录',category:p.category||'全部',basis:'退款冲减原支出；自有账户转移不计消费',coverage:'当前会话内合成本行流水及沙箱执行记录'};}
+/**
+ * When a goal would be reached at the current pace: the average monthly surplus (income and refunds minus spending,
+ * own-account moves excluded) over the last three full months. An estimate with its basis, never a promise.
+ */
+export function goalProjection(s:BankState,remaining:number){
+ const today=businessDay(s),month=(back:number)=>{const d=new Date(today.slice(0,7)+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-back);return d.toISOString().slice(0,7);};
+ const months=[1,2,3].map(month).filter(m=>rows(s,'transactions').some(r=>String(r.date).startsWith(m)));
+ if(!months.length)return {available:false,reason:'没有完整月份的流水，暂时无法估算。'};
+ const surplus=months.map(m=>rows(s,'transactions').filter(r=>String(r.date).startsWith(m)).reduce((n,r)=>n+(r.kind==='income'||r.kind==='refund'?num(r,'amount'):r.kind==='expense'?-num(r,'amount'):0),0));
+ const monthly=Math.round(surplus.reduce((a,b)=>a+b,0)/months.length);
+ if(remaining<=0)return {available:true,monthly,months:0,basis:`近${months.length}个月平均每月结余`};
+ if(monthly<=0)return {available:false,monthly,reason:`近${months.length}个月平均每月没有结余（${(monthly/100).toFixed(2)}元），按现在的花法攒不够，需要先减少支出或设置自动储蓄。`};
+ const need=Math.ceil(remaining/monthly),reach=new Date(today.slice(0,7)+'-01T00:00:00Z');reach.setUTCMonth(reach.getUTCMonth()+need);
+ return {available:true,monthly,months:need,reachBy:reach.toISOString().slice(0,7),basis:`近${months.length}个月（${Number(months.at(-1)!.slice(5))}—${Number(months[0].slice(5))}月）平均每月结余`};
+}
 function boolean(p:Params,key:string){return p[key]===true;}
 
 export type EstimateItem={label:string;amount:number};
@@ -220,7 +235,7 @@ export function queryBusiness(s:BankState,t:FlowTask):unknown{
   case 'SU05':return step(t,'D08','区分银行状态与外部用户报告',()=>({subscription:getRow(s,'subscriptions',p.subscriptionId),...subscriptionView(getRow(s,'subscriptions',p.subscriptionId)),cancellations:rows(s,'cancellations').filter(r=>r.subscriptionId===p.subscriptionId),coverage:'仅沙箱协议状态；外部平台无自动核验接口'}));
   case 'SU07':return step(t,'D12','分开真实扣费和预计未来少支出',()=>({subscriptions:rows(s,'subscriptions'),actual:aggregate(s,{...p,category:'订阅'}),projectedMonthlyReduction:rows(s,'subscriptions').filter(r=>r.status==='cancelled'&&r.cycle==='monthly').reduce((n,r)=>n+num(r,'amount'),0)}));
   case 'SU08':return step(t,'D11','只计算已知扣款日，不移动商户日期',()=>fundsCalendar(s));
-  case 'IN03':return step(t,'I03','只读取已入账目标余额',()=>{const g=getRow(s,'goals',p.goalId);return {...g,remaining:num(g,'target')-num(g,'balance'),progress:num(g,'target')?num(g,'balance')/num(g,'target'):0};});
+  case 'IN03':return step(t,'I03','只读取已入账目标余额',()=>{const g=getRow(s,'goals',p.goalId),remaining=num(g,'target')-num(g,'balance');return {...g,remaining,progress:num(g,'target')?num(g,'balance')/num(g,'target'):0,projection:goalProjection(s,remaining)};});
   case 'IN06':return step(t,'I07','读取合成产品及费率',()=>readTool(s,'I07',p));
   case 'IN07':return step(t,'I08','按相同字段比较指定产品',()=>{if(!Array.isArray(p.productIds)||p.productIds.length<2)throw new WorkflowError('请选择至少两项产品。');return compareProducts(p.productIds.map(x=>getRow(s,'products',x)));});
   case 'IN10':return step(t,'I15','净值、成本与收益同口径；合成数据',()=>rows(s,'holdings').filter(r=>!p.holdingId||r.id===p.holdingId).map(r=>({...r,profit:num(r,'value')-num(r,'cost'),asOf:now(s),synthetic:true})));

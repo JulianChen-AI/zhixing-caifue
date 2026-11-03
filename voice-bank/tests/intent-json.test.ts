@@ -80,3 +80,42 @@ test('names the user labelled are kept when the model collapses two people with 
  const r = await understandIntent(initialState(), '我、室友张三、同学李四、房东张三', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify(reply))) as typeof fetch);
  assert.deepEqual((r.action as unknown as { command: { params: { participants: string[] } } }).command.params.participants, ['我', '室友张三', '同学李四', '房东张三']);
 });
+
+test('the sum in the user sentence corrects the model reading of jiao and fen', async () => {
+ const reply = { choices: [{ message: { content: JSON.stringify({ intent: 'run', functionId: 'TR03', params: { recipientId: 'zhang-roommate', amount: 50.05 }, say: '好的' }) } }] };
+ const r = await understandIntent(initialState(), '给室友张三转五十块零五毛', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify(reply))) as typeof fetch);
+ assert.equal((r.action as unknown as { command: { params: { amount: number } } }).command.params.amount, 50.5);
+});
+
+test('a meaningless AA carve-out is dropped, and a finished card turns an edit into a new business', async () => {
+ const fake = (body: object) => (async () => new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(body) } }] }))) as typeof fetch;
+ const r = await understandIntent(initialState(), '四个人吃饭360，我请两个，剩下的和张三AA', [], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'run', functionId: 'TR05', params: { action: 'create', total: 360, adjustments: [{ label: '饭钱', amount: 360, participants: ['我', '我'] }] }, say: '好的' }));
+ assert.ok(r.dropped.includes('adjustments:unclear'));
+ assert.equal((r.action as unknown as { command: { params: Record<string, unknown> } }).command.params.adjustments, undefined);
+ let s = reduceBank(initialState(), { type: 'workflow', command: { operation: 'run', functionId: 'TR05', params: { action: 'create', total: 360 }, source: 'card' } }, crypto.randomUUID());
+ s = reduceBank(s, { type: 'workflow', command: { operation: 'cancel', taskId: s.workflows!.currentTaskId!, source: 'card' } }, crypto.randomUUID());
+ const again = await understandIntent(s, '每人70，一共5个人AA，总共350', [], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'amend', params: { total: 350 }, say: '好的' }));
+ assert.equal((again.action as unknown as { command: { operation: string } }).command.operation, 'run');
+});
+
+test('asking whether a finished business went through reads its record instead of cancelling', async () => {
+ let s = reduceBank(initialState(), { type: 'workflow', command: { operation: 'run', functionId: 'SU04', params: { subscriptionId: 'sub-video' }, source: 'card' } }, crypto.randomUUID());
+ const id = s.workflows!.currentTaskId!;
+ s = reduceBank(s, { type: 'workflow', command: { operation: 'confirm', taskId: id, token: s.workflows!.tasks.find(t => t.id === id)!.reviewToken! , source: 'card' } }, crypto.randomUUID());
+ s = reduceBank(s, { type: 'workflow', command: { operation: 'authenticate', taskId: id, token: s.workflows!.tasks.find(t => t.id === id)!.verificationId!, code: '123456', source: 'card' } }, crypto.randomUUID());
+ const r = await understandIntent(s, '视频会员刚才取消了吗', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ intent: 'cancel', say: '好的' }) } }] }))) as typeof fetch);
+ assert.deepEqual((r.action as unknown as { command: { operation: string; taskId: string } }).command, { operation: 'status', taskId: id, source: 'card', utterance: '视频会员刚才取消了吗' });
+});
+
+test('per-person times head count must match the stated total', async () => {
+ const r = await understandIntent(initialState(), '每人 80，一共 5 个人 AA，总共 350', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ intent: 'run', functionId: 'TR05', params: { action: 'create', total: 350 }, say: '好的' }) } }] }))) as typeof fetch);
+ assert.equal(r.action, undefined); assert.match(r.say, /合计应是400元.*总共350元/);
+});
+
+test('a card described by its state is chosen by the record, and several matches are asked about', async () => {
+ const fake = (body: object) => (async () => new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(body) } }] }))) as typeof fetch;
+ const many = await understandIntent(initialState(), '冻结我那张受限的卡', [{ user: '从储蓄账户给他转两百', reply: '' }], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'run', functionId: 'CA06', params: { action: 'freeze', cardId: 'card-risk' }, say: '好的' }));
+ assert.equal(many.action, undefined); assert.match(many.say, /受限的卡有 2 张：储蓄借记卡（尾号3609.*司法限制演示卡（尾号9012/);
+ const one = await understandIntent(initialState(), '冻结我那张正常的卡', [], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'run', functionId: 'CA06', params: { action: 'freeze' }, say: '好的' }));
+ assert.equal((one.action as unknown as { command: { params: { cardId: string } } }).command.params.cardId, 'card-daily');
+});

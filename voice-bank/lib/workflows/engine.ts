@@ -173,6 +173,8 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
   // Name what is being confirmed, so a listener knows without looking at the card.
   const facts=workflowReview(s,t).entries.filter(e=>!['无','否',''].includes(e.value)&&!['note','saveRecipient','autoSave'].includes(e.key)).slice(0,4).map(e=>e.label+'：'+e.value).join('；');
   t.message='请核对“'+t.title+'”'+(facts?'——'+facts+'。':'的当前信息。')+(t.functionId==='SU04'?'解除代扣不等于商户退订或退款。':t.functionId==='CA07'?'正式挂失后旧卡不可临时解冻恢复。':t.functionId==='IN08'?'产品和费率均为合成数据；可能亏损，申购受理不等于份额确认。':'本次仅操作沙箱数据。')+'确认后'+(needsAuth(t)?'在专门卡片完成演示认证。':'提交。');
+  // Freezing a card that is already restricted: say what the restriction is and that freezing does not lift it.
+  if(t.functionId==='CA06'&&t.params.action==='freeze'){const card=rows(s,'cards').find(r=>r.id===t.params.cardId);if(card?.status==='restricted'){const why=card.restriction==='judicial'?'司法限制（需按司法机关要求处理）':'保护性风控（核实身份后可申请解除）';t.message=`${card.name}（尾号${card.tail}）目前因${why}受限。临时冻结会再停掉它的全部交易，但不会解除原来的限制。`+t.message;}}
   if(preview)t.message=preview;
  }catch(error){markFailure(current(s,t.id)||t,error);}
  return s;
@@ -308,7 +310,6 @@ function finalized(s:BankState,cmd:WorkflowCommand,requestId:string,id:string){
   SU04:[['verifyReminder','D10','后续核验提醒尚未自动建立。'],['evidenceExport','S16','争议材料导出尚未接入。']],
   SU05:[['prepareEvidence','S16','争议材料导出尚未接入，本次只返回当前状态。']],
   SU08:[['incomeDates','D11','到账日与资金缺口联算尚未接入。'],['reserveReminder','D10','资金预留提醒尚未建立。']],
-  IN03:[['includeProjection','I01','目标进度预测尚未接入，本次只返回已入账余额和实际进度。']],
   CA02:[['includeSafetyHistory','C12','守护历史数据尚未接入，本次只返回当前卡片信息。']],
   CA07:[['expiryReminder','D10','挂失到期提醒尚未建立。']],
  };

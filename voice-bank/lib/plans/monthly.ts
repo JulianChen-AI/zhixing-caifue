@@ -3,6 +3,8 @@ import { businessDay, businessISO } from '../demo/clock.ts';
 import { WorkflowError, type FlowTask } from '../workflows/types.ts';
 import { assertVoiceEvidence, validateVoiceDraft, familyBudgetAmount, hasFamilyBudgetContext } from '../workflows/fields.ts';
 import { materialize } from './materialize.ts';
+import { contactsOf } from '../bank/recipients.ts';
+import { amountFromText } from '../checklists/routing.ts';
 import type { PlanStep, TaskPlan } from './types.ts';
 
 /** Only an explicit request selects the saved plan; it is never an authorization. */
@@ -84,4 +86,36 @@ export function monthlyBudgetTotal(plan:TaskPlan):number {
   latest.set(JSON.stringify([step.params.period,step.params.category]),cents);
  }
  return [...latest.values()].reduce((total,amount)=>total+amount,0);
+}
+
+/** “下个月的钱安排一下”: a plan for a month to come, not this month's saved template. */
+export const isNextMonthPlan = (text:string) => /(?:下个?月|每个?月)的?(?:钱|收入|生活费|工资)?.{0,6}(?:安排|规划|计划|分配|怎么花|怎么分)|(?:安排|规划)(?:一下)?(?:下个?月|每个?月)/.test(text) && !/取消|不要|别/.test(text);
+
+/**
+ * A month draft read from the books: income and rent from the last full month, the savings the user named,
+ * the mandates still active, and what is left per day. It moves no money; rent and savings become two rule
+ * cards that each need their own confirmation.
+ */
+export function nextMonthDraft(s:BankState,text:string){
+ const today=businessDay(s),last=(()=>{const d=new Date(today.slice(0,7)+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);})();
+ const rows=(s.workflows?.records.transactions||[]).filter(r=>String(r.date).startsWith(last));
+ const income=rows.filter(r=>r.kind==='income').reduce((n,r)=>n+Number(r.amount||0),0);
+ const history=(s.workflows?.records.transferHistory||[]).filter(r=>/房租/.test(String(r.note||''))).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)))[0];
+ const rentSaid=text.match(/房租[^，,。]*?(\d+(?:\.\d+)?)/)?.[1],rent=rentSaid?Math.round(Number(rentSaid)*100):Number(history?.amount||0);
+ const saveSaid=text.match(/(?:存|攒|储蓄)\s*(\d+(?:\.\d+)?|[一二两三四五六七八九十百千万]+)\s*(?:元|块)?/);
+ const savings=saveSaid?(/\d/.test(saveSaid[1])?Math.round(Number(saveSaid[1])*100):amountFromText(saveSaid[1]+'元').amount||0):0;
+ const mandates=(s.workflows?.records.subscriptions||[]).filter(r=>r.status==='active'&&r.cycle==='monthly');
+ const fixed=mandates.reduce((n,r)=>n+Number(r.amount||0),0),left=income-rent-savings-fixed;
+ const next=new Date(today.slice(0,7)+'-01T00:00:00Z');next.setUTCMonth(next.getUTCMonth()+1);const days=new Date(Date.UTC(next.getUTCFullYear(),next.getUTCMonth()+1,0)).getUTCDate();
+ const y=(c:number)=>`¥${(c/100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+ const payee=history?contactsOf(s).find(c=>c.id===history.recipientId):undefined,goal=(s.workflows?.records.goals||[]).find(g=>g.status!=='closed');
+ const lead=`“${next.getUTCMonth()+1}月资金安排（草稿）”：按${Number(last.slice(5))}月记录，收入约 ${y(income)}；房租 ${y(rent)}${payee?`（转给${payee.label}${payee.name}，每月1日）`:''}；储蓄 ${y(savings)}；固定扣款 ${y(fixed)}（${mandates.map(m=>m.name).join('、')}）；剩下 ${y(left)} 可自由支配，平均每天约 ${y(Math.floor(left/days))}。${left<0?'收入不够覆盖这些安排，请调整。':''}这只是草稿，没有扣款；下面的房租和储蓄要分别确认后才会生效。`;
+ // The pieces of the sentence each task owns, so the plan engine can check they tile what was said.
+ const at=Math.max(1,text.search(/存|攒|储蓄/));
+ const tasks=[
+  ...(rent&&payee?[{quote:'',functionId:'TR04',params:{action:'create',recipientId:payee.id,accountId:'daily',amount:rent/100,schedule:'每月1日',note:'房租'}}]:[]),
+  ...(savings&&goal?[{quote:'',functionId:'IN04',params:{action:'update',goalId:goal.id,accountId:'daily',amount:savings/100,schedule:'每月1日'}}]:[]),
+ ];
+ if(tasks.length===2){tasks[0].quote=text.slice(0,at);tasks[1].quote=text.slice(at);}else if(tasks.length===1)tasks[0].quote=text;
+ return {lead,tasks};
 }

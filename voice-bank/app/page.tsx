@@ -216,7 +216,8 @@ export default function Home() {
       }
       return state.lastReply;
     } catch (e) {
-      if (turn === generation.current && !(e instanceof DOMException && e.name === "AbortError")) { showError((e as Error).message); return "这次操作尚未完成，请查看页面提示。"; }
+      // The reason also goes into the conversation, so a refused request is never answered with silence.
+      if (turn === generation.current && !(e instanceof DOMException && e.name === "AbortError")) { showError((e as Error).message); if (origin === "text") addMessage("assistant", userMessage((e as Error).message)); return "这次操作尚未完成，请查看页面提示。"; }
       return null;
     } finally { if (turn === generation.current) { setBusy(false); setPhase("idle"); } }
   }, [addMessage, presentState, request, showError, speak, stopSpeech]);

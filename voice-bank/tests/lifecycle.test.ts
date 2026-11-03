@@ -164,3 +164,15 @@ test('spoken days are worked out from the business date, weeks starting on Monda
   assert.equal(currentWorkflow(s)!.params.period, '2026-10-16');
   assert.match(replyForState(s), /同学李四转了 ¥36.00/);
 });
+
+test('an old unconfirmed transfer does not block a later question, and a later write drops it', () => {
+  let s = app(initialState(), { type: 'workflow', command: { operation: 'run', functionId: 'TR03', params: { recipientId: 'zhang-roommate', amount: 200, accountId: 'daily' }, source: 'card', utterance: '给室友张三转200，用日常账户' } });
+  // The checklist has been left alone long enough to count as stale.
+  s = structuredClone(s); for (const e of s.plan!.log) e.at = new Date(Date.now() - 11 * 60 * 1000).toISOString(); s.plan!.createdAt = s.plan!.log[0].at;
+  const read = app(s, { type: 'workflow', command: { operation: 'run', functionId: 'BI02', params: { period: '2026-10' }, source: 'card', utterance: '上个月花了多少' } });
+  assert.equal(currentWorkflow(read)!.functionId, 'BI02');
+  assert.equal(currentWorkflow(read)!.status, 'complete');
+  const write = app(s, { type: 'workflow', command: { operation: 'run', functionId: 'CA06', params: { action: 'freeze', cardId: 'card-daily' }, source: 'card', utterance: '冻结尾号8021的卡' } });
+  assert.equal(currentWorkflow(write)!.functionId, 'CA06');
+  assert.ok(!write.task || ['complete', 'cancelled'].includes(write.task.step));
+});

@@ -243,7 +243,18 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   if(existing&&currentPlanStep(s)&&child(s,currentPlanStep(s)!)?.status==='authenticate')throw new WorkflowError('当前业务正在等待认证，请先完成或取消认证再切换。');
   const adopted=cmd.adoptTaskId?s.workflows?.tasks.find(t=>t.id===cmd.adoptTaskId&&t.functionId===cmd.functionId&&['queued','collecting','review','blocked'].includes(t.status)):undefined;
   if(cmd.adoptTaskId&&!adopted)throw new WorkflowError('原任务已变化，请刷新。',409);
-  if(!existing&&s.task&&!['complete','cancelled'].includes(s.task.step)&&adopted?.legacyTaskId!==s.task.id)throw new WorkflowError('已有未完成转账，请先恢复原任务。');
+  // An open transfer draft from earlier does not block a question; a new business that changes something drops the draft (nothing was sent).
+  // A transfer waiting for authentication is never interrupted; finish or cancel it first.
+  if(!existing&&s.task?.step==='authenticate'&&adopted?.legacyTaskId!==s.task.id)throw new WorkflowError('当前转账正在等待认证，请先完成或取消认证再办理其他业务。');
+  if(!existing&&s.task&&!['complete','cancelled'].includes(s.task.step)&&adopted?.legacyTaskId!==s.task.id){
+   const incoming=cmd.tasks?.map(t=>({functionId:t.functionId,params:t.params||{}}))||(cmd.functionId?[{functionId:cmd.functionId,params:cmd.params||{}}]:[]);
+   if(!incoming.length||incoming.some(t=>isWrite(t))){
+    const draft=s.workflows?.tasks.find(t=>t.legacyTaskId===s.task!.id&&!['complete','cancelled'].includes(t.status));
+    s=draft?reducer(s,{type:'workflow',command:{operation:'cancel',taskId:draft.id,source:'card'}},'drop-old-transfer-'+crypto.randomUUID()):reducer(s,{type:'cancel'},'drop-old-transfer-'+crypto.randomUUID());
+    if(s.plan&&!terminal(s.plan)&&!s.plan.steps.some(unfinished)){s.plan.status='cancelled';}
+    asideNote='之前那笔转账还没提交，已放下，没有扣款。';
+   }
+  }
   const text=cmd.utterance||cmd.clarification||'';
   if(cmd.functionId&&(!functionById(cmd.functionId)||cmd.source==='voice'&&inferFunction(text)&&inferFunction(text)!.slice(0,2)!==cmd.functionId.slice(0,2)))throw new WorkflowError('所选业务与本轮要求不一致，未建立任务。');
   // A model may select the right business while omitting fields already said
@@ -275,6 +286,7 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   log(p,existing?'inserted':'created','已创建并保存所有业务实例，尚未执行后续任务。');s.view='workflow';s=pump(s,reducer);
   for(const [stepId,ask] of asks)askRecipient(s,s.plan?.steps.find(x=>x.id===stepId),ask);
   if(asideNote)s.lastReply=asideNote+s.lastReply;
+  if(cmd.lead&&s.plan){s.plan.announcements=[...(s.plan.announcements||[]),cmd.lead];s.lastReply=cmd.lead.replace(/^“[^”]*”：/,'')+s.lastReply;}
   // Asking to skip the review is answered, not obeyed: the card still needs the user's own confirmation.
   if(/不用确认|无需确认|免确认|直接转|跳过(?:确认|核对|验证)|别让我确认/.test(text)&&s.plan?.steps.some(x=>x.functionId&&isWrite({functionId:x.functionId,params:x.params}))){const note='转账、扣款这类业务必须由你在卡片上核对确认，这一步不能跳过。',open=s.workflows?.tasks.find(t=>t.id===s.workflows?.currentTaskId);s.lastReply=note+s.lastReply;if(open&&!open.message.startsWith(note))open.message=note+open.message;}
  }else{

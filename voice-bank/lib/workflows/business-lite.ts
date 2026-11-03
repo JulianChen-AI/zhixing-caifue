@@ -343,7 +343,9 @@ export function monthlyReport(s: BankState, p: Params, summary: Record<string, u
   const matching = transactions.filter((row) => inPeriod(row, chosen.period, chosen.kind) && matchesFilters(row, p));
   const current = totalsFor(matching, transactions);
   const baselinePeriod = previousPeriod(chosen.period, chosen.kind);
-  const baselineRows = transactions.filter((row) => inPeriod(row, baselinePeriod, chosen.kind) && matchesFilters(row, p));
+  // A month still in progress is compared with the same days of the previous month, not with a whole month.
+  const today = new Date(businessNow(s) + 8 * 3600_000).toISOString().slice(0, 10), toDate = chosen.kind === 'month' && chosen.period === today.slice(0, 7);
+  const baselineRows = transactions.filter((row) => inPeriod(row, baselinePeriod, chosen.kind) && matchesFilters(row, p) && (!toDate || String(row.date).slice(8, 10) <= today.slice(8, 10)));
   const baseline = totalsFor(baselineRows, transactions);
   const hasBaseline = baselineRows.length > 0;
   const changeAmount = hasBaseline ? current.netExpenses - baseline.netExpenses : null;
@@ -404,6 +406,7 @@ export function monthlyReport(s: BankState, p: Params, summary: Record<string, u
     periodType: chosen.kind,
     periodSource: chosen.source,
     periodNotice: chosen.notice,
+    hasBudget: !!s.workflows?.records.budgets?.length,
     summary: reportSummary,
     categoryBreakdown: current.categoryBreakdown,
     comparison: {
@@ -411,6 +414,7 @@ export function monthlyReport(s: BankState, p: Params, summary: Record<string, u
       baselineNetExpenses: hasBaseline ? baseline.netExpenses : null,
       changeAmount,
       changePercent,
+      ...(toDate ? { sameDays: `${Number(baselinePeriod.slice(5))}月1日至${Number(today.slice(8, 10))}日` } : {}),
       ...(hasBaseline ? {} : { unavailableReason: `未找到${baselinePeriod}匹配流水。` }),
       ...(hasBaseline && baseline.netExpenses === 0 ? { unavailableReason: '基期净支出为0，百分比不可比。' } : {}),
     },

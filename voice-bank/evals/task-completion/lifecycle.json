@@ -1,6 +1,6 @@
 {
   "version": "lifecycle-2026-11-03",
-  "notes": "多轮生命周期：结束当前业务、拦截后办下一件事、旧草稿不串进新任务、否定取消不误取消、状态口径（issue #1、#3）。 LC-13 起覆盖适当性（#4）、AA 人数（#5）、免确认与同名收款人（#6）。 LC-16 起含卡片轮：【卡片】确认 / 认证 / 取消 直接操作卡片，【刷新】模拟刷新页面；这些是用户本人的操作，因此 effects=allowed。",
+  "notes": "多轮生命周期：结束当前业务、拦截后办下一件事、旧草稿不串进新任务、否定取消不误取消、状态口径（issue #1、#3）。 LC-13 起覆盖适当性（#4）、AA 人数（#5）、免确认与同名收款人（#6）。 LC-16 起含卡片轮：【卡片】确认 / 认证 / 取消 直接操作卡片，【刷新】模拟刷新页面；这些是用户本人的操作，因此 effects=allowed。 LC-19 起来自 2026-11-03 第二轮截图：具体日期、对比、试算、月度安排、角分金额、按状态选卡、询问结果、AA 矛盾与放弃后重建（#10–#15）。",
   "cases": [
     {
       "id": "LC-01",
@@ -355,6 +355,176 @@
           "另有1项已解除"
         ],
         "effects": "allowed"
+      }
+    },
+    {
+      "id": "LC-19",
+      "scenario": "bills",
+      "brief": "两个具体日期分别统计",
+      "source": "variant",
+      "turns": [
+        "上上周五和这周三我分别花了多少"
+      ],
+      "expect": {
+        "plan": [
+          [
+            "BI01",
+            "BI02"
+          ],
+          [
+            "BI01",
+            "BI02"
+          ]
+        ],
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-20",
+      "scenario": "bills",
+      "brief": "花超了吗，跟上月比",
+      "source": "variant",
+      "turns": [
+        "我这个月是不是花超了？跟上个月比怎么样"
+      ],
+      "expect": {
+        "functionId": "BI06",
+        "status": "complete",
+        "say": [
+          "上月同期"
+        ],
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-21",
+      "scenario": "wealth",
+      "brief": "目标何时攒够",
+      "source": "variant",
+      "turns": [
+        "按我现在的花法，旅行目标3000元什么时候能攒够"
+      ],
+      "expect": {
+        "functionId": "IN03",
+        "status": "complete",
+        "say": [
+          "个月后",
+          "估算"
+        ],
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-22",
+      "scenario": "cross",
+      "brief": "下个月的钱安排一下",
+      "source": "variant",
+      "turns": [
+        "帮我把下个月的钱安排一下：房租照交，存500，剩下的随便花"
+      ],
+      "expect": {
+        "functionId": "TR04",
+        "status": "review",
+        "params": {
+          "recipientId": "zhang-landlord",
+          "amount": 1500
+        },
+        "plan": [
+          "TR04",
+          "IN04"
+        ],
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-23",
+      "scenario": "transfer",
+      "brief": "角分金额",
+      "source": "variant",
+      "turns": [
+        "给室友转五十块零五毛"
+      ],
+      "expect": {
+        "functionId": "TR03",
+        "params": {
+          "recipientId": "zhang-roommate",
+          "amount": 50.5
+        },
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-24",
+      "scenario": "cards",
+      "brief": "按状态描述卡片",
+      "source": "variant",
+      "turns": [
+        "冻结我那张受限的卡"
+      ],
+      "expect": {
+        "say": [
+          "尾号3609",
+          "尾号9012"
+        ],
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-25",
+      "scenario": "subscriptions",
+      "brief": "询问刚办的业务结果",
+      "source": "variant",
+      "turns": [
+        "帮我把视频会员的代扣取消掉",
+        "【卡片】确认",
+        "【卡片】认证",
+        "视频会员刚才取消了吗"
+      ],
+      "expect": {
+        "functionId": [
+          "SU04",
+          "SU05"
+        ],
+        "status": "complete",
+        "say": [
+          "后续续费已停止"
+        ],
+        "effects": "allowed"
+      }
+    },
+    {
+      "id": "LC-26",
+      "scenario": "transfer",
+      "brief": "AA每人金额与总额矛盾",
+      "source": "variant",
+      "turns": [
+        "每人80，一共5个人AA，总共350"
+      ],
+      "expect": {
+        "say": [
+          "合计应是400元"
+        ],
+        "effects": "none"
+      }
+    },
+    {
+      "id": "LC-27",
+      "scenario": "transfer",
+      "brief": "放弃后重新发起AA",
+      "source": "variant",
+      "turns": [
+        "四个人吃饭360，我请两个，剩下的和张三AA",
+        "不弄了",
+        "每人70，一共5个人AA，总共350"
+      ],
+      "expect": {
+        "functionId": "TR05",
+        "status": "collecting",
+        "params": {
+          "total": 350,
+          "headcount": 5
+        },
+        "effects": "none"
       }
     }
   ]

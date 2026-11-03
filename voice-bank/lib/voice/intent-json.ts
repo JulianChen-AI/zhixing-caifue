@@ -8,8 +8,10 @@ import { FIELDS } from '../workflows/fields.ts';
 import { ACTIONS } from '../workflows/adapters.ts';
 import { explicitWorkflowConfirmation } from '../workflows/offline.ts';
 import { FRAUD_WORDS } from '../workflows/engine.ts';
-import { isMonthlyRequest, savedMonthlyPlans } from '../plans/monthly.ts';
+import { isMonthlyRequest, isNextMonthPlan, nextMonthDraft, savedMonthlyPlans } from '../plans/monthly.ts';
 import { businessDay } from '../demo/clock.ts';
+import { amountFromText } from '../checklists/routing.ts';
+import { parseBillingQuery } from '../workflows/billing-query.ts';
 import { bankToolResult } from '../bank/realtime-tools.ts';
 import catalog from '../workflows/catalog-data.json' with { type: 'json' };
 
@@ -138,6 +140,12 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
   intent = { ...intent, intent: 'run', functionId: 'TR03', params: intent.params || {} };
  // A reply that changes nothing must not sound as if it did (“已取消暂停操作”); the card keeps the real state.
  if (intent.intent === 'ask' || intent.intent === 'chat') return CLAIMED.test(say) ? { dropped: [...dropped, 'say:claimed_change'], say: '好的，当前进度保留，没有做任何改动。' } : { dropped, say };
+ // “下个月的钱安排一下” is a month draft computed from the books; rent and savings follow as cards to confirm one by one.
+ if (!['confirm', 'cancel'].includes(intent.intent) && isNextMonthPlan(utterance)) {
+  const draft = nextMonthDraft(s, utterance);
+  if (!draft.tasks.length) return { dropped, say: draft.lead.replace(/^“[^”]*”：/, '') };
+  return { action: { type: 'plan', command: { operation: 'create', tasks: draft.tasks, lead: draft.lead, source: 'card', utterance } }, dropped, say };
+ }
  // Asking for this month's arrangement opens the saved plan read-only, whatever the model made of the rest of the sentence.
  if (!['confirm', 'cancel'].includes(intent.intent) && isMonthlyRequest(utterance) && savedMonthlyPlans(s).length)
   return { action: { type: 'plan', command: { operation: 'open_saved', source: 'card', utterance } }, dropped, say: '先看数据范围和计划，现在还没有执行任何付款或申购。' };
@@ -156,14 +164,64 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
   return { dropped: ['empty_plan'], say };
  }
  const wanted = intent.taskId, taskId = wanted && wf?.tasks.some(t => t.id === wanted) ? wanted : current?.id;
+ // “视频会员刚才取消了吗” asks about a result; it is answered from the record, never sent as a new cancel.
+ if (intent.intent === 'cancel' && ASKS.test(utterance)) {
+  const done = [...(wf?.tasks || [])].reverse().find(t => ['complete', 'external'].includes(t.status) && mentions(s, t, utterance)) || wf?.tasks.find(t => t.id === taskId && ['complete', 'external'].includes(t.status));
+  if (done) return { action: { type: 'workflow', command: { operation: 'status', taskId: done.id, source: 'card', utterance } }, dropped: [...dropped, 'cancel:question'], say };
+  return { dropped: [...dropped, 'cancel:question'], say: '没有查到刚才办过这项业务的记录，所以也没有取消。需要的话可以现在办理。' };
+ }
  // Like confirmation, cancelling is the user's decision: it needs their own cancel words, not a model reading of “停”.
  if (intent.intent === 'cancel' && (!CANCEL.test(utterance) || NOT_CANCEL.test(utterance))) return { dropped: ['cancel_without_literal'], say: '好的，先停在这里，进度保留。' };
  if (intent.intent === 'cancel') return taskId ? { action: { type: 'workflow', command: { operation: 'cancel', taskId, source: 'card', utterance } }, dropped, say } : { dropped: ['no_task'], say };
  // “amend” toward another function is a new business, not an edit of the current card.
  if (intent.intent === 'amend' && intent.functionId && intent.functionId !== wf?.tasks.find(t => t.id === taskId)?.functionId) intent = { ...intent, intent: 'run' };
- const functionId = intent.intent === 'amend' ? wf?.tasks.find(t => t.id === taskId)?.functionId : intent.functionId;
+ // A finished or dropped card cannot be edited; the same words start a new one (a new AA after an abandoned one).
+ const target = wf?.tasks.find(t => t.id === taskId);
+ if (intent.intent === 'amend' && target && ['complete', 'cancelled', 'external', 'unsupported'].includes(target.status)) intent = { ...intent, intent: 'run', functionId: intent.functionId || target.functionId };
+ let functionId = intent.intent === 'amend' ? wf?.tasks.find(t => t.id === taskId)?.functionId : intent.functionId;
+ // “花超了吗”“跟上个月比” need the month report, which compares with the previous month; a plain total cannot answer it.
+ if (intent.intent === 'run' && (functionId === 'BI01' || functionId === 'BI02') && /花超|超支|超了没|超没超|跟上个?月比|和上个?月比|比上个?月|与上个?月比/.test(utterance)) { functionId = 'BI06'; intent = { ...intent, functionId, params: { period: (parseBillingQuery(utterance, s).params.period as string) || businessDay(s).slice(0, 7) } }; }
  if (!functionId || !FIELDS[functionId]) return { dropped: ['unknown_function'], say };
- const params = clean(s, functionId, keepSpokenNames(intent.params, utterance), heard, dropped);
+ const params = clean(s, functionId, keepSpokenNames(intent.params, utterance), heard, dropped, utterance);
+ // A card described by its state (受限的卡、正常那张) is picked by the record, not by the model; several matches are asked about.
+ if (/^CA/.test(functionId) && !/\d{4}/.test(utterance)) {
+  const state = utterance.match(/受限|被限制|限制的|正常的|正常那|冻结的|冻结着|挂失的/)?.[0];
+  if (state) {
+   const want = /受限|限制/.test(state) ? 'restricted' : /正常/.test(state) ? 'active' : /冻结/.test(state) ? 'frozen' : 'lost';
+   const cards = ((s.workflows?.records.cards || []) as { id: string; name: string; tail: string; status: string; restriction?: string }[]).filter(c => c.status === want);
+   if (cards.length === 1) params.cardId = cards[0].id;
+   else {
+    delete params.cardId;
+    const why: Record<string, string> = { risk: '保护性风控', judicial: '司法限制' };
+    return { dropped: [...dropped, 'cardId:several'], say: cards.length ? `${state.replace(/的|那$/, '')}的卡有 ${cards.length} 张：${cards.map(c => `${c.name}（尾号${c.tail}${c.restriction && why[c.restriction] ? '，' + why[c.restriction] : ''}）`).join('、')}。要办哪一张？` : `没有${state.replace(/的|那$/, '')}的卡。` };
+   }
+  }
+ }
+ // Dates and filters of a bill query come from the user's words: the parser resolves 上上周五 and 这周三 on the bank calendar,
+ // splits several periods into separate queries, and conditions the user never said (a category, an account) are dropped.
+ if (functionId === 'BI01' || functionId === 'BI02') {
+  const parsed = parseBillingQuery(utterance, s), followUp = /^(?:那|那么)?.{0,10}呢[？?]?$/.test(utterance);
+  for (const key of ['category', 'merchant', 'accountId'] as const) {
+   if (params[key] == null || params[key] === '' || parsed.params[key] === params[key] || followUp && heard.includes(String(params[key]))) continue;
+   if (key === 'merchant' && utterance.includes(String(params[key]))) continue;
+   if (key === 'accountId' && /日常|储蓄|尾号|账户/.test(utterance)) continue;
+   delete params[key]; dropped.push(key + ':unsaid');
+  }
+  if (parsed.periods.length > 1) {
+   // Each query owns the stretch of the sentence from its time phrase to the next, so the pieces tile the sentence.
+   const marks = [...utterance.matchAll(TIME_PHRASE)].map(m => m.index!);
+   if (marks.length !== parsed.periods.length) return { dropped: [...dropped, 'period:several'], say: '这句话里有几个时间，请分开说要查哪几天或哪几个月。' };
+   const cut = [0, ...marks.slice(1), utterance.length];
+   return { action: { type: 'plan', command: { operation: 'create', tasks: parsed.periods.map((period, i) => ({ quote: utterance.slice(cut[i], cut[i + 1]), functionId: functionId!, params: { ...params, period } })), source: 'card', utterance } }, dropped, say };
+  }
+  if (typeof parsed.params.period === 'string') params.period = parsed.params.period;
+ }
+ // “每人80，5个人，总共350” does not add up; ask which number is right instead of drafting either.
+ if (functionId === 'TR05') {
+  const each = utterance.match(/(?:每人|人均|每个人|每位)\s*(\d+(?:\.\d+)?)/)?.[1], people = headcount(utterance), sum = utterance.match(/(?:总共|一共|合计|总额)\s*(\d+(?:\.\d+)?)\s*(?:元|块)?(?!\s*个?人)/)?.[1];
+  if (each && people && sum && Math.round(Number(each) * people * 100) !== Math.round(Number(sum) * 100))
+   return { dropped: [...dropped, 'total:conflict'], say: `每人${each}元、${people}个人，合计应是${Number(each) * people}元，但你说总共${sum}元。以哪个为准？` };
+ }
  // Schema default: a new task on a function that can be created starts as create.
  if (intent.intent === 'run' && params.action == null && ACTIONS[functionId]?.includes('create')) params.action = 'create';
  // Asking again for a card that is still open returns to it; only different values make it a new business.
@@ -211,7 +269,17 @@ function keepSpokenNames(input: Record<string, unknown> | undefined, utterance: 
  const fits = said.length === list.length && new Set(said).size === said.length && said.every((name, i) => typeof list[i] === 'string' && name.endsWith(list[i] as string));
  return fits ? { ...input, participants: said } : input;
 }
-function clean(s: BankState, functionId: string, input: Record<string, unknown> | undefined, heard: string, dropped: string[]) {
+/** The time phrases parseBillingQuery resolves, used only to cut a sentence between them. */
+const TIME_PHRASE = /(?:上上|上|这|本)?\s*(?:周|星期|礼拜)[一二三四五六日天]|大前天|前天|昨天|今天|(?:上上|上|这|本)(?:个)?(?:周|星期|礼拜)|(?:最近|近)\s*(?:\d{1,2}|[一二两三四五六七八九十]+)?\s*(?:天|周|星期)|这个月|本月|上个月|上月|20\d{2}年\d{1,2}月/g;
+/** A question about what happened, not a request to do it. */
+const ASKS = /了吗|了没|了么|有没有|是不是|没有[？?]?$|[吗么][？?]?$|[？?]$/;
+/** The task names something the user said: a subscription, card tail, payee or the business itself. */
+function mentions(s: BankState, t: { functionId: string; title: string; params: Record<string, unknown> }, said: string) {
+ const r = s.workflows?.records || {}, p = t.params;
+ const names = [r.subscriptions?.find(x => x.id === p.subscriptionId)?.name, r.cards?.find(x => x.id === p.cardId)?.tail, contactsOf(s).find(c => c.id === p.recipientId)?.name, r.goals?.find(x => x.id === p.goalId)?.name, r.products?.find(x => x.id === p.productId)?.name];
+ return names.some(n => typeof n === 'string' && n && said.includes(n)) || said.includes(t.title);
+}
+function clean(s: BankState, functionId: string, input: Record<string, unknown> | undefined, heard: string, dropped: string[], said?: string) {
  const params: Record<string, unknown> = {};
  for (const [key, value] of Object.entries(input || {})) {
   if (value == null || value === '') continue;
@@ -221,17 +289,28 @@ function clean(s: BankState, functionId: string, input: Record<string, unknown> 
   if (key === 'recipientId' && !distinguished(s, String(value), heard)) { dropped.push('recipientId:same_name'); continue; }
   if (key === 'accountId' && !s.accounts.some(a => a.id === value)) { dropped.push(key); continue; }
   // With several cards, “my card is lost” names none of them; a card the user never named is a guess, so ask.
-  if (key === 'cardId' && !cardNamed(s, String(value), heard)) { dropped.push('cardId:unnamed'); continue; }
+  // A card is named in this sentence; earlier turns count only when the user points back (这张、那张).
+  if (key === 'cardId' && !cardNamed(s, String(value), said && !/这张|那张|这卡|那卡|它/.test(said) ? said : heard)) { dropped.push('cardId:unnamed'); continue; }
   if (key === 'deadline' && !/^\d{4}-\d{2}-\d{2}$/.test(String(value))) { dropped.push(key); continue; }
   // Free-text fields take text only; a model's `false` or `{}` must not end up typed into a card field.
   if (TEXT_FIELDS.has(key) && typeof value !== 'string') { dropped.push(key + ':type'); continue; }
   if (['amount', 'total'].includes(key) && !(typeof value === 'number' && value > 0)) { dropped.push(key); continue; }
+  // Jiao and fen are where the model misreads (五十块零五毛 is 50.50, not 50.05); there the user's own words decide.
+  if (['amount', 'total'].includes(key) && said && /[毛角]|[一二两三四五六七八九\d]\s*分/.test(said)) { const spoken = amountFromText(said); if (spoken.amount != null && !spoken.uncertain && spoken.amount !== Math.round(Number(value) * 100)) { params[key] = spoken.amount / 100; dropped.push(key + ':spoken'); continue; } }
   if (key === 'action' && ACTIONS[functionId] && !ACTIONS[functionId].includes(String(value))) { dropped.push(key); continue; }
   // Every participant must be the user, a known contact or a name the user said; a made-up placeholder voids the list.
   // A stated headcount that the list does not match is a doubt to ask about, never a split to draft.
   // With headcount also proposed, a shorter list is the names said so far, and the card asks for the rest.
   if (key === 'participants' && Array.isArray(value) && headcount(heard) != null && headcount(heard) !== value.length && !(input?.headcount === headcount(heard) && value.length < headcount(heard)!)) { dropped.push('participants:count'); continue; }
   if (key === 'participants' && !(Array.isArray(value) && value.every(name => typeof name === 'string' && (name === '我' || heard.includes(name) || contactsOf(s).some(c => c.name === name))))) { dropped.push('participants:unheard'); continue; }
+  // A carve-out has to name who shares it, each once, and be part of the bill (not “饭钱360由我、我分摊”).
+  if (key === 'adjustments' && Array.isArray(value)) {
+   const total = Number(input?.total) || Infinity, kept = value.filter(item => { const who = (item as { participants?: unknown })?.participants, amount = Number((item as { amount?: unknown })?.amount);
+    return Array.isArray(who) && who.length > 0 && new Set(who).size === who.length && !(who.length === 1 && who[0] === '我') && amount > 0 && amount < total; });
+   if (kept.length !== value.length) dropped.push('adjustments:unclear');
+   if (kept.length) params[key] = kept;
+   continue;
+  }
   params[key] = value;
  }
  // Standing debits only when the user asked for them; a plain “存够3000” goal stays manual.
