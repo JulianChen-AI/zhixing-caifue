@@ -19,13 +19,16 @@ test('task-completion cases name real functions and scenes and cover every scena
  for (const key of Object.keys(SCENARIOS)) assert.ok(file.cases.filter(c => c.scenario === key).length >= 7, `${key} has at least seven cases`);
 });
 
-test('holdout cases are new ids that name real functions', () => {
- const ids = holdout.cases.map(c => c.id), used = new Set(file.cases.map(c => c.id));
- assert.equal(new Set(ids).size, ids.length);
- assert.deepEqual(ids.filter(id => used.has(id)), []);
- const known = new Set(USER_FUNCTIONS.map(f => f.id));
- const named = holdout.cases.flatMap(c => [c.expect, ...(c.expect.anyOf || [])].flatMap(b => [b.functionId, ...(b.plan || [])].flat().filter((v): v is string => typeof v === 'string')));
- assert.deepEqual(named.filter(id => !known.has(id)), []);
+test('holdout and tricky cases are new ids that name real functions', () => {
+ const used = new Set(file.cases.map(c => c.id)), known = new Set(USER_FUNCTIONS.map(f => f.id));
+ for (const set of [holdout, load('tricky-dev'), load('tricky-holdout')]) {
+  const ids = set.cases.map(c => c.id);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.deepEqual(ids.filter(id => used.has(id)), [], set.version);
+  ids.forEach(id => used.add(id));
+  const named = set.cases.flatMap(c => [c.expect, ...(c.expect.anyOf || [])].flatMap(b => [b.functionId, ...(b.plan || [])].flat().filter((v): v is string => typeof v === 'string')));
+  assert.deepEqual(named.filter(id => !known.has(id)), []);
+ }
 });
 
 test('grading never lets a committed effect pass and flags a wrong draft at the gate', () => {

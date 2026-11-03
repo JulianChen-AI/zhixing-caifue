@@ -26,7 +26,7 @@ function evidence(t:FlowTask,params:Record<string,unknown>,cmd:WorkflowCommand){
  if(['TR03','TR04'].includes(t.functionId))t.riskSignals=[...new Set([...(t.riskSignals||[]),...([...(cmd.history||[]),cmd.utterance||'',String(params.note||'')].join(' ').match(FRAUD_WORDS)||[])])];
 }
 // Scam scripts a transfer must never follow: paying to “unfreeze” or “verify” funds, or impersonated police.
-export const FRAUD_WORDS=/刷单|解冻费|安全账户|保证金|跑分|兼职返利|洗钱|涉嫌|配合调查|公检法/g;
+export const FRAUD_WORDS=/刷单|解冻费|安全账户|保证金|跑分|兼职返利|洗钱|涉嫌|配合调查|公检法|网恋|网上认识|才能见面/g;
 function invalidate(t:FlowTask){t.reviewToken=null;t.verificationId=null;t.confirmedToken=null;t.result=null;}
 function finish(t:FlowTask,result:unknown,message='查询完成，结果来自当前合成演示数据。'){
  if((isBillingQuery(t.functionId)||t.functionId==='IN15')&&result&&typeof result==='object'&&'spokenSummary' in result&&typeof result.spokenSummary==='string')message=result.spokenSummary;

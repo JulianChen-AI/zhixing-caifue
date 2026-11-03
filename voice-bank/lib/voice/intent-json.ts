@@ -40,10 +40,10 @@ const SYSTEM = `你是知行银行的意图理解模块。读用户本轮原话�
 - 卡、产品、持仓、目标、订阅、交易等字段填records里对应的id（cardId、productId、holdingId、goalId、subscriptionId、transactionId），不要编造id；用户用名称或尾号指代时换成id。
 - recipientId/accountId必须是contacts/accounts里的id；同名多人且无法区分时不填recipientId。
 - AA（TR05）：total为总额；participants为全部分摊人（含“我”），同名的人带上用户说的称呼以示区分（如“室友张三”“房东张三”），只说了人数或名字不全时不填，不用“其他1”之类占位名；某项只由部分人分摊时必须写adjustments。例：“昨晚300元饭钱，五个人AA，其中50元酒只有张三、李四喝了”→{"intent":"run","functionId":"TR05","params":{"action":"create","total":300,"adjustments":[{"label":"酒","amount":50,"participants":["张三","李四"]}]}}
-- 卡片：卡丢了/可能丢了/不认识的消费/保护这张卡/先冻结 → CA06 action=freeze（先止损，可解冻）；只有用户明确说“挂失”才用CA07。卡为什么不能刷/被限制/能不能解开 → CA05。
+- 卡片：卡丢了/可能丢了/不认识的消费/保护这张卡/先冻结 → CA06 action=freeze（先止损，可解冻）；只有用户明确说“挂失”才用CA07。卡为什么不能刷/被限制 → CA05 action=query；要求解开限制 → CA05 action=unlock。用户没说是哪张卡（尾号或卡名）时不填cardId，由卡片追问，不要猜。
 - 用户换成另一种业务时用run新建，不要amend当前任务。
 - 只说了一半也先run建任务并填上已说出的字段（如“给室友张三转”先填recipientId），缺的由卡片追问；之后补充用amend。
-- 对已有任务的补充或改口用amend并给taskId；不要为同一件事重复run。
+- 对已有任务的补充或改口用amend并给taskId；不要为同一件事重复run。没有currentTask时不能amend。同一句话里的改口（“两百五，不对，三百”）是一项新业务：用run，填齐这句里说过的全部字段，金额取改口后的值。
 - say用中文，不超过40字。`;
 
 export type IntentResult = { intent: Intent | null; before?: BankAction; action?: BankAction; fallback?: BankAction; dropped: string[]; say: string };
@@ -113,6 +113,11 @@ function distinguished(s: BankState, id: string, heard: string) {
  if (contacts.filter(c => c.name === chosen.name).length < 2) return true;
  const marks = [chosen.label, chosen.tail, ...((chosen as { aliases?: { labels?: string[] } }).aliases?.labels || [])].filter(Boolean) as string[];
  return marks.some(mark => heard.includes(mark));
+}
+function cardNamed(s: BankState, id: string, heard: string) {
+ const cards = (s.workflows?.records.cards || []) as { id: string; name: string; tail: string }[], card = cards.find(c => c.id === id);
+ if (!card || cards.length < 2 || heard.includes(id)) return true;
+ return heard.includes(card.tail) || heard.includes(card.name.replace(/(?:演示)?(?:借记)?卡$/, ''));
 }
 function validate(s: BankState, intent: Intent | null, utterance: string, heard = utterance): { before?: BankAction; action?: BankAction; dropped: string[]; say: string } {
  const dropped: string[] = [], say = intent?.say || '请再说一下想办理什么。';
@@ -193,6 +198,8 @@ function clean(s: BankState, functionId: string, input: Record<string, unknown> 
   // Same-name payees: the user must have said what tells them apart (label, alias or tail), else ask.
   if (key === 'recipientId' && !distinguished(s, String(value), heard)) { dropped.push('recipientId:same_name'); continue; }
   if (key === 'accountId' && !s.accounts.some(a => a.id === value)) { dropped.push(key); continue; }
+  // With several cards, “my card is lost” names none of them; a card the user never named is a guess, so ask.
+  if (key === 'cardId' && !cardNamed(s, String(value), heard)) { dropped.push('cardId:unnamed'); continue; }
   if (key === 'deadline' && !/^\d{4}-\d{2}-\d{2}$/.test(String(value))) { dropped.push(key); continue; }
   if (['amount', 'total'].includes(key) && !(typeof value === 'number' && value > 0)) { dropped.push(key); continue; }
   if (key === 'action' && ACTIONS[functionId] && !ACTIONS[functionId].includes(String(value))) { dropped.push(key); continue; }

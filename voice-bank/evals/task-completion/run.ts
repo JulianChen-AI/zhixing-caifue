@@ -31,7 +31,8 @@ if (!['rules', 'delegate', 'voice', 'json'].includes(driver)) throw new Error('-
 const here = new URL('.', import.meta.url);
 // --cases=holdout runs holdout.json, phrasings never used while tuning, to check cases.json for overfitting.
 const caseSet = args.cases || 'cases';
-if (!['cases', 'holdout'].includes(caseSet)) throw new Error('--cases 只能是 cases 或 holdout');
+// tricky-dev / tricky-holdout: hard phrasings added 2026-11-02; fixes are tuned on dev only, holdout is run once.
+if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev 或 tricky-holdout');
 const file = caseFile.parse(JSON.parse(readFileSync(new URL(`${caseSet}.json`, here), 'utf8')));
 const only = args.only?.split(',');
 const cases = file.cases.filter(c => (!only || only.includes(c.id)) && (!args.scenario || c.scenario === args.scenario));
