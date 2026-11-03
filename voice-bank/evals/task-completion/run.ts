@@ -8,6 +8,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { initialState, reduceBank } from '../../lib/bank/engine.ts';
 import type { BankAction, BankState } from '../../lib/bank/types.ts';
 import { contactsOf } from '../../lib/bank/recipients.ts';
+import { businessDay } from '../../lib/demo/clock.ts';
 import { qwenConfig, type QwenEnv } from '../../lib/bank/qwen.ts';
 import { toolAction, type ToolCall } from '../../lib/bank/tool-action.ts';
 import { operationToolResult } from '../../lib/bank/tool-result.ts';
@@ -32,7 +33,10 @@ const here = new URL('.', import.meta.url);
 // --cases=holdout runs holdout.json, phrasings never used while tuning, to check cases.json for overfitting.
 const caseSet = args.cases || 'cases';
 // tricky-dev / tricky-holdout: hard phrasings added 2026-11-02; fixes are tuned on dev only, holdout is run once.
-if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev 或 tricky-holdout');
+// prompts28: the 28 demo prompts handed to judges.
+if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout', 'prompts28'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev、tricky-holdout 或 prompts28');
+// --clock=now runs default-scene cases on data anchored at today, as a live session sees it.
+const clockNow = args.clock === 'now';
 const file = caseFile.parse(JSON.parse(readFileSync(new URL(`${caseSet}.json`, here), 'utf8')));
 const only = args.only?.split(',');
 const cases = file.cases.filter(c => (!only || only.includes(c.id)) && (!args.scenario || c.scenario === args.scenario));
@@ -60,6 +64,7 @@ if (driver !== 'rules') {
 }
 
 function start(c: EvalCase): BankState {
+ if ((!c.scene || c.scene === 'default') && clockNow) { const now = new Date().toISOString(); return { ...initialState(businessDay({ demoClock: now } as BankState)), demoClock: now }; }
  const fresh = initialState();
  if (!c.scene || c.scene === 'default') return { ...fresh, demoClock: DEFAULT_CLOCK };
  return reduceBank(fresh, { type: 'load_scene', sceneId: c.scene }, crypto.randomUUID());
@@ -195,7 +200,7 @@ const meta = { driver, model: driver !== 'rules' ? provider!.planner : null, rea
  speechModels: speech ? { tts: speech.tts, asr: speech.asr } : null, realtimeVoice: false, humanSpeech: false,
  caseVersion: file.version, cases: cases.length, repeat, clock: DEFAULT_CLOCK, ranAt: new Date().toISOString() };
 
-const tag = `${driver}${caseSet !== 'cases' ? '-' + caseSet : ''}${input !== 'text' ? `-${input}-${voice}` : ''}${repeat > 1 ? '-x' + repeat : ''}`;
+const tag = `${driver}${caseSet !== 'cases' ? '-' + caseSet : ''}${input !== 'text' ? `-${input}-${voice}` : ''}${repeat > 1 ? '-x' + repeat : ''}${clockNow ? '-now' : ''}`;
 const out = new URL(`../../outputs/eval-task-completion-${tag}-${meta.ranAt.replace(/[:.]/g, '-')}/`, here);
 mkdirSync(out, { recursive: true });
 writeFileSync(new URL('report.json', out), JSON.stringify({ meta, total, scenarios: rows, results }, null, 1));

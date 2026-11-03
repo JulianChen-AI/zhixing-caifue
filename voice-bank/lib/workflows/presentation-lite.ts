@@ -130,7 +130,7 @@ export function transferView(receipt: unknown): object {
  return {
   ...recordOf(receipt),
   executionState: 'transferred',
-  executionNotice: '已在当前会话沙箱扣款并生成回执；仅代表本地演示数据，不代表真实银行系统入账。',
+  executionNotice: (receipt as { historical?: boolean })?.historical ? '演示开始前的合成历史转账，仅用于查询展示。' : '已在当前会话沙箱扣款并生成回执；仅代表本地演示数据，不代表真实银行系统入账。',
  };
 }
 

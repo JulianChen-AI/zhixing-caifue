@@ -4,7 +4,7 @@ import type { FlowStore, WorkflowCommand } from '../workflows/types.ts';
 import type { TaskPlan, PlanCommand } from '../plans/types.ts';
 export type Contact = { id: string; name: string; label: string; bank: string; tail: string; color: string; previouslyUsed: boolean; accountRef?: string; source?: string; saved?: boolean; aliases?: { names?: string[]; labels?: string[] } };
 /** held: accepted but unsettled purchases. The book balance keeps them until settlement. */
-export type Account = { id: string; name: string; tail: string; balance: number; held?: number };
+export type Account = { id: string; name: string; tail: string; balance: number; held?: number; opening?: { date: string; amount: number } };
 export type Step = "recipient" | "details" | "review" | "authenticate" | "complete" | "cancelled";
 export type TransferTask = {
   policyVersion: string; id: string; step: Step; recipientId: string | null; amount: number | null; accountId: string | null;
@@ -14,7 +14,7 @@ export type TransferTask = {
 export type Receipt = { id: string; taskId: string; recipientId: string; accountId: string; amount: number; note: string; createdAt: string; archive?: string };
 export type AuditEntry = { id: string; at: string; action: string; workflowId: string; policyVersion: string; outcome: string; reason: string | null; fromStep: Step | null; toStep: Step | null; checks: ChecklistRun['checks']; evidence: Evidence[] };
 export type DelegationRequest={id:string;utterance:string;turnId:string;sceneEpoch?:string;kind:'business'|'control';status:'pending'|'waiting'|'paused'|'done'|'unknown';taskIds:string[];functions:string[];stopReason?:string;resumes?:string};
-export type BankState = { policyVersion: string; routing: RoutingDecision | null; checklist: ChecklistRun | null; audit: AuditEntry[]; revision: number; demoClock?: string; sceneId?: string; sceneVersion?: string; sceneEpoch?: string; lastDemoControl?: { requestId: string; type: "load_scene" | "advance_clock" | "reset"; actionFingerprint: string; sourceEpoch: string | null; resultEpoch: string; resultRevision: number }; contacts?: Contact[]; accounts: Account[]; task: TransferTask | null; receipts: Receipt[]; lastReply: string; view: "home" | "balance" | "transfer" | "workflow"; recentRequestIds: string[]; workflows?: FlowStore; plan?:TaskPlan|null; monthlyHistory?:Record<string,TaskPlan>;delegationRequests?:DelegationRequest[] };
+export type BankState = { policyVersion: string; routing: RoutingDecision | null; checklist: ChecklistRun | null; audit: AuditEntry[]; revision: number; demoClock?: string; dataAnchor?: string; dataVersion?: string; sceneId?: string; sceneVersion?: string; sceneEpoch?: string; lastDemoControl?: { requestId: string; type: "load_scene" | "advance_clock" | "reset"; actionFingerprint: string; sourceEpoch: string | null; resultEpoch: string; resultRevision: number }; contacts?: Contact[]; accounts: Account[]; task: TransferTask | null; receipts: Receipt[]; lastReply: string; view: "home" | "balance" | "transfer" | "workflow"; recentRequestIds: string[]; workflows?: FlowStore; plan?:TaskPlan|null; monthlyHistory?:Record<string,TaskPlan>;delegationRequests?:DelegationRequest[] };
 export type Intent = { kind: "transfer" | "amend" | "cancel" | "balance" | "help" | "confirm_amount" | "confirm_transfer"; amountInferred?: boolean; amount?: number | null; recipientId?: string | null; accountId?: string | null; note?: string | null };
 export type BankAction =
   | { type: 'delegation_request'; request:DelegationRequest }

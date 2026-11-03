@@ -154,7 +154,8 @@ export function preflight(s:BankState,t:FlowTask){
  }
  if(id==='TR05'&&a==='remind'&&!reminderDrafts(getRow(s,'aa',p.sessionId)).length)throw new WorkflowError('名单里的人都已付款，没有需要提醒的对象。');
  if(id==='BI09'&&(!Number.isInteger(p.periodCount)||Number(p.periodCount)<1||Number(p.periodCount)>600))throw new WorkflowError('期数应为 1 至 600 的整数。');
- if(id==='BI09'&&p.interestAssumption!=null)throw new WorkflowError('本版只实现本金试算，利率试算工具尚未接入。');
+ // A zero or false rate is the principal-only estimate that is implemented.
+ if(id==='BI09'&&p.interestAssumption!=null&&p.interestAssumption!==false&&Number(p.interestAssumption)!==0)throw new WorkflowError('本版只实现本金试算，利率试算工具尚未接入。');
  if(id==='SU03'&&a==='create'&&(!Number.isInteger(p.leadDays)||Number(p.leadDays)<0||Number(p.leadDays)>30))throw new WorkflowError('提前天数须为 0 至 30 的整数。');
  if(['SU03','IN14'].includes(id)&&p.notifyChannel&&p.notifyChannel!=='in_app')throw new WorkflowError('本沙箱只支持站内提醒。');
 }
@@ -176,7 +177,13 @@ export function queryBusiness(s:BankState,t:FlowTask):unknown{
   case 'IN05':return step(t,'I06','查询当前会话已保存的测评画像',()=>{const profile=readTool(s,'I06');return {assessmentState:!profile?'not_found':Date.parse((profile as {validUntil:string}).validUntil)>businessNow(s)?'valid':'expired',profile:profile?{level:(profile as {level:number}).level,validUntil:(profile as {validUntil:string}).validUntil}:null,notice:'查询已成功；以上仅反映当前沙箱会话保存的记录，不代表其他机构或历史账户情况。'};});
   case 'TR01':return step(t,'T01','读取会话账户列表',()=>readTool(s,'T01',p));
   case 'TR02':return step(t,'T02','读取当前真实沙箱余额',()=>readTool(s,'T02',p));
-  case 'TR06':return step(t,'T08','查询已保存模拟转账',()=>s.receipts.filter(r=>(!p.transferId||r.id===p.transferId||r.taskId===p.transferId)&&(!p.recipientId||r.recipientId===p.recipientId)&&(!p.period||r.createdAt.startsWith(String(p.period)))).map(transferView));
+  case 'TR06':return step(t,'T08','查询已保存模拟转账',()=>{
+   const all=[...s.receipts,...rows(s,'transferHistory')] as Row[],payee=(id:unknown)=>contactsOf(s).find(c=>c.id===id);
+   // Periods are business days in Beijing time, so compare the local date rather than the UTC timestamp.
+   return all.filter(r=>(!p.transferId||r.id===p.transferId||r.taskId===p.transferId)&&(!p.recipientId||r.recipientId===p.recipientId)&&(!p.period||businessDay({demoClock:String(r.createdAt)} as BankState).startsWith(String(p.period))))
+    .sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)))
+    .map(r=>({...transferView(r),recipient:payee(r.recipientId)?`${payee(r.recipientId)!.label}${payee(r.recipientId)!.name}`:undefined}));
+  });
   case 'TR04':return step(t,'T10','查询周期资金规则',()=>rows(s,'rules').filter(r=>r.kind==='transfer').map(ruleView));
   case 'TR05':return step(t,'T12','读取 AA 及人工核销来源',()=>rows(s,'aa').filter(r=>!p.sessionId||r.id===p.sessionId));
   case 'TR08':return step(t,'T14','读取沙箱联系人',()=>[...contactsOf(s),...rows(s,'contacts')]);

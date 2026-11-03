@@ -4,6 +4,7 @@ import { POLICY_VERSION, DEMO_POLICY } from '../checklists/catalog.ts';
 import { evaluateChecklist, type ChecklistRun } from '../checklists/evaluate.ts';
 import { appendTransaction } from '../workflows/business-lite.ts';
 import { initialFlowStore } from '../workflows/seed.ts';
+import { demoDataset, DEFAULT_ANCHOR } from '../demo/dataset.ts';
 import { reduceWorkflow } from '../workflows/engine.ts';
 import {flattenPlan} from '../plans/materialize.ts';
 import { assertPlanAccess, reconcilePlan, reducePlan, refreshPlanCalculation } from '../plans/engine.ts';
@@ -15,12 +16,14 @@ import { delayedNotice, scheduleDelayedTransfer } from '../demo/schedule.ts';
 import { prerequisiteAction } from '../workflows/prerequisites.ts';
 
 export class BankError extends Error { constructor(message: string, public status = 400) { super(message); } }
-export function initialState(): BankState {
-  return { policyVersion: POLICY_VERSION, routing: null, checklist: null, audit: [], revision: 0, accounts: [
-    { id: 'daily', name: '日常账户', tail: '8021', balance: 1286500 },
-    { id: 'savings', name: '储蓄账户', tail: '3609', balance: 3000000 },
-  ], task: null, receipts: [], lastReply: '你好，今天想办点什么？', view: 'home', recentRequestIds: [], workflows: initialFlowStore() };
+/** Tests and evaluations use the fixed default anchor; live sessions pass the current business day. */
+export function initialState(anchor = DEFAULT_ANCHOR): BankState {
+  const data = demoDataset(anchor);
+  return { policyVersion: POLICY_VERSION, routing: null, checklist: null, audit: [], revision: 0, dataAnchor: data.anchor, dataVersion: data.version, accounts: data.accounts,
+    task: null, receipts: [], lastReply: '你好，今天想办点什么？', view: 'home', recentRequestIds: [], workflows: initialFlowStore(anchor) };
 }
+/** A fresh default dataset for the live session: anchored on today unless a scene clock is running. */
+export const liveInitialState = (s?: BankState) => initialState(s?.demoClock ? s.dataAnchor ?? DEFAULT_ANCHOR : businessDay());
 /** Old active drafts have no proof of account selection, so require fresh selection/confirmation. */
 export function normalizeState(previous: BankState): BankState {
   const s = structuredClone(previous);
@@ -131,7 +134,7 @@ export function reduceBank(previous: BankState, action: BankAction, requestId: s
   try { return reduceOnce(next, guide, requestId + ':guide'); } catch { return next; }
 }
 function reduceOnce(previous: BankState, action: BankAction, requestId: string): BankState {
-  if(isDemoControl(previous,action))return reduceDemoControl(previous,action,requestId,initialState());
+  if(isDemoControl(previous,action))return reduceDemoControl(previous,action,requestId,liveInitialState());
   if(previous.recentRequestIds.includes(requestId))return previous;
   if(action.type==='delegation_request'){
    const s=structuredClone(previous),entry=action.request;
@@ -163,7 +166,7 @@ function reduceSingleBank(previous: BankState, action: BankAction, requestId: st
   if (action.type === 'workflow') return reduceWorkflow(normalizeState(previous), action.command, requestId, reduceSingleBank);
   const s = normalizeState(previous), fromStep = s.task?.step || null; s.revision++;
   switch (action.type) {
-    case 'reset': { const fresh = initialState(); fresh.revision = s.revision; fresh.lastReply = '演示已重置，我们重新开始。'; fresh.recentRequestIds = [requestId]; return fresh; }
+    case 'reset': { const fresh = liveInitialState(); fresh.revision = s.revision; fresh.lastReply = '演示已重置，我们重新开始。'; fresh.recentRequestIds = [requestId]; return fresh; }
     case 'home': s.view = 'home'; break;
     case 'route': {
       s.routing = structuredClone(action.decision);

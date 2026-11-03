@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { initialState, BankError, reduceBank, normalizeState } from "./engine";
+import { liveInitialState, BankError, reduceBank, normalizeState } from "./engine";
 import { type BankAction, type BankState, type Contact, type Intent } from "./types";
 import { contactsOf } from "./recipients";
 import { assertSceneEpoch, demoControlReplay, isDemoControl } from '../demo/control';
@@ -36,9 +36,11 @@ export async function loadSession(req: Request) {
   const candidate = req.headers.get("cookie")?.match(/(?:^|;\s*)zx_demo=([\w-]{36})/)?.[1];
   if (candidate) {
     const row = await db.prepare("SELECT state, revision FROM demo_sessions WHERE id = ? AND owner = ?").bind(candidate, user).first<{ state: string; revision: number }>();
-    if (row) return { id: candidate, user, state: normalizeState(JSON.parse(row.state) as BankState), fresh: false };
+    const saved = row && JSON.parse(row.state) as BankState;
+    // Sessions created before the generated dataset hold the old October-only ledger; start them over.
+    if (saved && (saved.dataVersion || saved.sceneId)) return { id: candidate, user, state: normalizeState(saved), fresh: false };
   }
-  const id = crypto.randomUUID(), state = initialState();
+  const id = crypto.randomUUID(), state = liveInitialState();
   await db.prepare("INSERT INTO demo_sessions (id, owner, revision, state, updated_at) VALUES (?, ?, ?, ?, ?)").bind(id, user, 0, JSON.stringify(state), Date.now()).run();
   return { id, user, state, fresh: true };
 }
@@ -50,7 +52,7 @@ export async function reloadSession(session:DemoSession):Promise<DemoSession> {
 }
 export function sessionHeaders(s: DemoSession, req: Request) {
   const secure = new URL(req.url).protocol === "https:" || Boolean(serveIdentity(req, runtimeEnv().TAILSCALE_SERVE_ORIGIN));
-  return { "Cache-Control": "no-store", ...(s.fresh ? { "Set-Cookie": `zx_demo=${s.id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${secure ? "; Secure" : ""}` } : {}) };
+  return { "Cache-Control": "no-store", ...(s.fresh ? { "Set-Cookie": `zx_demo=${s.id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000${secure ? "; Secure" : ""}` } : {}) };
 }
 export async function commit(session: DemoSession, action: BankAction, expectedRevision: number, requestId: string, expectedEpoch = session.state.sceneEpoch) {
   if (isDemoControl(session.state,action) && demoControlReplay(session.state,action,requestId,expectedEpoch)) return session.state;

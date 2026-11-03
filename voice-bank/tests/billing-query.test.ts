@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {initialState,reduceBank} from '../lib/bank/engine.ts';
+import {initialState as fullState,reduceBank} from '../lib/bank/engine.ts';
+import { scriptedLedger } from '../lib/demo/dataset.ts';
+// These checks spell out totals by hand, so they run on the original six-row ledger.
+const initialState=()=>scriptedLedger(fullState());
 import {dispatchAction} from '../lib/plans/dispatch.ts';
 import {currentWorkflow} from '../lib/workflows/engine.ts';
 import {offlineWorkflow} from '../lib/workflows/offline.ts';

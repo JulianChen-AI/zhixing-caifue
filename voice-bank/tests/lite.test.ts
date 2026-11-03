@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialState, reduceBank } from '../lib/bank/engine.ts';
+import { scriptedLedger } from '../lib/demo/dataset.ts';
 import { currentWorkflow } from '../lib/workflows/engine.ts';
 import { runQuickReview } from '../lib/workflows/quick-review.ts';
 import { assertCancellation, assertAaLimit, appendTransaction, monthlyReport } from '../lib/workflows/business-lite.ts';
@@ -55,7 +56,7 @@ test('report preserves negative refund categories and uses matching summary for 
 test('new money fields stay cents internally and yuan in model output',()=>{
  const s=run(initialState(),'IN09',{holdingId:'holding-cash',accountId:'daily',amount:40});
  const result=workflowToolResult(s)!.preview as any;assert.equal(result.netAmount,40);assert.equal(result.fee,0);
- const report=workflowToolResult(run(initialState(),'BI06',{period:'2026-10'}))!.result as any;
+ const report=workflowToolResult(run(scriptedLedger(initialState()),'BI06',{period:'2026-10'}))!.result as any;
  assert.equal(report.comparison.baselineNetExpenses,25);assert.equal(report.comparison.changeAmount,78);
 });
 

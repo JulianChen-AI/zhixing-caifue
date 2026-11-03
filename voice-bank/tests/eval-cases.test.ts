@@ -21,7 +21,7 @@ test('task-completion cases name real functions and scenes and cover every scena
 
 test('holdout and tricky cases are new ids that name real functions', () => {
  const used = new Set(file.cases.map(c => c.id)), known = new Set(USER_FUNCTIONS.map(f => f.id));
- for (const set of [holdout, load('tricky-dev'), load('tricky-holdout')]) {
+ for (const set of [holdout, load('tricky-dev'), load('tricky-holdout'), load('prompts28')]) {
   const ids = set.cases.map(c => c.id);
   assert.equal(new Set(ids).size, ids.length);
   assert.deepEqual(ids.filter(id => used.has(id)), [], set.version);

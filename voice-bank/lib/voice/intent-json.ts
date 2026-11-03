@@ -38,6 +38,8 @@ const SYSTEM = `你是知行银行的意图理解模块。读用户本轮原话�
 - functionId从functions里选最贴切的一项；该功能有actions时必须在params.action里填其中一个（新建填create，查看填list）；params只用该功能fields里的字段名，只填用户说过或上下文能唯一确定的值，不猜。
 - 金额一律是以元为单位的数字：1万2=12000，一千二=1200，五百=500，两百五=250。周期写进schedule原话，如“每月5日”。期间写YYYY-MM或YYYY，按today和weekday（星期几）换算“这个月/上个月/今年/下周五”。
 - 卡、产品、持仓、目标、订阅、交易等字段填records里对应的id（cardId、productId、holdingId、goalId、subscriptionId、transactionId），不要编造id；用户用名称或尾号指代时换成id。
+- “这张卡/那笔/这笔/刚才那个”指history里上一轮用户提到的那个对象（如上一轮说了尾号8021，“这张卡”就是8021那张；上一轮问的咖啡，“那笔”就是咖啡那笔），用户顺口说的旧分类或描述与它不符时，以指代为准。
+- 账单：某商户或订阅“一共花了/扣了多少”是BI02（按merchant统计）；某个订阅下次什么时候扣是SU01；BI05只用于找出有哪些周期扣费或闲置订阅。records.transactions里suspectedDuplicate=true是疑似重复扣款，originalId指向原交易；问“扣了两次/重复扣款/退款回来没”用BI04并填对应transactionId。
 - recipientId/accountId必须是contacts/accounts里的id；同名多人且无法区分时不填recipientId。
 - AA（TR05）：total为总额；participants为全部分摊人（含“我”），同名的人带上用户说的称呼以示区分（如“室友张三”“房东张三”），只说了人数或名字不全时不填，不用“其他1”之类占位名；某项只由部分人分摊时必须写adjustments。例：“昨晚300元饭钱，五个人AA，其中50元酒只有张三、李四喝了”→{"intent":"run","functionId":"TR05","params":{"action":"create","total":300,"adjustments":[{"label":"酒","amount":50,"participants":["张三","李四"]}]}}
 - 卡片：卡丢了/可能丢了/不认识的消费/保护这张卡/先冻结 → CA06 action=freeze（先止损，可解冻）；只有用户明确说“挂失”才用CA07。卡为什么不能刷/被限制 → CA05 action=query；要求解开限制 → CA05 action=unlock。用户没说是哪张卡（尾号或卡名）时不填cardId，由卡片追问，不要猜。
@@ -73,7 +75,7 @@ export async function understandIntent(s: BankState, utterance: string, history:
   accounts: s.accounts.map(a => ({ id: a.id, name: a.name, tail: a.tail })),
   contacts: contactsOf(s).map(c => ({ id: c.id, name: c.name, label: c.label, tail: c.tail })),
   currentTask: current && { id: current.id, functionId: current.functionId, status: current.status, params: current.params, missing: current.missing },
-  today: businessDay(s), weekday: '日一二三四五六'[new Date(businessDay(s) + 'T12:00:00Z').getUTCDay()], records: records(s), savedPlans: (bankToolResult(s) as { savedPlans?: unknown }).savedPlans,
+  today: businessDay(s), weekday: '日一二三四五六'[new Date(businessDay(s) + 'T12:00:00Z').getUTCDay()], records: records(s, [utterance, ...history.slice(-2).map(h => h.user)].join(' ')), savedPlans: (bankToolResult(s) as { savedPlans?: unknown }).savedPlans,
   plan: s.plan && { status: s.plan.status, steps: s.plan.steps.map(step => ({ functionId: step.functionId, status: step.status })) },
   history: history.slice(-6), functions,
  };
@@ -96,13 +98,18 @@ export async function understandIntent(s: BankState, utterance: string, history:
 }
 
 const MONEY = ['amount', 'target', 'balance', 'value', 'cost', 'limit'];
-const KEEP = ['id', 'name', 'tail', 'status', 'merchant', 'category', 'date', 'kind', 'accountId', 'productId', 'risk', 'type', 'channel', 'cycle', 'nextChargeAt', 'deadline', 'restriction', ...MONEY];
+const KEEP = ['id', 'name', 'tail', 'status', 'merchant', 'category', 'date', 'kind', 'accountId', 'productId', 'risk', 'type', 'channel', 'cycle', 'nextChargeAt', 'deadline', 'restriction', 'suspectedDuplicate', 'originalId', 'recipientId', 'note', 'createdAt', ...MONEY];
 /** Business objects the model may refer to, by id, with amounts shown in yuan like its own output. */
-function records(s: BankState) {
+function records(s: BankState, heard: string) {
  const out: Record<string, unknown[]> = {};
- for (const [kind, rows] of Object.entries(s.workflows?.records || {})) {
-  if (!Array.isArray(rows) || !rows.length) continue;
-  out[kind] = rows.slice(-30).map(row => Object.fromEntries(Object.entries(row as Record<string, unknown>).filter(([k]) => KEEP.includes(k)).map(([k, v]) => [k, MONEY.includes(k) && typeof v === 'number' ? v / 100 : v])));
+ for (const [kind, all] of Object.entries(s.workflows?.records || {})) {
+  // Past transfers are answered by TR06 itself; listing them only crowds out names the user is saying now.
+  if (!Array.isArray(all) || !all.length || kind === 'transferHistory') continue;
+  // Months of ledger do not fit: send the rows whose merchant or category was mentioned, then the latest ones.
+  // Anomalies (suspected duplicates and refunds) are what users ask about without naming them, so they always go along.
+  const named = kind === 'transactions' ? all.filter(row => row.suspectedDuplicate || row.kind === 'refund' || [row.merchant, row.category].some(v => typeof v === 'string' && v && heard.includes(v))) : [];
+  const rows = named.length ? [...new Set([...named.slice(-12), ...all.slice(-30)])].slice(0, 30).sort((a, b) => String(a.date).localeCompare(String(b.date))) : all.slice(-30);
+  out[kind] = rows.map(row => Object.fromEntries(Object.entries(row as Record<string, unknown>).filter(([k]) => KEEP.includes(k)).map(([k, v]) => [k, MONEY.includes(k) && typeof v === 'number' ? v / 100 : v])));
  }
  return out;
 }

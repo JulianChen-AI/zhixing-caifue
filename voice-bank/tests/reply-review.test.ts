@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {initialState,reduceBank,BankError} from '../lib/bank/engine.ts';
+import { scriptedLedger } from '../lib/demo/dataset.ts';
 import {dispatchAction} from '../lib/plans/dispatch.ts';
 import {operationToolResult} from '../lib/bank/tool-result.ts';
 import {currentWorkflow} from '../lib/workflows/engine.ts';
@@ -17,7 +18,7 @@ import {queryReviewFacts,queryReplyIssue} from '../lib/voice/query-review.ts';
 import {superviseReply} from '../lib/voice/supervision.ts';
 import {WorkflowError} from '../lib/workflows/types.ts';
 const apply=(s:BankState,a:BankAction)=>reduceBank(s,dispatchAction(s,a),crypto.randomUUID());
-const start=()=>apply(initialState(),{type:'plan',command:{operation:'create',source:'voice',utterance:'先做风险测评，然后查询订阅清单。'}});
+const start=()=>apply(scriptedLedger(initialState()),{type:'plan',command:{operation:'create',source:'voice',utterance:'先做风险测评，然后查询订阅清单。'}});
 const tick=()=>new Promise(r=>setTimeout(r,0));
 
 test('catalog and definition receipts survive an active Plan without changing task focus or saved answers',()=>{

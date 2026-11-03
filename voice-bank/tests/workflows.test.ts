@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialState, reduceBank } from '../lib/bank/engine.ts';
+import { scriptedLedger } from '../lib/demo/dataset.ts';
 import type { BankState } from '../lib/bank/types.ts';
 import { USER_FUNCTIONS, LOGICAL_TOOLS } from '../lib/workflows/catalog.ts';
 import { currentWorkflow } from '../lib/workflows/engine.ts';
@@ -202,7 +203,7 @@ test('natural confirmation cannot absorb an edit, question, opposite action or m
  const missing=run(initialState(),'CA06',{action:'freeze'});assert.throws(()=>act(missing,{operation:'confirm',taskId:currentWorkflow(missing)!.id,source:'voice',utterance:'按卡片上的办吧'}));
 });
 test('billing refunds reduce spend, account transfers stay out of consumption, and correction defaults to one transaction',()=>{
- let s=run(initialState(),'BI02',{period:'2026-10',category:'餐饮'});const result=currentWorkflow(s)!.result as {current:{netExpenses:number}};assert.equal(result.current.netExpenses,5200);
+ let s=run(scriptedLedger(initialState()),'BI02',{period:'2026-10',category:'餐饮'});const result=currentWorkflow(s)!.result as {current:{netExpenses:number}};assert.equal(result.current.netExpenses,5200);
  s=run(s,'BI03',{transactionId:'txn-coffee',category:'人情往来'});s=finish(s);assert.equal(row(s,'transactions','txn-coffee').category,'人情往来');assert.equal(s.workflows!.records.categories.length,0);
  s=finish(run(s,'IN02',{direction:'deposit',goalId:'goal-travel',accountId:'daily',amount:100}));s=run(s,'BI02',{period:'2026-10'});assert.equal((currentWorkflow(s)!.result as {current:{netExpenses:number}}).current.netExpenses,10300);
 });
@@ -242,7 +243,7 @@ test('public model facts use yuan and omit authentication tokens and questionnai
  s=finish(run(s,'IN05',{answers:[2,2,2]}));const visible=workflowToolResult(s)!;assert.equal(visible.params.answers,undefined);assert.equal((visible.result as Record<string,unknown>).answers,undefined);assert.ok(!JSON.stringify(visible).includes('verificationId'));
 });
 test('unavailable device adapters fail explicitly and never publish forged imported data',()=>{
- const s=run(initialState(),'BI07',{source:'wechat',file:'sample.csv'});assert.equal(currentWorkflow(s)!.status,'unsupported');assert.equal(s.workflows!.records.transactions.length,6);
+ const before=initialState().workflows!.records.transactions.length,s=run(initialState(),'BI07',{source:'wechat',file:'sample.csv'});assert.equal(currentWorkflow(s)!.status,'unsupported');assert.equal(s.workflows!.records.transactions.length,before);
 });
 test('explicit sandbox settlement conserves assets and cannot settle an order twice',()=>{
  let s=finish(run(initialState(),'IN05',{answers:[2,2,2]}));s=finish(run(s,'IN08',{productId:'fund-cash',accountId:'daily',amount:100}));
@@ -283,7 +284,7 @@ test('monetary record amendments keep cents and automatic goal results disclose 
 });
 
 test('bill details expose deterministic totals and terminal unavailable tasks do not grow without bound',()=>{
- let s=run(initialState(),'BI01',{period:'2026-10',category:'餐饮'});const result=workflowToolResult(s)!.result as {summary:{grossExpenses:number;netExpenses:number;refunds:number}};
+ let s=run(scriptedLedger(initialState()),'BI01',{period:'2026-10',category:'餐饮'});const result=workflowToolResult(s)!.result as {summary:{grossExpenses:number;netExpenses:number;refunds:number}};
  assert.deepEqual([result.summary.grossExpenses,result.summary.refunds,result.summary.netExpenses],[64,12,52]);
  for(let i=0;i<40;i++)s=run(s,'CA10');assert.equal(s.workflows!.tasks.length,30);assert.equal(currentWorkflow(s)!.status,'unsupported');
 });
@@ -294,3 +295,8 @@ test('an unavailable optional enhancement is disclosed without repeating a compl
  s=act(s,{operation:'status',taskId:t.id});assert.equal(s.workflows!.records.cancellations.length,1);assert.throws(()=>act(s,{operation:'confirm',taskId:t.id,token:t.confirmedToken!}));
 });
 
+
+test('a zero interest assumption runs the principal-only savings estimate; a real rate is still not offered',()=>{
+ for(const rate of [0,false,'0'])assert.equal(currentWorkflow(run(initialState(),'BI09',{category:'all',savePerPeriod:50,periodCount:26,interestAssumption:rate}))!.status,'complete',String(rate));
+ assert.equal(currentWorkflow(run(initialState(),'BI09',{category:'all',savePerPeriod:50,periodCount:26,interestAssumption:0.02}))!.status,'blocked');
+});
