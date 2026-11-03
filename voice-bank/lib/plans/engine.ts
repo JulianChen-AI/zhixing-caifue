@@ -252,6 +252,8 @@ export function reducePlan(previous:BankState,cmd:PlanCommand,id:string,reducer:
   const initialParams=cmd.functionId?normalizedParams(cmd.functionId,{...(cmd.source==='voice'?extractParams(text,cmd.functionId,s):{}),...cmd.params}):{};
   // The AA head count is read from the user's own words on every entry, so text mode keeps “五个人” too.
   if(cmd.functionId==='TR05'&&initialParams.headcount==null&&text){const said=extractParams(text,'TR05',s).headcount;if(said!=null)initialParams.headcount=said;}
+  // A day the user named (上周五) overrides the model's own date arithmetic, which is not reliable.
+  if(cmd.functionId==='TR06'&&text){const day=extractParams(text,'TR06',s).period;if(day)initialParams.period=day;}
   const incoming=cmd.functionId?{id:crypto.randomUUID(),layer:'double' as const,status:'collecting' as const,steps:[{id:adopted?.id||crypto.randomUUID(),kind:'workflow' as const,title:functionById(cmd.functionId)!.title,quote:text,functionId:cmd.functionId,params:adopted?.params||initialParams,...(adopted?{taskId:adopted.id}:{}),dependsOn:[],status:'pending' as const}],message:'正在安排任务。',createdAt:new Date().toISOString(),log:[]}:decompose(text,s,cmd.tasks||cmd.steps);
   if(existing?.monthly?.rentUnknown&&incoming.steps.some(x=>x.functionId==='TR03'))throw new WorkflowError('房租原订单结果待核对，不能另建转账；请先回查原订单。');
   const asks=new Map<string,RecipientAsk>();

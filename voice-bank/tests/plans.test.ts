@@ -256,7 +256,7 @@ test('a temporary query completes and returns to the exact saved checklist witho
  const p=s.plan!.id,id=flow(s).id,evidence=structuredClone(flow(s).fieldEvidence);
  s=startApp(s,'SU01','先查询订阅清单');
  assert.equal(s.plan!.id,p);assert.equal(s.workflows!.currentTaskId,id);assert.deepEqual(flow(s).params.answers,[3,0,0]);assert.deepEqual(flow(s).fieldEvidence,evidence);
- assert.match(s.lastReply,/查看订阅清单和详情”：查询完成/);assert.equal(s.plan!.steps.filter(x=>x.functionId==='SU01'&&x.status==='complete').length,1);assert.equal(s.plan!.returnTo,undefined);
+ assert.match(s.lastReply,/查看订阅清单和详情”：生效中的订阅有 3 项/);assert.equal(s.plan!.steps.filter(x=>x.functionId==='SU01'&&x.status==='complete').length,1);assert.equal(s.plan!.returnTo,undefined);
  assert.equal(s.workflows!.records.questionnaires.length,0);
 });
 test('unfinished inserted work can be selected, restored and cancelled across reloads',()=>{

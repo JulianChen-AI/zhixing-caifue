@@ -74,3 +74,9 @@ test('a chat reply that claims a change is replaced, because nothing changed', a
  const r = await understandIntent(initialState(), '稍等，不是取消', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify(reply))) as typeof fetch);
  assert.equal(r.action, undefined); assert.doesNotMatch(r.say, /已取消/); assert.ok(r.dropped.includes('say:claimed_change'));
 });
+
+test('names the user labelled are kept when the model collapses two people with the same name', async () => {
+ const reply = { choices: [{ message: { content: JSON.stringify({ intent: 'run', functionId: 'TR05', params: { action: 'create', total: 240, participants: ['我', '张三', '李四', '张三'] }, say: '好的' }) } }] };
+ const r = await understandIntent(initialState(), '我、室友张三、同学李四、房东张三', [], { base: 'x', planner: 'm' }, new AbortController().signal, (async () => new Response(JSON.stringify(reply))) as typeof fetch);
+ assert.deepEqual((r.action as unknown as { command: { params: { participants: string[] } } }).command.params.participants, ['我', '室友张三', '同学李四', '房东张三']);
+});

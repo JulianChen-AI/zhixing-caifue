@@ -134,3 +134,33 @@ test('the AA head count comes from the words even when the proposal leaves it ou
   assert.deepEqual(t.params.participants, ['我']);
   assert.match(t.message, /一共 5 人.*还差 4 位/);
 });
+
+test('replies carry the facts: options when asking, the subject when reviewing, the answer when a query is done', () => {
+  let s = say(initialState(), 'TR03', '给室友张三转200', { recipientId: 'zhang-roommate', amount: 200 });
+  assert.match(replyForState(s), /请补充账户：日常账户（尾号8021）、储蓄账户（尾号3609），选哪个？/);
+  const again = app(s, { type: 'workflow', command: { operation: 'amend', taskId: currentWorkflow(s)!.id, params: {}, source: 'card' } });
+  assert.match(replyForState(again), /结束这个业务/);
+  s = app(s, { type: 'workflow', command: { operation: 'amend', taskId: currentWorkflow(s)!.id, params: { accountId: 'daily' }, source: 'card' } });
+  assert.match(replyForState(s), /请核对|准备从日常账户给室友张三转/);
+  const cards = say(initialState(), 'CA01', '看看我的卡');
+  assert.match(replyForState(cards), /日常借记卡（8021）正常/);
+  const subs = say(initialState(), 'SU01', '我有哪些订阅');
+  assert.match(replyForState(subs), /生效中的订阅有 3 项，每月固定支出 ¥531.00/);
+  const history = say(initialState(), 'TR06', '我给谁转过钱');
+  assert.match(replyForState(history), /找到 \d+ 笔转账：.*给(室友|房东|同学)/);
+  for (const r of [cards, subs, history].map(replyForState)) assert.doesNotMatch(r, /结果已显示/);
+});
+
+test('spoken days are worked out from the business date, weeks starting on Monday', async () => {
+  const { spokenDay } = await import('../lib/plans/decompose.ts');
+  // 2026-10-25 is a Sunday.
+  assert.equal(spokenDay('我上周五给谁转过钱', '2026-10-25'), '2026-10-16');
+  assert.equal(spokenDay('这周五', '2026-10-25'), '2026-10-23');
+  assert.equal(spokenDay('周五转的', '2026-10-21'), '2026-10-16');
+  assert.equal(spokenDay('昨天', '2026-11-01'), '2026-10-31');
+  assert.equal(spokenDay('上周日', '2026-10-28'), '2026-10-25');
+  assert.equal(spokenDay('给张三转钱', '2026-10-25'), undefined);
+  const s = app({ ...initialState(), demoClock: '2026-10-25T04:00:00.000Z' }, { type: 'workflow', command: { operation: 'run', functionId: 'TR06', params: { period: '2026-10-24' }, source: 'card', utterance: '我上周五给谁转过钱' } });
+  assert.equal(currentWorkflow(s)!.params.period, '2026-10-16');
+  assert.match(replyForState(s), /同学李四转了 ¥36.00/);
+});

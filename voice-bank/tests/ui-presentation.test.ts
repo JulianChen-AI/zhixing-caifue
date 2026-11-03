@@ -34,7 +34,7 @@ test('authentication presentation preserves the current review and authenticatio
   state = act(state, { operation: 'confirm', taskId: review.id, token: review.reviewToken! });
   const before = structuredClone(state);
   assert.equal(currentWorkflow(state)!.status, 'authenticate');
-  assert.equal(replyForState(state), '请输入验证码。');
+  assert.equal(replyForState(state), '已确认，请在卡片上输入演示验证码完成认证；验证码不要在对话里说。');
   assert.match(currentWorkflow(state)!.message, /模型不能代填/);
   assert.deepEqual(state, before);
   assert.equal(state.workflows!.records.cards.find(card => card.id === 'card-daily')!.status, 'active');

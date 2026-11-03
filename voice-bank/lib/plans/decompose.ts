@@ -8,6 +8,7 @@ import { offlineWorkflow } from '../workflows/offline.ts';
 import { functionById } from '../workflows/catalog.ts';
 import { choices, normalizedParams } from '../workflows/fields.ts';
 import { WorkflowError, type Params } from '../workflows/types.ts';
+import { businessDay } from '../demo/clock.ts';
 import type { BalanceFormula, PlanProposal, PlanStep, TaskPlan } from './types.ts';
 
 export function clauses(text:string){
@@ -71,6 +72,8 @@ export function extractParams(text:string,id:string,state:BankState):Params{
   const parsed=amountFromText(/^[零〇一二两三四五六七八九十百千万]+$/.test(clean)?clean+'元':clean);
   if(parsed.amount!=null&&!parsed.uncertain&&!/美元|港币|欧元|日元|USD|HKD|EUR|JPY/i.test(text))p.amount=parsed.amount/100;
  }
+ // A single day said in words (上周五、昨天、周三) is worked out from the business date, not left to the model.
+ if(id==='TR06'){const day=spokenDay(text,businessDay(state));if(day)p.period=day;}
  // AA head count is read from the words (“五个人AA”), never inferred from a list.
  if(id==='TR05'){const m=text.match(/(\d{1,2}|[两二三四五六七八九十]+)\s*(?:个)?人\s*(?:一起)?\s*(?:AA|aa|均摊|平摊|分摊)/);const n=m?(/\d/.test(m[1])?Number(m[1]):countHan(m[1])):0;if(n>=2&&n<=20)p.headcount=n;}
  if(id==='IN02'&&/存入|转入|存进/.test(text))p.direction='deposit';
@@ -115,3 +118,15 @@ export function decompose(text:string,state:BankState,proposals?:PlanProposal[])
 
 
 function countHan(word:string){const d:Record<string,number>={一:1,二:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9};if(word==='十')return 10;if(word.startsWith('十'))return 10+(d[word[1]]||0);if(word.includes('十'))return (d[word[0]]||0)*10+(d[word[2]]||0);return d[word]||0;}
+
+/** The calendar day a phrase like 上周五 / 这周三 / 周五 / 昨天 / 前天 / 今天 names, with weeks starting on Monday. */
+export function spokenDay(text:string,today:string):string|undefined{
+ const shift=(n:number)=>{const d=new Date(today+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
+ if(/大前天/.test(text))return shift(-3);if(/前天/.test(text))return shift(-2);if(/昨天/.test(text))return shift(-1);if(/今天/.test(text))return shift(0);
+ const m=text.match(/(上上|上|这|本)?\s*(?:周|星期|礼拜)([一二三四五六日天])/);if(!m)return;
+ const todayIndex=(new Date(today+'T00:00:00Z').getUTCDay()+6)%7,day='一二三四五六日天'.indexOf(m[2]),target=day>6?6:day;
+ let offset=(m[1]==='上上'?-14:m[1]==='上'?-7:0)+target-todayIndex;
+ // A bare “周五” still ahead this week means the one just past.
+ if(!m[1]&&offset>0)offset-=7;
+ return shift(offset);
+}

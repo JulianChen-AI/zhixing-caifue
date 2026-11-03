@@ -4,8 +4,9 @@ import { ambiguousRecipients, contactsOf } from '../bank/recipients.ts';
 import { availableFunctions, functionById, toolById, UNSUPPORTED_FUNCTIONS, WORKFLOW_VERSION } from './catalog.ts';
 import { estimate, type EstimateItem } from './adapters.ts';
 import { ACTIONS, cents, executeBusiness, isWrite, needsAuth, preflight, queryBusiness, readTool, rows, settleOrders, step, suitabilityStop } from './adapters.ts';
-import { validateVoiceDraft, FIELDS, LABELS, normalizedParams, requiredFields } from './fields.ts';
-import { acknowledgesReview } from './review.ts';
+import { choices, validateVoiceDraft, FIELDS, LABELS, normalizedParams, requiredFields } from './fields.ts';
+import { acknowledgesReview, workflowReview } from './review.ts';
+import { readSummary } from './summaries.ts';
 import { initialFlowStore } from './seed.ts';
 import { goalPlan } from './business-lite.ts';
 import { aaShares, reminderDrafts, type AaItem } from './aa.ts';
@@ -27,8 +28,17 @@ function evidence(t:FlowTask,params:Record<string,unknown>,cmd:WorkflowCommand){
 }
 // Scam scripts a transfer must never follow: paying to “unfreeze” or “verify” funds, or impersonated police.
 export const FRAUD_WORDS=/刷单|解冻费|安全账户|保证金|跑分|兼职返利|洗钱|涉嫌|配合调查|公检法|网恋|网上认识|才能见面/g;
+/** A question that names what is missing and, for a short list of options, the options themselves. */
+function askFor(s:BankState,missing:string[]){
+ const label=(k:string)=>(LABELS[k]||k).replace('（可选）','').replace('（元）','');
+ const first=missing[0],options=choices(s,first);
+ const offer=options.length>1&&options.length<=4&&!['category','action'].includes(first)?`：${options.map(o=>o.label.replace(' · ','（').replace(/$/,o.label.includes(' · ')?'）':'')).join('、')}，选哪个？`:'';
+ const rest=missing.slice(1).map(label);
+ return '请补充'+label(first)+(offer||'。')+(rest.length?`另外还需要${rest.join('、')}。`:'');
+}
 function invalidate(t:FlowTask){t.reviewToken=null;t.verificationId=null;t.confirmedToken=null;t.result=null;}
-function finish(t:FlowTask,result:unknown,message='查询完成，结果来自当前合成演示数据。'){
+function finish(t:FlowTask,result:unknown,message=''){
+ message||=readSummary(t.functionId,result)||'查询完成，结果来自当前合成演示数据。';
  if((isBillingQuery(t.functionId)||t.functionId==='IN15')&&result&&typeof result==='object'&&'spokenSummary' in result&&typeof result.spokenSummary==='string')message=result.spokenSummary;
  t.status='complete';t.result=result;t.message=message;t.verificationId=null;t.reviewToken=null;
  for(const x of t.steps)if(x.status==='pending'){x.status='skipped';x.reason='本次参数或路径未触发，无需调用';}
@@ -122,8 +132,10 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
  if(headcount&&!(Array.isArray(t.params.participants)&&(t.params.participants as unknown[]).length)){t.params.participants=['我'];(t.fieldEvidence||={}).participants={source:'calculation',quote:'AA 的付款人是你自己'};}
  const named=Array.isArray(t.params.participants)?t.params.participants as string[]:[];
  if(headcount&&named.length!==headcount&&!t.missing.includes('participants'))t.missing.push('participants');
- if(t.missing.length){t.status='collecting';t.message='请补充'+t.missing.map(k=>LABELS[k]||k).join('、')+'。';
-  if(headcount&&t.missing.includes('participants'))t.message=named.length<headcount?`这次 AA 一共 ${headcount} 人，${named.length?`已记下${named.join('、')}，`:''}还差 ${headcount-named.length} 位，请说一下他们的称呼。`:`你说一共 ${headcount} 人，但名单里有 ${named.length} 位，请核对人数或名单。`;if(t.functionId==='IN05'){const questions=questionnaire(t.params.answers),q=questions.find(q=>q.status==='missing')!;t.message=`已保存${questions.filter(q=>q.status==='filled').length}题。第${q.index}题：${q.title} ${q.choices.map(c=>c.value+'：'+c.label).join('；')}。`;}return s;}
+ if(t.missing.length){const asked=t.message;t.status='collecting';t.message=askFor(s,t.missing);
+  // The same question twice in a row reads as stuck; say how to leave.
+  if(asked===t.message||asked.startsWith(t.message))t.message+='不想办了也可以说“结束这个业务”。';
+  if(headcount&&t.missing.includes('participants'))t.message=named.length<headcount?`这次 AA 一共 ${headcount} 人，${named.length?`已记下${named.join('、')}，`:''}还差 ${headcount-named.length} 位，请说一下他们的称呼。`:`你说一共 ${headcount} 人，但名单里有 ${named.length} 位，请核对人数或名单。`;if(t.functionId==='IN05'){const questions=questionnaire(t.params.answers),q=questions.find(q=>q.status==='missing')!;const filled=questions.filter(q=>q.status==='filled').length;t.message=`${filled?`已保存${filled}题。`:`风险测评共 ${questions.length} 题，答案只用于判断能买哪类产品。`}第${q.index}题：${q.title} ${q.choices.map(c=>c.value+'：'+c.label).join('；')}。`;}return s;}
  try{
   step(t,'S07','白名单参数及后台事实检查',()=>preflight(s,t));
   if(t.functionId==='TR03'){
@@ -158,7 +170,9 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
   if(t.functionId==='SU04'){const sub=rows(s,'subscriptions').find(r=>r.id===t.params.subscriptionId)!,yuan=(c:unknown)=>(Number(c)/100).toFixed(Number(c)%100?2:0);t.result={name:sub.name,amount:sub.amount,cycle:sub.cycle,nextChargeAt:sub.nextChargeAt,benefitUntil:sub.benefitUntil,channel:sub.channel};preview=sub.channel==='bank'?`将停止${sub.name}（每月${yuan(sub.amount)}元${sub.nextChargeAt?`，下次${sub.nextChargeAt}续费`:''}）的后续续费。以前的扣款不会退还${sub.benefitUntil?`，本期权益到${sub.benefitUntil}`:''}。确认后在卡片完成演示认证。`:`${sub.name}需要到服务方那里取消，银行不能代你退订；确认后给出官方操作步骤。`;}
   if(t.functionId==='TR05'&&t.params.action==='remind'){const drafts=reminderDrafts(rows(s,'aa').find(r=>r.id===t.params.sessionId)!);t.result={reminders:drafts,channel:'模拟通道（演示）'};preview=`将分别给${drafts.map(d=>`${d.to}（${(d.amount/100).toFixed(d.amount%100?2:0)}元）`).join('、')}发一条私密提醒，内容：“${drafts[0].text.replace(/\d+(?:\.\d+)?元/,'……元')}”已付款的人不会收到。请确认后发送。`;}
   t.status='review';t.reviewToken=crypto.randomUUID();
-  t.message='请核对“'+t.title+'”的当前信息。'+(t.functionId==='SU04'?'解除代扣不等于商户退订或退款。':t.functionId==='CA07'?'正式挂失后旧卡不可临时解冻恢复。':t.functionId==='IN08'?'产品和费率均为合成数据；可能亏损，申购受理不等于份额确认。':'本次仅操作沙箱数据。')+'确认后'+(needsAuth(t)?'在专门卡片完成演示认证。':'提交。');
+  // Name what is being confirmed, so a listener knows without looking at the card.
+  const facts=workflowReview(s,t).entries.filter(e=>!['无','否',''].includes(e.value)&&!['note','saveRecipient','autoSave'].includes(e.key)).slice(0,4).map(e=>e.label+'：'+e.value).join('；');
+  t.message='请核对“'+t.title+'”'+(facts?'——'+facts+'。':'的当前信息。')+(t.functionId==='SU04'?'解除代扣不等于商户退订或退款。':t.functionId==='CA07'?'正式挂失后旧卡不可临时解冻恢复。':t.functionId==='IN08'?'产品和费率均为合成数据；可能亏损，申购受理不等于份额确认。':'本次仅操作沙箱数据。')+'确认后'+(needsAuth(t)?'在专门卡片完成演示认证。':'提交。');
   if(preview)t.message=preview;
  }catch(error){markFailure(current(s,t.id)||t,error);}
  return s;

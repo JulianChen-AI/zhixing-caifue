@@ -1,5 +1,7 @@
 import type { BankState } from '../bank/types.ts';
 import type { FlowTask } from '../workflows/types.ts';
+import { taskIdentity } from './business.ts';
+import { readSummary } from '../workflows/summaries.ts';
 
 /** Public wording only. Raw tool messages and execution state stay unchanged. */
 export function userMessage(message: string): string {
@@ -53,10 +55,8 @@ export function workflowMessage(task: FlowTask): string {
   const result = object(task.result);
   const list = Array.isArray(task.result) ? task.result.map(object) : [];
   if (task.functionId === 'TR02') return list.length ? list.map(row => `${row.name}余额 ${amount(row.balance)}${typeof row.available === 'number' ? `，其中 ${amount(row.held)} 已被理财申购占用，可用 ${amount(row.available)}` : ''}`).join('；') + '。' : '没有查到可用账户。';
-  if (task.functionId === 'TR01') return `共 ${list.length} 个账户。`;
-  if (task.functionId === 'CA01') return `共 ${list.length} 张银行卡。`;
-  if (task.functionId === 'SU01') return list.length ? `共 ${list.length} 项订阅。` : '没有查到订阅。';
-  if (task.functionId === 'IN06') return list.length ? `共 ${list.length} 款产品。` : '没有符合条件的产品。';
+  const read = readSummary(task.functionId, task.result);
+  if (read) return read;
   if (['BI01', 'BI02', 'BI06'].includes(task.functionId)) {
     const summary = object(result.summary || result.current);
     const guessed = Array.isArray(result.transactions) ? result.transactions.map(object).filter(row => row.kind === 'expense' && row.classificationSource !== 'user-confirmed').length : 0;
@@ -88,7 +88,7 @@ export function workflowMessage(task: FlowTask): string {
     if (result.status === 'paused') return '规则已暂停。';
     return '规则已保存，自动执行尚未启用。';
   }
-  if (/^查询完成，结果来自当前合成演示数据。/.test(task.message)) return '';
+  if (/^查询完成，结果来自当前合成演示数据。/.test(task.message)) return '查好了，详细内容在卡片上。';
   if (/^已完成当前沙箱操作。/.test(task.message)) return '已保存。';
   return userMessage(task.message).replace(/ 部分附加请求尚未完成[\s\S]*$/, '');
 }
@@ -106,9 +106,10 @@ function currentReply(state: BankState): string {
   if (task) {
     const message = workflowMessage(task);
     if (message) return message;
-    if (task.status === 'review') return '请核对本次办理信息。';
-    if (task.status === 'authenticate') return '请输入验证码。';
-    if (task.status === 'complete') return '结果已显示。';
+    // Say what is being checked, not just that something is: the user may be listening, not looking.
+    if (task.status === 'review') { const who = taskIdentity(state, task); return `请核对：${who.title}${who.detail ? `，${who.detail}` : ''}。没问题就在卡片上确认，要改可以直接说。`; }
+    if (task.status === 'authenticate') return '已确认，请在卡片上输入演示验证码完成认证；验证码不要在对话里说。';
+    if (task.status === 'complete') return '查好了，详细内容在卡片上。';
   }
   if (state.view === 'balance') return state.accounts.map(account => `${account.name}余额 ${amount(account.balance)}${account.held ? `，可用 ${amount(account.balance - account.held)}` : ''}`).join('；') + '。';
   return userMessage(state.lastReply);
@@ -116,7 +117,8 @@ function currentReply(state: BankState): string {
 
 /** The card already carries routine prompts; additional explanations remain available. */
 export function cardCaption(state: BankState | null, text: string) {
-  if (!text || /^(?:请核对本次办理信息。|请输入验证码。|结果已显示。)$/.test(text)) return '';
+  // Routine prompts the card already shows are not repeated above it.
+  if (!text || /^(?:请核对本次办理信息。|请输入验证码。|结果已显示。|查好了，详细内容在卡片上。|已确认，请在卡片上输入演示验证码完成认证；验证码不要在对话里说。)$/.test(text) || /^请核对：/.test(text)) return '';
   const task = state?.view === 'workflow' ? state.workflows?.tasks.find(item => item.id === state.workflows?.currentTaskId) : undefined;
   if (task && text === workflowMessage(task)) return '';
   return text;

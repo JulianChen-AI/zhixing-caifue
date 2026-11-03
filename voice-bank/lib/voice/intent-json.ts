@@ -39,7 +39,7 @@ const SYSTEM = `你是知行银行的意图理解模块。读用户本轮原话�
 - 金额一律是以元为单位的数字：1万2=12000，一千二=1200，五百=500，两百五=250。周期写进schedule原话，如“每月5日”。期间写YYYY-MM或YYYY，按today和weekday（星期几）换算“这个月/上个月/今年/下周五”。
 - 卡、产品、持仓、目标、订阅、交易等字段填records里对应的id（cardId、productId、holdingId、goalId、subscriptionId、transactionId），不要编造id；用户用名称或尾号指代时换成id。
 - “这张卡/那笔/这笔/刚才那个”指history里上一轮用户提到的那个对象（如上一轮说了尾号8021，“这张卡”就是8021那张；上一轮问的咖啡，“那笔”就是咖啡那笔），用户顺口说的旧分类或描述与它不符时，以指代为准。
-- 账单：某商户或订阅“一共花了/扣了多少”是BI02（按merchant统计）；某个订阅下次什么时候扣是SU01；BI05只用于找出有哪些周期扣费或闲置订阅。records.transactions里suspectedDuplicate=true是疑似重复扣款，originalId指向原交易；问“扣了两次/重复扣款/退款回来没”用BI04并填对应transactionId。
+- 账单：某商户或订阅“一共花了/扣了多少”是BI02（按merchant统计）；某个订阅下次什么时候扣是SU01；查某一天的转账记录（“上周五”“昨天”给谁转过钱）用TR06，period写那一天YYYY-MM-DD；BI05只用于找出有哪些周期扣费或闲置订阅。records.transactions里suspectedDuplicate=true是疑似重复扣款，originalId指向原交易；问“扣了两次/重复扣款/退款回来没”用BI04并填对应transactionId。
 - recipientId/accountId必须是contacts/accounts里的id；同名多人且无法区分时不填recipientId。
 - AA（TR05）：total为总额；participants为全部分摊人（含“我”），同名的人带上用户说的称呼以示区分（如“室友张三”“房东张三”），只说了人数或名字不全时不填，不用“其他1”之类占位名；某项只由部分人分摊时必须写adjustments。例：“昨晚300元饭钱，五个人AA，其中50元酒只有张三、李四喝了”→{"intent":"run","functionId":"TR05","params":{"action":"create","total":300,"adjustments":[{"label":"酒","amount":50,"participants":["张三","李四"]}]}}
 - 卡片：卡丢了/可能丢了/不认识的消费/保护这张卡/先冻结 → CA06 action=freeze（先止损，可解冻）；只有用户明确说“挂失”才用CA07。卡为什么不能刷/被限制 → CA05 action=query；要求解开限制 → CA05 action=unlock。用户没说是哪张卡（尾号或卡名）时不填cardId，由卡片追问，不要猜。
@@ -163,7 +163,7 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
  if (intent.intent === 'amend' && intent.functionId && intent.functionId !== wf?.tasks.find(t => t.id === taskId)?.functionId) intent = { ...intent, intent: 'run' };
  const functionId = intent.intent === 'amend' ? wf?.tasks.find(t => t.id === taskId)?.functionId : intent.functionId;
  if (!functionId || !FIELDS[functionId]) return { dropped: ['unknown_function'], say };
- const params = clean(s, functionId, intent.params, heard, dropped);
+ const params = clean(s, functionId, keepSpokenNames(intent.params, utterance), heard, dropped);
  // Schema default: a new task on a function that can be created starts as create.
  if (intent.intent === 'run' && params.action == null && ACTIONS[functionId]?.includes('create')) params.action = 'create';
  // Asking again for a card that is still open returns to it; only different values make it a new business.
@@ -199,6 +199,17 @@ function headcount(text: string) {
  const word = text.match(/([两二三四五六七八九十]|\d{1,2})\s*个人/)?.[1];
  if (!word) return undefined;
  return /\d/.test(word) ? Number(word) : '一二三四五六七八九十'.indexOf(word) + 1 || 2;
+}
+/**
+ * The model sometimes strips the labels that tell two people apart (“室友张三、房东张三” → “张三、张三”). When the user's
+ * own sentence is just that list, the names are taken as written; nothing is added that the user did not say.
+ */
+function keepSpokenNames(input: Record<string, unknown> | undefined, utterance: string) {
+ const list = input?.participants;
+ if (!Array.isArray(list) || new Set(list).size === list.length) return input;
+ const said = utterance.replace(/^(?:参与者|名单|成员|还有|是)[:：]?/, '').split(/[、，,和及]|\s+/).map(x => x.trim()).filter(Boolean);
+ const fits = said.length === list.length && new Set(said).size === said.length && said.every((name, i) => typeof list[i] === 'string' && name.endsWith(list[i] as string));
+ return fits ? { ...input, participants: said } : input;
 }
 function clean(s: BankState, functionId: string, input: Record<string, unknown> | undefined, heard: string, dropped: string[]) {
  const params: Record<string, unknown> = {};
