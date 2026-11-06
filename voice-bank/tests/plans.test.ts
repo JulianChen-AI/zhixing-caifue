@@ -12,6 +12,8 @@ const plan=(s:BankState,c:Omit<PlanCommand,'source'>&{source?:'voice'|'card'},id
 const create=(text:string,s=initialState())=>plan(s,{operation:'create',utterance:text});
 const flow=(s:BankState)=>s.workflows!.tasks.find(t=>t.id===currentPlanStep(s)?.taskId)!;
 function confirm(s:BankState){const t=flow(s);return act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'确认',turnId:crypto.randomUUID()}});}
+// Transfers of ¥5,000 or more need the card button; a spoken “确认” is refused (lib/workflows/risk.ts).
+function confirmByCard(s:BankState){const t=flow(s);return act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'card'}});}
 function authenticate(s:BankState,id:string=crypto.randomUUID()){const t=flow(s);return act(s,{type:'workflow',command:{operation:'authenticate',taskId:t.id,token:t.verificationId!,code:'123456',source:'card'}},id);}
 const fraction='我要转账，额，给尾号6688的那个张三，然后转余额比较小的那个账户的三分之一余额。先给我核对，不要直接提交。';
 
@@ -166,7 +168,7 @@ test('a model cannot turn a purpose-free clause into a checked business step',()
 test('separate ratio steps are parsed independently and read balances only when reached',()=>{
  const text='先从日常账户给室友转余额的一半，然后从储蓄账户给李四转余额的1/3';assert.equal(isComplexRequest(text,initialState()),true);
  let s=create(text);assert.equal(s.plan!.steps.length,6);assert.equal(s.plan!.steps[4].calculation,undefined);
- s=authenticate(confirm(s));assert.equal(s.plan!.steps[4].calculation!.amountCents,1000000);assert.equal(s.receipts.length,1);assert.equal(currentPlanStep(s)!.functionId,'TR03');
+ s=authenticate(confirmByCard(s));assert.equal(s.plan!.steps[4].calculation!.amountCents,1000000);assert.equal(s.receipts.length,1);assert.equal(currentPlanStep(s)!.functionId,'TR03');
 });
 test('model clause punctuation does not prevent valid grounded plans',()=>{
  const s=plan(initialState(),{operation:'create',utterance:'先查余额，然后从日常账户给室友转500元。',steps:[{quote:'查余额，',functionId:'TR02'},{quote:'从日常账户给室友转500元。',functionId:'TR03'}]});assert.equal(flow(s).status,'review');

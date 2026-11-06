@@ -1,3 +1,4 @@
+import { transferRisk, elevatedNotice, VOICE_REFUSED } from '../workflows/risk.ts';
 import { type BankAction, type BankState, type Intent } from './types.ts';
 import { contactsOf, recipientCandidates, recipientIdentityMentioned } from './recipients.ts';
 import { POLICY_VERSION, DEMO_POLICY } from '../checklists/catalog.ts';
@@ -87,7 +88,9 @@ function prepare(s: BankState) {
     else s.lastReply = run.question!;
   }
   else {
-    s.lastReply = transferSummary(s);
+    // Elevated risk opens the review with why the card button is required; nothing else changes.
+    const risk = transferRisk(s, t);
+    s.lastReply = (risk.elevated ? elevatedNotice(risk) : '') + transferSummary(s);
   }
 }
 function confirmTransfer(s: BankState) {
@@ -95,7 +98,8 @@ function confirmTransfer(s: BankState) {
   s.lastReply='信息已确认。请在卡片上输入演示验证码 123456，完成这笔模拟转账。';
 }
 function applyIntent(s: BankState, intent: Intent) {
-  if (intent.kind === 'confirm_transfer') { confirmTransfer(s); return; }
+  // confirm_transfer only comes from speech (routing or a model tool); the card button dispatches { type: 'confirm' }.
+  if (intent.kind === 'confirm_transfer') { const t = requireTask(s), risk = transferRisk(s, t); if (risk.elevated) throw new BankError(VOICE_REFUSED(risk)); confirmTransfer(s); return; }
   if (intent.kind === 'confirm_amount') { const t=requireTask(s); if (!t.amountNeedsConfirmation || t.amount == null) throw new BankError('当前没有待确认的金额。'); t.amountNeedsConfirmation=false; resolveFields(s,['amount']); prepare(s); return; }
   if (intent.kind === 'cancel') {
     if (s.task?.step === 'complete') { s.lastReply = '这笔模拟转账已完成，无法通过取消对话撤回。你可以查看回执。'; return; }
