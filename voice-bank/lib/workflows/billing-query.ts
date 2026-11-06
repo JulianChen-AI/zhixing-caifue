@@ -49,13 +49,15 @@ export const SPOKEN_MONTH=new RegExp(String.raw`(?<![\d年\-/一二两三四五�
 const SPAN_WORD=/^(?:到|至|~)$/;
 const monthNumber=(word:string)=>/\d/.test(word)?Number(word):word.startsWith('十')?10+(({一:1,二:2} as Record<string,number>)[word[1]]||0):'一二三四五六七八九'.indexOf(word)+1;
 const validMonth=(n:number)=>n>=1&&n<=12;
-const spanDays=(y:number,from:number,to:number)=>`${monthText(y,from)}-01~${monthText(y,to)}-${String(new Date(Date.UTC(y,to,0)).getUTCDate()).padStart(2,'0')}`;
-const monthsBetween=(y:number,from:number,to:number)=>Array.from({length:to-from+1},(_,i)=>monthText(y,from+i));
+type YearMonth={year:number;month:number};
+const monthIndex=(m:YearMonth)=>m.year*12+m.month-1;
+const spanDays=(from:YearMonth,to:YearMonth)=>`${monthText(from.year,from.month)}-01~${monthText(to.year,to.month)}-${String(new Date(Date.UTC(to.year,to.month,0)).getUTCDate()).padStart(2,'0')}`;
+const monthsBetween=(from:YearMonth,to:YearMonth)=>Array.from({length:monthIndex(to)-monthIndex(from)+1},(_,i)=>{const n=monthIndex(from)+i;return monthText(Math.floor(n/12),n%12+1);});
 /** Every month named in a sentence, with where it was said. A span stays one period unless each month was asked for. */
 function spokenMonths(text:string,thisYear:number){
- const found:{at:number;period:string}[]=[];let year=thisYear,invalid=false,backwards=false,previous:{end:number;month:number;at:number}|null=null;
+ const found:{at:number;period:string}[]=[];let year=thisYear,invalid=false,backwards=false,previous:{end:number;month:YearMonth;at:number}|null=null;
  const each=/分别|每个?月|各/.test(text);
- const span=(at:number,y:number,from:number,to:number)=>{if(from>to){backwards=true;return;}for(const period of each?monthsBetween(y,from,to):[spanDays(y,from,to)])found.push({at,period});};
+ const span=(at:number,from:YearMonth,to:YearMonth)=>{if(monthIndex(from)>monthIndex(to)){backwards=true;return;}for(const period of each?monthsBetween(from,to):[spanDays(from,to)])found.push({at,period});};
  for(const m of text.matchAll(SPOKEN_MONTH)){
   const g=m.groups!,at=m.index!,stated=g.year;
   if(stated)year=stated==='今年'?thisYear:stated==='去年'?thisYear-1:Number(stated.slice(0,4));
@@ -64,10 +66,10 @@ function spokenMonths(text:string,thisYear:number){
   const between=previous?text.slice(previous.end,at):'';
   if(previous&&SPAN_WORD.test(between)){
    // “9月到10月”: the first month was already taken on its own; the span replaces it.
-   const single=found.findIndex(x=>x.at===previous!.at&&!x.period.includes('~'));if(single>=0)found.splice(single,1);span(previous.at,year,previous.month,last);
-  }else if(listed&&SPAN_WORD.test(g.sep))span(at,year,first,last);
+   const single=found.findIndex(x=>x.at===previous!.at&&!x.period.includes('~'));if(single>=0)found.splice(single,1);span(previous.at,previous.month,{year,month:last});
+  }else if(listed&&SPAN_WORD.test(g.sep))span(at,{year,month:first},{year,month:last});
   else{if(listed)found.push({at,period:monthText(year,first)});found.push({at:at+(listed?1:0),period:monthText(year,last)});}
-  previous={end:at+m[0].length,month:last,at:at+(listed?1:0)};
+  previous={end:at+m[0].length,month:{year,month:last},at:at+(listed?1:0)};
  }
  return {found,invalid,backwards};
 }

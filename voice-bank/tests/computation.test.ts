@@ -100,6 +100,24 @@ test('a span followed by another month never loses or invents a period', () => {
   assert.ok(parseBillingQuery('9到10月到11月花了多少', day()).params.period || parseBillingQuery('9到10月到11月花了多少', day()).periods.length);
 });
 
+test('a span across a stated new year counts every month of it; without years it asks', () => {
+  const parsed = (text: string) => parseBillingQuery(text, day());
+  assert.equal(parsed('去年11月到今年2月花了多少').params.period, '2025-11-01~2026-02-28');
+  assert.deepEqual(parsed('去年11月到今年1月每个月分别花了多少').periods, ['2025-11', '2025-12', '2026-01']);
+  assert.equal(parsed('11月到2月花了多少').clarification?.field, 'period');
+});
+
+test('each month of a span is its own query, up to what one plan can hold', async () => {
+  const text = '8月到10月每个月分别花了多少';
+  const { s } = await say(day(), text, { intent: 'run', functionId: 'BI02', params: {}, say: '好' });
+  assert.deepEqual(s.plan!.steps.map(x => x.params.period), ['2026-08', '2026-09', '2026-10']);
+  assert.equal(s.plan!.steps.map(x => x.quote).join(''), text);
+  assert.ok(s.plan!.steps.every(x => x.status === 'complete'));
+  const { r } = await say(day(), '1月到10月每个月分别花了多少', { intent: 'run', functionId: 'BI02', params: {}, say: '好' });
+  assert.equal(r.action, undefined);
+  assert.match(r.say, /最多.*6/);
+});
+
 test('a span of months runs as one query and answers for the whole span', async () => {
   const { s } = await say(day(), '9月到10月花了多少', { intent: 'run', functionId: 'BI02', params: { period: '2026-09' }, say: '好' });
   const task = currentWorkflow(s)!;
