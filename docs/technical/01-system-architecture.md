@@ -77,7 +77,7 @@
 | 模块 | 代码 | 职责 |
 |---|---|---|
 | 外层 Plan 引擎 | `lib/plans/` | 把一句话拆成最多 6 个业务子句、最多 12 个步骤，建立依赖链；比例金额由后台按实时余额计算；单队列逐项激活 |
-| 内层 Checklist 引擎 | `lib/workflows/engine.ts`、`fields.ts`、`adapters.ts` | 54 项用户功能的草稿、缺项、预检、摘要令牌、确认、认证与执行 |
+| 内层 Checklist 引擎 | `lib/workflows/engine.ts`、`fields.ts`、`adapters.ts` | 57 项用户功能的草稿、缺项、预检、摘要令牌、确认、认证与执行 |
 | 转账状态机 | `lib/bank/engine.ts` | `recipient → details → review → authenticate → complete`，执行 TF-T01 九步检查单 |
 | 规则目录 | `lib/checklists/` | 62 份业务检查单（269 条规则），带 `policyVersion` 与业务原稿行号 |
 
@@ -85,7 +85,7 @@
 
 | 组件 | 说明 |
 |---|---|
-| 用户功能目录 | `lib/workflows/catalog-data.json`：5 个模块共 54 项功能（转账与账户 9、账单 10、订阅与代扣 8、理财与目标储蓄 15、卡片管理 12），对应 85 个逻辑工具 |
+| 用户功能目录 | `lib/workflows/catalog-data.json`：5 个模块共 57 项功能（转账与账户 11、账单 10、订阅与代扣 8、理财与目标储蓄 16、卡片管理 12），对应 91 个逻辑工具。2026-11-06 新增 TR10 邀请同学、TR11 第三方商户下单指引、IN16 理财复盘；提交版（答辩稿）为 54 项 |
 | 沙箱适配器 | `lib/workflows/adapters.ts`、`business-lite.ts`：49 项功能有沙箱适配器；BI07、BI10、CA10、CA11、CA12 共 5 项标记为 `unavailable`，调用时明确返回“未接入、没有执行” |
 | 会话状态 `BankState` | 账户、转账任务、回执、流水、Workflow 任务、Plan、审计记录、最近 64 个 `requestId` |
 | 持久化 | D1（SQLite）表 `demo_sessions(id, owner, revision, state, updated_at)`，整份状态以 JSON 保存，按 `owner` 隔离；本地与演示服务器均为 Wrangler 本地持久化，未使用 Cloudflare 云端 D1 |
@@ -179,6 +179,18 @@ BankState
 | 项目 | 状态 |
 |---|---|
 | 真实银行、支付通道、身份认证 | 未接入；全部为合成数据与演示验证码 |
-| 54 项功能 | 49 项有沙箱适配器，5 项明确不可用；规则目录 62 份检查单中仅 2 份标为 `demo-ready`，其余作为规则依据保留 |
+| 57 项功能 | 52 项有沙箱适配器（TR11 只给官方渠道指引、结果保持外部办理），5 项明确不可用；规则目录 62 份检查单中仅 2 份标为 `demo-ready`，其余作为规则依据保留 |
 | 财富鹅 PixiJS 播放器 | 未接入；当前为 Canvas 2D 实现 |
 | 真人语音验收 | 已有合成音轨与真实模型的自动化记录；真人麦克风、手机回声、跨网质量仍需现场验收 |
+
+## 附：2026-11-06 增补
+
+| 增补 | 位置 | 说明 |
+|---|---|---|
+| IN16 理财复盘 | `lib/workflows/portfolio-review.ts` | 按持仓与已结算订单列成本、市值、盈亏（整数分）、每次买入、持有天数和 2–3 个复盘问题；只读，不给买卖建议、不预测收益。复盘笔记是唯一写操作，只需确认 |
+| 底层资产 | `lib/demo/dataset.ts`、`presentation-lite.ts` | 合成产品带“底层资产构成（合成）”，IN06 详情展示、IN07 对比 |
+| TR10 邀请同学 | `lib/workflows/invite.ts` | 只发给用户点名的一位同学，确认后经模拟通道发送一次；不读通讯录、不群发，权益与交易无关 |
+| 生日联动 | `lib/plans/birthday.ts`、TR11 | 含生日、日期、金额的一句话由程序拆成目标储蓄 → 提醒 → 商户官方渠道指引；TR11 永远是外部办理，不下单、不付款 |
+| 确认分级 | `lib/workflows/risk.ts` | 转账风险分升高时语音确认不算数，必须点卡片；低风险不减少任何关卡 |
+| 金额追问与大写回读 | `lib/voice/intent-json.ts`、`lib/bank/amount-words.ts` | 一句话一个金额而模型与解析不一致时追问；核对卡带大写金额 |
+| IM 渠道 | `app/api/im/route.ts`、`lib/im/handler.ts`、`/im` | HMAC 签名的 webhook；可查询、起草、确认，不能认证；`/im` 为本机模拟页 |
