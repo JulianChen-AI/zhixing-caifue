@@ -29,7 +29,7 @@ test('catalog and definition receipts survive an active Plan without changing ta
   const out=operationToolResult(before,s,{name:'bank_function',arguments:args});
   assert.equal(currentWorkflow(s)!.id,id);assert.equal(s.plan!.currentTaskId,id);assert.deepEqual(currentWorkflow(s)!.params.answers,[3,0,0]);
   const receipt=out.operationResult.workflow!;
-  if(args.operation==='list'){assert.equal((receipt.result as any[]).length,56);assert.ok((receipt.result as any[]).some(f=>f.id==='BI01'));}
+  if(args.operation==='list'){assert.equal((receipt.result as any[]).length,57);assert.ok((receipt.result as any[]).some(f=>f.id==='BI01'));}
   else {assert.ok((receipt.result as any).acceptedFields.includes('period'));assert.equal(receipt.functionId,'BI01');}
   assert.equal(out.workflow!.taskId,id);
   assert.deepEqual(operationToolResult(s,s,{name:'bank_function',arguments:args}).operationResult.workflow!.result,receipt.result,'deduplicated receipt retains directory');

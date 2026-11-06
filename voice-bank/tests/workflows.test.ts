@@ -76,8 +76,8 @@ test('card selection and fund product replies amend the existing checklist inste
  let fund=run(assessed,'IN08');const fundId=currentWorkflow(fund)!.id;fund=act(fund,workflowTextAction(fund,'演示债券基金')!);assert.equal(currentWorkflow(fund)!.id,fundId);assert.equal(currentWorkflow(fund)!.params.productId,'fund-bond');assert.ok(currentWorkflow(fund)!.missing.includes('amount'));
 });
 
-test('four-layer catalog covers 56 unique functions and 90 unique logical tools; every reference resolves',()=>{
- assert.equal(USER_FUNCTIONS.length,56);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.id)).size,56);assert.equal(LOGICAL_TOOLS.length,90);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.moduleId)).size,5);
+test('four-layer catalog covers 57 unique functions and 91 unique logical tools; every reference resolves',()=>{
+ assert.equal(USER_FUNCTIONS.length,57);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.id)).size,57);assert.equal(LOGICAL_TOOLS.length,91);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.moduleId)).size,5);
  for(const f of USER_FUNCTIONS)for(const id of f.tools)assert.ok(LOGICAL_TOOLS.some(t=>t.id===id),id);
 });
 test('shared concrete readers are reusable without mutating state; catalog write IDs cannot bypass checklists',()=>{
@@ -88,7 +88,7 @@ test('draft previews cannot be mistaken for committed business results in model 
  assert.deepEqual(r.missing,[]);assert.equal(r.fields.find(f=>f.key==='accountId')!.required,false);assert.ok(!r.requiredFields.includes('accountId'));
 });
 test('every catalog entry opens a real sandbox query, collecting draft or explicit unavailable result',()=>{
- for(const f of USER_FUNCTIONS){const s=run(initialState(),f.id);assert.ok(['collecting','complete','unsupported','review'].includes(currentWorkflow(s)!.status),f.id+': '+currentWorkflow(s)!.message);}
+ for(const f of USER_FUNCTIONS){const s=run(initialState(),f.id);assert.ok(['collecting','complete','unsupported','review',...(f.id==='TR11'?['external']:[])].includes(currentWorkflow(s)!.status),f.id+': '+currentWorkflow(s)!.message);}
 });
 test('optional note is skipped; a supplied note persists across omitted patches and null explicitly clears',()=>{
  let s=run(initialState(),'TR03',{recipientId:'zhang-roommate',accountId:'daily',amount:500});let t=currentWorkflow(s)!;assert.equal(t.status,'review');assert.equal(t.steps.find(x=>x.toolId==='T16')!.status,'skipped');assert.equal(s.task!.note,'');
