@@ -12,6 +12,7 @@ import { isMonthlyRequest, isNextMonthPlan, nextMonthDraft, savedMonthlyPlans } 
 import { businessDay } from '../demo/clock.ts';
 import { amountFromText } from '../checklists/routing.ts';
 import { parseBillingQuery } from '../workflows/billing-query.ts';
+import { birthdayPlan } from '../plans/birthday.ts';
 import { bankToolResult } from '../bank/realtime-tools.ts';
 import catalog from '../workflows/catalog-data.json' with { type: 'json' };
 
@@ -101,7 +102,7 @@ export async function understandIntent(s: BankState, utterance: string, history:
  return { intent, ...result, fallback };
 }
 
-export const TEXT_FIELDS = new Set(['invitee', 'archive', 'note', 'name', 'merchant', 'category', 'period', 'baseline', 'schedule', 'deadline', 'topic', 'narrative', 'file', 'label', 'query', 'reason']);
+export const TEXT_FIELDS = new Set(['invitee', 'item', 'archive', 'note', 'name', 'merchant', 'category', 'period', 'baseline', 'schedule', 'deadline', 'topic', 'narrative', 'file', 'label', 'query', 'reason']);
 const MONEY = ['amount', 'target', 'balance', 'value', 'cost', 'limit'];
 const KEEP = ['id', 'name', 'tail', 'status', 'merchant', 'category', 'date', 'kind', 'accountId', 'productId', 'risk', 'type', 'channel', 'cycle', 'nextChargeAt', 'deadline', 'restriction', 'suspectedDuplicate', 'originalId', 'recipientId', 'note', 'createdAt', ...MONEY];
 /** Business objects the model may refer to, by id, with amounts shown in yuan like its own output. */
@@ -146,6 +147,8 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
   if (!draft.tasks.length) return { dropped, say: draft.lead.replace(/^“[^”]*”：/, '') };
   return { action: { type: 'plan', command: { operation: 'create', tasks: draft.tasks, lead: draft.lead, source: 'card', utterance } }, dropped, say };
  }
+ // A birthday with a date and an amount to put aside is split by the program: goal, reminder, then merchant guidance.
+ if (!['confirm', 'cancel'].includes(intent.intent)) { const birthday = birthdayPlan(s, utterance); if (birthday) return { action: { type: 'plan', command: { operation: 'create', tasks: birthday, source: 'card', utterance } }, dropped, say: '拆成几步：先建生日目标，再设提醒；订蛋糕要你在商户官方渠道自己下单。每步单独确认。' }; }
  // Asking for this month's arrangement opens the saved plan read-only, whatever the model made of the rest of the sentence.
  if (!['confirm', 'cancel'].includes(intent.intent) && isMonthlyRequest(utterance) && savedMonthlyPlans(s).length)
   return { action: { type: 'plan', command: { operation: 'open_saved', source: 'card', utterance } }, dropped, say: '先看数据范围和计划，现在还没有执行任何付款或申购。' };

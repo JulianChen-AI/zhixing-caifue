@@ -209,6 +209,12 @@ function learnResult(s:BankState,p:Params){
   spokenSummary:'投教不是购买门槛。可能亏在几处：净值下跌亏本金、费用吃掉收益、急用钱时赎回慢或低价卖出。能否交易只看有效正式测评、机构适当性规则和产品规则。'+fit,synthetic:true,assessmentChanged:false};
 }
 
+export function merchantGuide(p:Params){
+ const item=typeof p.item==='string'&&p.item.trim()?p.item.trim():'这件商品';
+ return {item,guide:['打开商户的官方 App 或小程序','自己挑选、核对价格和配送时间','在商户页面由你本人确认付款'],connected:false,
+  notice:'暂未接入商户开放接口：银行没有下单，也没有付款，不会显示“已订好”。',
+  message:`${item}需要你在商户官方 App 或小程序自己下单；暂未接入商户开放接口，我没有下单，也没有付款。付款后可以回来查账单。`};
+}
 export function queryBusiness(s:BankState,t:FlowTask):unknown{
  const p=t.params,id=t.functionId;
  switch(id){
@@ -226,6 +232,8 @@ export function queryBusiness(s:BankState,t:FlowTask):unknown{
   case 'TR05':return step(t,'T12','读取 AA 及人工核销来源',()=>rows(s,'aa').filter(r=>!p.sessionId||r.id===p.sessionId));
   case 'TR08':return step(t,'T14','读取沙箱联系人',()=>[...contactsOf(s),...rows(s,'contacts')]);
   case 'TR09':return step(t,'T15','查询个人辅助往来记录',()=>rows(s,'relations'));
+  // Ordering from a merchant is the user's own step in the merchant's official channel: no order, no payment, never “已订好”.
+  case 'TR11':return step(t,'T20','只给出商户官方渠道指引；不代下单、不代付',()=>merchantGuide(p));
   case 'TR10':return step(t,'T19','读取已发出的邀请及状态',()=>rows(s,'invites').map(inviteView));
   case 'BI01':return step(t,'B01','查询合成流水并披露覆盖范围',()=>readTool(s,'B01',p));
   case 'BI02':return step(t,'B03','计算确定性统计，退款冲减支出',()=>readTool(s,'B03',p));

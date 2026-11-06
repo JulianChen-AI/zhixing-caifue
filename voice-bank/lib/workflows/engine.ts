@@ -156,6 +156,8 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
    live.legacyTaskId=s.task!.id;live.legacyReviewToken=s.task!.reviewToken!;
    live.status='review';live.reviewToken=crypto.randomUUID();live.message=s.lastReply+(s.task!.note?' 备注：'+s.task!.note:'（无备注）');s.view='workflow';return s;
   }
+  // Merchant orders stay external: guidance is given, nothing is ordered, and the task never reads as complete.
+  if(t.functionId==='TR11'){const r=queryBusiness(s,t) as {message:string};finish(t,r,r.message);t.status='external';return s;}
   if(!isWrite(t)){finish(t,queryBusiness(s,t));return s;}
   if(t.functionId==='IN01')t.result=step(t,'I01','目标计划由程序计算；不假设收益',()=>({...goalPlan(s,t.params),autoSave:t.params.autoSave===true}));
   if(t.functionId==='IN04'&&t.params.action==='update'){
