@@ -13,6 +13,7 @@ import { businessDay } from '../demo/clock.ts';
 import { amountFromText } from '../checklists/routing.ts';
 import { parseBillingQuery } from '../workflows/billing-query.ts';
 import { birthdayPlan } from '../plans/birthday.ts';
+import { spokenYuan } from '../bank/amount-words.ts';
 import { bankToolResult } from '../bank/realtime-tools.ts';
 import catalog from '../workflows/catalog-data.json' with { type: 'json' };
 
@@ -186,6 +187,8 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
  if (intent.intent === 'run' && (functionId === 'BI01' || functionId === 'BI02') && /花超|超支|超了没|超没超|跟上个?月比|和上个?月比|比上个?月|与上个?月比/.test(utterance)) { functionId = 'BI06'; intent = { ...intent, functionId, params: { period: (parseBillingQuery(utterance, s).params.period as string) || businessDay(s).slice(0, 7) } }; }
  if (!functionId || !FIELDS[functionId]) return { dropped: ['unknown_function'], say };
  const params = clean(s, functionId, keepSpokenNames(intent.params, utterance), heard, dropped, utterance);
+ const conflict = dropped.find(d => d.startsWith('amount:conflict:'));
+ if (conflict) { const [heardCents, modelCents] = conflict.split(':').slice(2).map(Number); return { dropped, say: `金额是${spokenYuan(heardCents)}还是${spokenYuan(modelCents)}？请再说一遍要转多少。` }; }
  // A card described by its state (受限的卡、正常那张) is picked by the record, not by the model; several matches are asked about.
  if (/^CA/.test(functionId) && !/\d{4}/.test(utterance)) {
   const state = utterance.match(/受限|被限制|限制的|正常的|正常那|冻结的|冻结着|挂失的/)?.[0];
@@ -301,6 +304,12 @@ function clean(s: BankState, functionId: string, input: Record<string, unknown> 
   if (TEXT_FIELDS.has(key) && typeof value !== 'string') { dropped.push(key + ':type'); continue; }
   if (['amount', 'total'].includes(key) && !(typeof value === 'number' && value > 0)) { dropped.push(key); continue; }
   // Jiao and fen are where the model misreads (五十块零五毛 is 50.50, not 50.05); there the user's own words decide.
+  // One amount in a transfer sentence that the model heard differently (三百 / 三千): ask, never pick either. Mixed forms like
+  // 1万2 and relative changes (再加100) are left to the model, where this parser is not reliable.
+  if (key === 'amount' && ['TR03', 'TR04'].includes(functionId) && said && typeof value === 'number' && !/\d\s*[十百千万]|[毛角]|[一二两三四五六七八九\d]\s*分|再|加|减|多转|少转|一半|翻倍|倍/.test(said)) {
+   const spoken = amountFromText(said);
+   if (spoken.amount != null && !spoken.uncertain && spoken.amount !== Math.round(value * 100)) { dropped.push(`amount:conflict:${spoken.amount}:${Math.round(value * 100)}`); continue; }
+  }
   if (['amount', 'total'].includes(key) && said && /[毛角]|[一二两三四五六七八九\d]\s*分/.test(said)) { const spoken = amountFromText(said); if (spoken.amount != null && !spoken.uncertain && spoken.amount !== Math.round(Number(value) * 100)) { params[key] = spoken.amount / 100; dropped.push(key + ':spoken'); continue; } }
   if (key === 'action' && ACTIONS[functionId] && !ACTIONS[functionId].includes(String(value))) { dropped.push(key); continue; }
   // Every participant must be the user, a known contact or a name the user said; a made-up placeholder voids the list.
