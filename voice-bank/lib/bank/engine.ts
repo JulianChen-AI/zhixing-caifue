@@ -1,3 +1,4 @@
+import { trimOldStatements } from '../workflows/retention.ts';
 import { transferRisk, elevatedNotice, VOICE_REFUSED } from '../workflows/risk.ts';
 import { upperAmount } from './amount-words.ts';
 import { type BankAction, type BankState, type Intent } from './types.ts';
@@ -133,6 +134,10 @@ function resolveFields(s: BankState, fields: string[]) {
 /** State changes and their rule results are saved together by the outer revision CAS. */
 /** Every state change, from any entry (voice, delegation, tool call, card), gets the same prerequisite guidance. */
 export function reduceBank(previous: BankState, action: BankAction, requestId: string): BankState {
+  const next = reduceWithGuide(previous, action, requestId);
+  return next === previous ? next : trimOldStatements(next);
+}
+function reduceWithGuide(previous: BankState, action: BankAction, requestId: string): BankState {
   const next = reduceOnce(previous, action, requestId);
   if (next === previous || action.type === 'plan' && action.command.prerequisite) return next;
   const guide = prerequisiteAction(next, action.type === 'workflow' || action.type === 'plan' ? action.command.utterance || '' : '');

@@ -168,7 +168,7 @@ function Statement({value}:{value:unknown}){
  return <div className="statement-result">
   <div className="statement-totals"><div><span>净支出</span><strong>{typeof summary.netExpenses==='number'?moneyText(summary.netExpenses):'待核对'}</strong></div>{typeof summary.refunds==='number'&&<div><span>退款</span><strong>{moneyText(summary.refunds)}</strong></div>}{typeof summary.count==='number'&&<div><span>笔数</span><strong>{summary.count}</strong></div>}</div>
   {dailyNet(transactions).length>1&&<Columns label="每日净支出" rows={dailyNet(transactions).map(day=>({key:day.date,tick:day.date.slice(5),value:day.value,tip:`${day.date} ${moneyText(day.value)}`}))}/>}
-  <WorkflowResult value={transactions}/>
+  {typeof result.transactionsTrimmed==='number'?<p className="result-timestamp">{result.transactionsTrimmed} 条明细已收起，再问一次可查看。</p>:<WorkflowResult value={transactions}/>}
   <details className="result-details"><summary>统计详情</summary><WorkflowResult value={rest}/>{known(result.asOf)&&<p className="result-timestamp">更新于 {localDate(String(result.asOf))}</p>}</details>
  </div>;
 }
