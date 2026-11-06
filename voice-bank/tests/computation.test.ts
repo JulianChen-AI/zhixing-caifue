@@ -35,6 +35,79 @@ test('two days in one question are two queries; filters the user never said are 
   assert.match(replyForState(s), /2026年10月23日.*净支出.*2026年11月4日（这一天还没到）：净支出 ¥0.00/);
 });
 
+test('every month named in a sentence is counted, however it is written', () => {
+  const periods = (text: string) => parseBillingQuery(text, day()).periods;
+  assert.deepEqual(periods('9月和10月分别花了多少'), ['2026-09', '2026-10']);
+  assert.deepEqual(periods('九月和十月分别花了多少'), ['2026-09', '2026-10']);
+  assert.deepEqual(periods('九月份、十月份各花了多少'), ['2026-09', '2026-10']);
+  assert.deepEqual(periods('9、10月分别花了多少'), ['2026-09', '2026-10']);
+  assert.deepEqual(periods('2026年9月和10月分别花了多少'), ['2026-09', '2026-10']);
+  assert.deepEqual(periods('去年9月和10月分别花了多少'), ['2025-09', '2025-10']);
+  assert.deepEqual(periods('上个月和9月分别花了多少'), ['2026-10', '2026-09']);
+  assert.deepEqual(periods('上个月和这个月分别花了多少'), ['2026-10', '2026-11']);
+});
+
+test('one month keeps working in every spelling, and words that only look like months are left alone', () => {
+  const period = (text: string) => parseBillingQuery(text, day()).params.period;
+  assert.equal(period('9月花了多少'), '2026-09');
+  assert.equal(period('九月花了多少'), '2026-09');
+  assert.equal(period('十二月账单'), '2026-12');
+  assert.equal(period('十月份花了多少'), '2026-10');
+  assert.equal(period('去年9月花了多少'), '2025-09');
+  assert.equal(period('今年3月花了多少'), '2026-03');
+  assert.equal(period('2026年10月账单'), '2026-10');
+  assert.equal(period('10月18号的账单'), '2026-10');
+  assert.equal(period('这个月花了多少'), '2026-11');
+  for (const text of ['这一月花了多少', '三个月花了多少', '半月花了多少', '每月花多少']) assert.notEqual(period(text), '2026-01', text);
+  assert.equal(parseBillingQuery('13月账单', day()).clarification?.field, 'period');
+  // The month is the period, not a merchant the user named.
+  assert.equal(parseBillingQuery('九月花了多少', day()).clarification, undefined);
+});
+
+test('a span of months is one query over the whole span', () => {
+  const period = (text: string) => parseBillingQuery(text, day()).params.period;
+  assert.equal(period('7月到10月花了多少'), '2026-07-01~2026-10-31');
+  assert.equal(period('9到10月花了多少'), '2026-09-01~2026-10-31');
+  assert.equal(period('九月至十月一共花了多少'), '2026-09-01~2026-10-31');
+  assert.equal(period('去年11月到12月花了多少'), '2025-11-01~2025-12-31');
+  assert.equal(period('2月到3月花了多少'), '2026-02-01~2026-03-31');
+  // “Each month of the span” is several answers, so it stays several queries.
+  assert.deepEqual(parseBillingQuery('8月到10月每个月分别花了多少', day()).periods, ['2026-08', '2026-09', '2026-10']);
+  // Backwards is a slip to ask about, never a silent empty range.
+  assert.equal(parseBillingQuery('10月到7月花了多少', day()).clarification?.field, 'period');
+});
+
+test('two months still ask when the user wants one total across them', () => {
+  assert.equal(parseBillingQuery('9月和10月一共花了多少', day()).clarification?.field, 'period');
+});
+
+test('two months in one question are two queries, whichever month the model picked', async () => {
+  const { s } = await say(day(), '9月和10月分别花了多少', { intent: 'run', functionId: 'BI02', params: { period: '2026-09' }, say: '好' });
+  assert.deepEqual(s.plan!.steps.map(x => [x.functionId, x.params.period, x.quote]), [['BI02', '2026-09', '9月和'], ['BI02', '2026-10', '10月分别花了多少']]);
+  assert.match(replyForState(s), /2026年9月.*净支出.*2026年10月.*净支出/);
+});
+
+test('months sharing one 月, and months in Chinese, are split the same way', async () => {
+  for (const text of ['9、10月分别花了多少', '九月和十月分别花了多少', '九月份和十月份分别花了多少', '2026年9月和10月分别花了多少']) {
+    const { s } = await say(day(), text, { intent: 'run', functionId: 'BI02', params: {}, say: '好' });
+    assert.deepEqual(s.plan!.steps.map(x => x.params.period), ['2026-09', '2026-10'], text);
+    assert.equal(s.plan!.steps.map(x => x.quote).join(''), text);
+  }
+});
+
+test('a span followed by another month never loses or invents a period', () => {
+  assert.deepEqual(parseBillingQuery('9到10月和12月分别花了多少', day()).periods, ['2026-09', '2026-10', '2026-12']);
+  assert.ok(parseBillingQuery('9到10月到11月花了多少', day()).params.period || parseBillingQuery('9到10月到11月花了多少', day()).periods.length);
+});
+
+test('a span of months runs as one query and answers for the whole span', async () => {
+  const { s } = await say(day(), '9月到10月花了多少', { intent: 'run', functionId: 'BI02', params: { period: '2026-09' }, say: '好' });
+  const task = currentWorkflow(s)!;
+  assert.equal(task.params.period, '2026-09-01~2026-10-31');
+  assert.equal(task.status, 'complete');
+  assert.match(task.message, /2026年9月1日至10月31日/);
+});
+
 test('“花超了吗” compares this month with the same days of last month and says when no budget exists', async () => {
   const { s } = await say(day(), '我这个月是不是花超了？跟上个月比怎么样', { intent: 'run', functionId: 'BI02', params: { period: '2026-11' }, say: '好' });
   assert.equal(currentWorkflow(s)!.functionId, 'BI06');

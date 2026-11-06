@@ -40,22 +40,60 @@ export function spokenPeriods(text:string,today:string):string[]{
  return found.sort((a,b)=>a.at-b.at).map(x=>x.period);
 }
 
+const MONTH_WORD=String.raw`\d{1,2}|十[一二]?|[一二三四五六七八九]`;
+/**
+ * A month as spoken: 9月, 九月份, 去年9月, 2026年10月, and the shared-月 list 9、10月 or span 9到10月.
+ * The lookbehind keeps it out of bigger numbers and dates and out of 这一月 or 半月; the lookahead out of 五月天 or 八月饼.
+ */
+export const SPOKEN_MONTH=new RegExp(String.raw`(?<![\d年\-/一二两三四五六七八九十这上下本每第半几])(?<year>20\d{2}年|今年|去年)?(?:(?<first>${MONTH_WORD})(?<sep>到|至|~|、|和|跟|与|及))?(?<last>${MONTH_WORD})月(?!(?:份)?[天饼亮球光])份?`,'g');
+const SPAN_WORD=/^(?:到|至|~)$/;
+const monthNumber=(word:string)=>/\d/.test(word)?Number(word):word.startsWith('十')?10+(({一:1,二:2} as Record<string,number>)[word[1]]||0):'一二三四五六七八九'.indexOf(word)+1;
+const validMonth=(n:number)=>n>=1&&n<=12;
+const spanDays=(y:number,from:number,to:number)=>`${monthText(y,from)}-01~${monthText(y,to)}-${String(new Date(Date.UTC(y,to,0)).getUTCDate()).padStart(2,'0')}`;
+const monthsBetween=(y:number,from:number,to:number)=>Array.from({length:to-from+1},(_,i)=>monthText(y,from+i));
+/** Every month named in a sentence, with where it was said. A span stays one period unless each month was asked for. */
+function spokenMonths(text:string,thisYear:number){
+ const found:{at:number;period:string}[]=[];let year=thisYear,invalid=false,backwards=false,previous:{end:number;month:number;at:number}|null=null;
+ const each=/分别|每个?月|各/.test(text);
+ const span=(at:number,y:number,from:number,to:number)=>{if(from>to){backwards=true;return;}for(const period of each?monthsBetween(y,from,to):[spanDays(y,from,to)])found.push({at,period});};
+ for(const m of text.matchAll(SPOKEN_MONTH)){
+  const g=m.groups!,at=m.index!,stated=g.year;
+  if(stated)year=stated==='今年'?thisYear:stated==='去年'?thisYear-1:Number(stated.slice(0,4));
+  const last=monthNumber(g.last),first=g.first?monthNumber(g.first):0,listed=!!g.first&&validMonth(first);
+  if(!validMonth(last)){invalid=true;previous=null;continue;}
+  const between=previous?text.slice(previous.end,at):'';
+  if(previous&&SPAN_WORD.test(between)){
+   // “9月到10月”: the first month was already taken on its own; the span replaces it.
+   const single=found.findIndex(x=>x.at===previous!.at&&!x.period.includes('~'));if(single>=0)found.splice(single,1);span(previous.at,year,previous.month,last);
+  }else if(listed&&SPAN_WORD.test(g.sep))span(at,year,first,last);
+  else{if(listed)found.push({at,period:monthText(year,first)});found.push({at:at+(listed?1:0),period:monthText(year,last)});}
+  previous={end:at+m[0].length,month:last,at:at+(listed?1:0)};
+ }
+ return {found,invalid,backwards};
+}
+
 /** Relative dates are resolved once using the bank's calendar, not the model's clock. */
 export function parseBillingQuery(text:string,state?:BankState,now=new Date(businessNow(state))){
  const params:Params={},clarifications:QueryClarification[]=[];
  const done=(issue?:QueryClarification)=>{if(issue)clarifications.push(issue);return {params,clarification:clarifications[0],clarifications,periods:[] as string[]};};
  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Shanghai',year:'numeric',month:'numeric'}).formatToParts(now);
  const year=Number(parts.find(p=>p.type==='year')!.value),month=Number(parts.find(p=>p.type==='month')!.value);
- const periods:string[]=spokenPeriods(text,businessDay({demoClock:now.toISOString()} as BankState));
+ const noMonth={field:'period',message:'这个月份不存在，请选择明确的统计月份。'} as const;
+ // Months and relative months are kept in the order said, so each answer lines up with the words that asked for it.
+ const dated:{at:number;period:string}[]=[];
  for(const match of text.matchAll(/(20\d{2})(?:年|[-/])(\d{1,2})月?/g)){
-  const m=Number(match[2]);if(m<1||m>12)clarifications.push({field:'period',message:'这个月份不存在，请选择明确的统计月份。'});
-  else periods.push(monthText(Number(match[1]),m));
+  const m=Number(match[2]);if(m<1||m>12)clarifications.push(noMonth);
+  else dated.push({at:match.index!,period:monthText(Number(match[1]),m)});
  }
- if(/这个月|本月/.test(text))periods.push(monthText(year,month));
- if(/上个月|上月/.test(text))periods.push(monthText(month===1?year-1:year,month===1?12:month-1));
- if(!periods.length){
-  const bareMonth=text.match(/(?:^|[^\d年-])(\d{1,2})月/);if(bareMonth){const m=Number(bareMonth[1]);if(m>=1&&m<=12)periods.push(monthText(year,m));else if(!clarifications.length)clarifications.push({field:'period',message:'这个月份不存在，请选择明确的统计月份。'});}
- }
+ const thisMonth=text.search(/这个月|本月/),lastMonth=text.search(/上个月|上月/);
+ if(thisMonth>=0)dated.push({at:thisMonth,period:monthText(year,month)});
+ if(lastMonth>=0)dated.push({at:lastMonth,period:monthText(month===1?year-1:year,month===1?12:month-1)});
+ const named=spokenMonths(text,year);
+ if(named.invalid&&!clarifications.length)clarifications.push(noMonth);
+ if(named.backwards)clarifications.push({field:'period',message:'起止月份前后颠倒了，请说明要查从哪个月到哪个月。'});
+ // A year-qualified month is found twice; a span replaces the single month it starts from.
+ const spans=named.found.filter(x=>x.period.includes('~')),covered=(period:string)=>spans.some(x=>x.period.slice(0,7)===period);
+ const periods:string[]=[...spokenPeriods(text,businessDay({demoClock:now.toISOString()} as BankState)),...[...dated.filter(x=>!covered(x.period)),...named.found].sort((a,b)=>a.at-b.at).map(x=>x.period)];
  if(!periods.length){
   const explicit=text.match(/(20\d{2})年/);if(explicit)periods.push(explicit[1]);
   else if(/今年|本年度/.test(text))periods.push(String(year));else if(/去年/.test(text))periods.push(String(year-1));
@@ -85,7 +123,7 @@ export function parseBillingQuery(text:string,state?:BankState,now=new Date(busi
  if(quoted){params.merchant=quoted[1].trim();return done();}
  const segments=text.split(/[，,。；;？?]/);
  let subject=(segments.findLast(part=>/花|消费|支出|收入/.test(part))||segments.find(part=>/账单|收支|流水|明细/.test(part))||segments[0]).split(/一共|总共|花了|花费|花多少|消费了?|支出|收入/)[0];
- subject=subject.replace(timeWords,'').replace(/最近|前阵子|这段时间|这两个月|近一个月|查询|统计|查看|看看|看一下|查一下|查下|帮我|请问|账单|明细|收支|流水|交易|情况|报告|多少钱|多少|全部|所有|改成|换成|改为|调整为|改口|选择|先选|只看|只查|先看/g,'').replace(/^(?:先|请|我|的|在|查|看)+/,'').replace(/(?:上|里|的|一共|总共)+$/,'').replace(/^(?:和|与|及|以及)?退款$/,'').trim();
+ subject=subject.replace(timeWords,'').replace(SPOKEN_MONTH,'').replace(/最近|前阵子|这段时间|这两个月|近一个月|查询|统计|查看|看看|看一下|查一下|查下|帮我|请问|账单|明细|收支|流水|交易|情况|报告|多少钱|多少|全部|所有|改成|换成|改为|调整为|改口|选择|先选|只看|只查|先看/g,'').replace(/^(?:先|请|我|的|在|查|看)+/,'').replace(/(?:上|里|的|一共|总共)+$/,'').replace(/^(?:和|与|及|以及)?退款$/,'').trim();
  if(!subject||/^(?:钱|净|总|总计|记录|本期|吗|呢|能吗|类别|商户|账户|期间)$/.test(subject)||namedCategories.includes(subject))return done();
  // Exact merchant names win. Short names may resolve only to one actual merchant.
  const exact=merchants.filter(name=>name===subject),matched=exact.length?exact:merchants.filter(name=>name.includes(subject));

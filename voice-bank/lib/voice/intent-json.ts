@@ -11,7 +11,7 @@ import { FRAUD_WORDS } from '../workflows/engine.ts';
 import { isMonthlyRequest, isNextMonthPlan, nextMonthDraft, savedMonthlyPlans } from '../plans/monthly.ts';
 import { businessDay } from '../demo/clock.ts';
 import { amountFromText } from '../checklists/routing.ts';
-import { parseBillingQuery } from '../workflows/billing-query.ts';
+import { parseBillingQuery, SPOKEN_MONTH } from '../workflows/billing-query.ts';
 import { birthdayPlan } from '../plans/birthday.ts';
 import { spokenYuan } from '../bank/amount-words.ts';
 import { bankToolResult } from '../bank/realtime-tools.ts';
@@ -215,7 +215,8 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
   }
   if (parsed.periods.length > 1) {
    // Each query owns the stretch of the sentence from its time phrase to the next, so the pieces tile the sentence.
-   const marks = [...utterance.matchAll(TIME_PHRASE)].map(m => m.index!);
+   // “9、10月” shares one 月 between two months, so the second one starts at its own number.
+   const marks = [...utterance.matchAll(TIME_PHRASE)].flatMap(m => { const g = m.groups || {}; return g.first && !/到|至|~/.test(g.sep) ? [m.index!, m.index! + (g.year?.length || 0) + g.first.length + g.sep.length] : [m.index!]; });
    if (marks.length !== parsed.periods.length) return { dropped: [...dropped, 'period:several'], say: '这句话里有几个时间，请分开说要查哪几天或哪几个月。' };
    const cut = [0, ...marks.slice(1), utterance.length];
    return { action: { type: 'plan', command: { operation: 'create', tasks: parsed.periods.map((period, i) => ({ quote: utterance.slice(cut[i], cut[i + 1]), functionId: functionId!, params: { ...params, period } })), source: 'card', utterance } }, dropped, say };
@@ -276,7 +277,7 @@ function keepSpokenNames(input: Record<string, unknown> | undefined, utterance: 
  return fits ? { ...input, participants: said } : input;
 }
 /** The time phrases parseBillingQuery resolves, used only to cut a sentence between them. */
-const TIME_PHRASE = /(?:上上|上|这|本)?\s*(?:周|星期|礼拜)[一二三四五六日天]|大前天|前天|昨天|今天|(?:上上|上|这|本)(?:个)?(?:周|星期|礼拜)|(?:最近|近)\s*(?:\d{1,2}|[一二两三四五六七八九十]+)?\s*(?:天|周|星期)|这个月|本月|上个月|上月|20\d{2}年\d{1,2}月/g;
+const TIME_PHRASE = new RegExp(String.raw`(?:上上|上|这|本)?\s*(?:周|星期|礼拜)[一二三四五六日天]|大前天|前天|昨天|今天|(?:上上|上|这|本)(?:个)?(?:周|星期|礼拜)|(?:最近|近)\s*(?:\d{1,2}|[一二两三四五六七八九十]+)?\s*(?:天|周|星期)|这个月|本月|上个月|上月|20\d{2}年\d{1,2}月|`.concat(SPOKEN_MONTH.source), 'g');
 /** A question about what happened, not a request to do it. */
 const ASKS = /了吗|了没|了么|有没有|是不是|没有[？?]?$|[吗么][？?]?$|[？?]$/;
 /** The task names something the user said: a subscription, card tail, payee or the business itself. */
