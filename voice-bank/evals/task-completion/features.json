@@ -136,6 +136,7 @@
     {"id": "BI-17", "scenario": "bills", "brief": "年份带到后面的月份", "source": "variant", "turns": ["2026年9月和10月各花了多少"], "expect": {"plan": [["BI02", "BI01"], ["BI02", "BI01"]]}},
     {"id": "BI-18", "scenario": "bills", "brief": "跨度算一次", "source": "variant", "turns": ["9月到10月花了多少"], "expect": {"functionId": ["BI02", "BI01"], "status": "complete", "params": {"period": "2026-09-01~2026-10-31"}}},
     {"id": "BI-19", "scenario": "bills", "brief": "单个中文月份", "source": "variant", "turns": ["九月花了多少"], "expect": {"functionId": ["BI02", "BI01"], "status": "complete", "params": {"period": "2026-09"}}},
-    {"id": "BI-20", "scenario": "bills", "brief": "去年的月份不算整年", "source": "variant", "turns": ["去年9月花了多少"], "expect": {"functionId": ["BI02", "BI01"], "status": "complete", "params": {"period": "2025-09"}}}
+    {"id": "BI-20", "scenario": "bills", "brief": "去年的月份不算整年", "source": "variant", "turns": ["去年9月花了多少"], "expect": {"functionId": ["BI02", "BI01"], "status": "complete", "params": {"period": "2025-09"}}},
+    {"id": "BI-21", "scenario": "bills", "brief": "跨度里每个月各算一次", "source": "variant", "turns": ["8月到10月每个月分别花了多少"], "expect": {"plan": [["BI02", "BI01"], ["BI02", "BI01"], ["BI02", "BI01"]]}}
   ]
 }

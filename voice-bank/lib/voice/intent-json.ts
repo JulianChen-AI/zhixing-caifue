@@ -217,8 +217,12 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
    // Each query owns the stretch of the sentence from its time phrase to the next, so the pieces tile the sentence.
    // “9、10月” shares one 月 between two months, so the second one starts at its own number.
    const marks = [...utterance.matchAll(TIME_PHRASE)].flatMap(m => { const g = m.groups || {}; return g.first && !/到|至|~/.test(g.sep) ? [m.index!, m.index! + (g.year?.length || 0) + g.first.length + g.sep.length] : [m.index!]; });
-   if (marks.length !== parsed.periods.length) return { dropped: [...dropped, 'period:several'], say: '这句话里有几个时间，请分开说要查哪几天或哪几个月。' };
-   const cut = [0, ...marks.slice(1), utterance.length];
+   const count = parsed.periods.length;
+   if (count > 6) return { dropped: [...dropped, 'period:too_many'], say: `这次提到了${count}个时间，一次最多查6个，请缩小范围。` };
+   // “8月到10月每个月” asks for more months than it names, so its words are shared out evenly; step quotes only have to tile the sentence.
+   const shared = marks.length !== count && /到|至|~/.test(utterance) && utterance.length >= count;
+   if (marks.length !== count && !shared) return { dropped: [...dropped, 'period:several'], say: '这句话里有几个时间，请分开说要查哪几天或哪几个月。' };
+   const cut = shared ? [...Array.from({ length: count }, (_, i) => Math.floor(i * utterance.length / count)), utterance.length] : [0, ...marks.slice(1), utterance.length];
    return { action: { type: 'plan', command: { operation: 'create', tasks: parsed.periods.map((period, i) => ({ quote: utterance.slice(cut[i], cut[i + 1]), functionId: functionId!, params: { ...params, period } })), source: 'card', utterance } }, dropped, say };
   }
   if (typeof parsed.params.period === 'string') params.period = parsed.params.period;
