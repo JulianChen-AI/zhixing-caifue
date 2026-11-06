@@ -54,7 +54,8 @@ export default function DemoPage() {
     if (!withAudio || capture) return;
     for (const line of compiled.lines) {
       let el = audio.current.get(line.id);
-      if (!el) { el = new Audio(`/demo/voice/${line.id}.wav`); audio.current.set(line.id, el); }
+      // AAC copies of the WAV sources (scripts/demo-video/tts.mjs writes both); about a tenth of the download.
+      if (!el) { el = new Audio(`/demo/voice/${line.id}.m4a`); audio.current.set(line.id, el); }
       const inside = t >= line.start && t < line.end;
       if (inside && playing && el.paused) { el.currentTime = t - line.start; void el.play().catch(() => {}); }
       if ((!inside || !playing) && !el.paused) el.pause();

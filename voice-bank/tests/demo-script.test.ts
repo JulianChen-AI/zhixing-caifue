@@ -1,7 +1,7 @@
 // Rehearses the whole 300-second director script against the sandbox, as a take would run.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { compile } from '../lib/demo/timeline.ts';
 import { CHAPTERS, VIDEO_SECONDS } from '../lib/demo/script.ts';
 import { rehearse, viewAt } from '../lib/demo/runtime.ts';
@@ -17,6 +17,11 @@ test('timeline lasts exactly 300 seconds and every line is used once', () => {
   assert.deepEqual(compiled.lines.map(l => l.id).sort(), voice.lines.map((l: { id: string }) => l.id).sort());
   for (let i = 1; i < compiled.lines.length; i++) assert.ok(compiled.lines[i].start >= compiled.lines[i - 1].end - 1e-6, `${compiled.lines[i].id} overlaps`);
   if (process.env.DEMO_PRINT) for (const c of compiled.chapters) console.log(c.id.padEnd(11), c.start.toFixed(1).padStart(6), c.end.toFixed(1).padStart(6), 'target', c.target.join('–'));
+});
+
+test('every voice clip has the AAC copy the /demo page plays', () => {
+  const missing = Object.keys(clips).filter(id => !existsSync(new URL(`../public/demo/voice/${id}.m4a`, import.meta.url)));
+  assert.deepEqual(missing, []);
 });
 
 test('a full take raises no sandbox errors', () => {

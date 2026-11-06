@@ -32,13 +32,21 @@ function wavSeconds(buffer) {
   throw new Error('No data chunk');
 }
 
+/** The page plays an AAC copy; the WAV stays as the source for mixing and ASR checks. */
+function webCopy(file) {
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-c:a', 'aac', '-b:a', '64k', '-movflags', '+faststart', file.replace(/\.wav$/, '.m4a')]);
+}
+
 const clips = {};
 for (const line of script.lines) {
   const voice = script.voices[line.speaker];
   const text = line.tts || line.text;
   const hash = createHash('sha256').update(`${voice}\n${text}`).digest('hex').slice(0, 16);
   const raw = join(outDir, `${line.id}.raw.wav`), file = join(outDir, `${line.id}.wav`);
-  if (!force && previous[line.id]?.hash === hash && existsSync(file)) { clips[line.id] = previous[line.id]; continue; }
+  if (!force && previous[line.id]?.hash === hash && existsSync(file)) {
+    if (!existsSync(file.replace(/\.wav$/, '.m4a'))) webCopy(file);
+    clips[line.id] = previous[line.id]; continue;
+  }
   const response = await fetch(`https://${host}/api/v1/services/aigc/multimodal-generation/generation`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
@@ -53,6 +61,7 @@ for (const line of script.lines) {
     'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.05,areverse,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.08,areverse',
     '-ar', '48000', '-ac', '1', file]);
   execFileSync('rm', [raw]);
+  webCopy(file);
   clips[line.id] = { hash, voice, seconds: Number(wavSeconds(readFileSync(file)).toFixed(3)) };
   console.log(line.id, voice, clips[line.id].seconds);
 }
