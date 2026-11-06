@@ -9,10 +9,11 @@ import { goalPlan, replanGoalRules, assertCancellation, cancellationDeadline, as
 import { standingLimits } from './limits.ts';
 import { aaShares, reminderDrafts, type AaItem } from './aa.ts';
 import { portfolioReview, reviewNote } from './portfolio-review.ts';
+import { existingInvite, inviteeName, inviteText, inviteView, INVITE_PERK } from './invite.ts';
 import { productDetail, compareProducts, redemptionQuote, cardApplicationGuide, judicialGuide, transferView, ruleView, orderView, subscriptionView, lossView } from './presentation-lite.ts';
 export { appendTransaction } from './business-lite.ts';
 
-export const ACTIONS:Record<string,string[]>={IN05:['status','assess'],TR04:['list','create','update','pause','resume','delete'],TR05:['list','create','update','status','remind','reconcile'],TR08:['list','create','update','delete'],TR09:['list','create','update','reconcile','delete'],BI08:['get','set','estimate'],SU02:['create','update'],SU03:['list','create','update','delete'],IN04:['update','pause','resume','close'],IN13:['list','create','update','pause','resume','delete'],IN14:['list','create','update','delete'],CA03:['list','guide','submit','status','supplement','withdraw'],CA04:['get','set','request'],CA05:['query','unlock'],CA06:['freeze','unfreeze'],CA07:['report','status'],CA08:['list','request','status','activate'],CA09:['list','mark_done'],IN16:['review','note']};
+export const ACTIONS:Record<string,string[]>={IN05:['status','assess'],TR04:['list','create','update','pause','resume','delete'],TR05:['list','create','update','status','remind','reconcile'],TR08:['list','create','update','delete'],TR09:['list','create','update','reconcile','delete'],BI08:['get','set','estimate'],SU02:['create','update'],SU03:['list','create','update','delete'],IN04:['update','pause','resume','close'],IN13:['list','create','update','pause','resume','delete'],IN14:['list','create','update','delete'],CA03:['list','guide','submit','status','supplement','withdraw'],CA04:['get','set','request'],CA05:['query','unlock'],CA06:['freeze','unfreeze'],CA07:['report','status'],CA08:['list','request','status','activate'],CA09:['list','mark_done'],IN16:['review','note'],TR10:['create','status']};
 export function step<T>(t:FlowTask,id:string,reason:string,fn:()=>T):T{
  const x=t.steps.find(x=>x.toolId===id);if(!x)throw new WorkflowError('工具不在当前 checklist 的白名单：'+id);
  try{const value=fn();x.status='passed';x.reason=reason;return value;}catch(e){x.status='blocked';x.reason=e instanceof Error?e.message:'工具失败';throw e;}
@@ -101,8 +102,8 @@ export function isWrite(t:Pick<FlowTask,'functionId'|'params'>):boolean{
  const a=String(t.params.action||'');
  // A portfolio review only reads; saving the user's own review note is the one write.
  if(t.functionId==='IN16')return t.params.action==='note';
- if(['TR04','TR05','TR08','TR09','BI08','SU03','IN05','IN13','IN14','CA03','CA04','CA05','CA07','CA08','CA09'].includes(t.functionId)&&['list','get','query','status','guide'].includes(a))return false;
- return ['TR03','TR04','TR05','TR07','TR08','TR09','BI03','BI08','SU02','SU03','SU04','SU06','IN01','IN02','IN04','IN05','IN08','IN09','IN12','IN13','IN14','CA03','CA04','CA05','CA06','CA07','CA08','CA09'].includes(t.functionId);
+ if(['TR04','TR05','TR08','TR09','TR10','BI08','SU03','IN05','IN13','IN14','CA03','CA04','CA05','CA07','CA08','CA09'].includes(t.functionId)&&['list','get','query','status','guide'].includes(a))return false;
+ return ['TR03','TR04','TR05','TR07','TR08','TR09','TR10','BI03','BI08','SU02','SU03','SU04','SU06','IN01','IN02','IN04','IN05','IN08','IN09','IN12','IN13','IN14','CA03','CA04','CA05','CA06','CA07','CA08','CA09'].includes(t.functionId);
 }
 export function needsAuth(t:FlowTask){return isWrite(t)&&(t.functionId==='IN01'&&t.params.autoSave===true||['TR03','TR04','SU04','SU06','IN02','IN08','IN09','IN12','IN13','CA03','CA04','CA05','CA06','CA07','CA08','CA09'].includes(t.functionId));}
 
@@ -171,6 +172,8 @@ export function preflight(s:BankState,t:FlowTask){
   if(!Array.isArray(p.participants))throw new WorkflowError('AA 参与者须为 2 至 20 人。');
   aaShares(cents(p.total),p.participants as string[],(p.adjustments as AaItem[])||[]);
  }
+ // One named person per invitation, sent once: a second request for the same person is answered from the record.
+ if(id==='TR10'&&a==='create'){const name=inviteeName(p.invitee),sent=existingInvite(s,name);if(sent)throw new WorkflowError(`已经给${name}发过邀请（${String(sent.createdAt).slice(0,10)}，模拟通道），不重复发送。可以说“看看邀请状态”。`);}
  if(id==='TR05'&&a==='remind'&&!reminderDrafts(getRow(s,'aa',p.sessionId)).length)throw new WorkflowError('名单里的人都已付款，没有需要提醒的对象。');
  if(id==='BI09'&&(!Number.isInteger(p.periodCount)||Number(p.periodCount)<1||Number(p.periodCount)>600))throw new WorkflowError('期数应为 1 至 600 的整数。');
  // A zero or false rate is the principal-only estimate that is implemented.
@@ -223,6 +226,7 @@ export function queryBusiness(s:BankState,t:FlowTask):unknown{
   case 'TR05':return step(t,'T12','读取 AA 及人工核销来源',()=>rows(s,'aa').filter(r=>!p.sessionId||r.id===p.sessionId));
   case 'TR08':return step(t,'T14','读取沙箱联系人',()=>[...contactsOf(s),...rows(s,'contacts')]);
   case 'TR09':return step(t,'T15','查询个人辅助往来记录',()=>rows(s,'relations'));
+  case 'TR10':return step(t,'T19','读取已发出的邀请及状态',()=>rows(s,'invites').map(inviteView));
   case 'BI01':return step(t,'B01','查询合成流水并披露覆盖范围',()=>readTool(s,'B01',p));
   case 'BI02':return step(t,'B03','计算确定性统计，退款冲减支出',()=>readTool(s,'B03',p));
   case 'BI04':return step(t,'B05','根据实际关联记录核对，不直接定性',()=>({transactions:filtered(s,p).filter(r=>!p.transactionId||r.id===p.transactionId||r.originalId===p.transactionId),signals:filtered(s,p).filter(r=>r.suspectedDuplicate).map(r=>({transactionId:r.id,reason:'合成数据标记为疑似重复，需核实',verdict:'unknown'}))}));
@@ -301,6 +305,10 @@ export function executeBusiness(s:BankState,t:FlowTask):unknown{
     return {reminders:sent,notice:`已通过模拟通道发送${sent.length}条私密提醒（演示用，不是真实消息）；收款进度不变，对方付款后才会更新。`};
    }if(a==='update')throw new WorkflowError('已发出 AA 的复杂改算尚未接入。',501);if(a==='reconcile'){aa.status='manually_reconciled';aa.source='用户手动核销，非支付通道回调';}return aa;
   });
+  case 'TR10':{
+   const name=inviteeName(p.invitee),text=step(t,'T17','按用户点名的一位同学生成私密邀请文案；不读通讯录',()=>inviteText(name));
+   return step(t,'T18','模拟通道发送一次；同一人不重复发送',()=>{const r=add(s,'invites',{id:uuid('invite'),invitee:name,text,perk:INVITE_PERK,channel:'模拟通道（演示）',status:'simulated_sent',createdAt:ts});return {...inviteView(r),notice:`已通过模拟通道把邀请发给${name}（演示，不是真实消息）。对方是否接受要由对方操作，演示里不会自动变化。`};});
+  }
   case 'TR07':throw new WorkflowError('已提交转账的延迟撤销通道未接入；可取消未完成草稿。',501);
   case 'CA03':return step(t,'C02','仅模拟收件和申请跟踪，不审批发卡',()=>{if(a==='submit')return add(s,'applications',{id:uuid('application'),productType:p.productType,purpose:p.purpose,status:'received',createdAt:ts,notice:'沙箱收件，尚未审批'});const app=getRow(s,'applications',p.applicationId);if(a==='withdraw')app.status='withdrawn';if(a==='supplement')app.status='supplement_received';return app;});
   case 'CA04':return step(t,'C03','区分交易限额直接设置与授信申请',()=>{const c=getRow(s,'cards',p.cardId);if(p.limitType==='credit')return add(s,'applications',{id:uuid('limit'),cardId:c.id,amount:cents(p.amount),status:'received',kind:'credit_limit'});c.limit=cents(p.amount);return c;});

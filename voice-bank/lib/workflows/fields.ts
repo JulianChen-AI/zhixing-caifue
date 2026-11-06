@@ -9,7 +9,7 @@ import { normalizeAdjustments, type AaItem } from './aa.ts';
 export const FIELDS: Record<string, string[]> = {
  TR01:['accountType'],TR02:['accountId'],TR03:['recipientId','accountId','amount','note','saveRecipient','receiptExport','archive'],
  TR04:['action','ruleId','recipientId','accountId','amount','schedule','note'],TR05:['action','sessionId','total','headcount','participants','adjustments','reminder'],
- TR06:['transferId','period','recipientId','receiptExport'],TR07:['transferId'],TR08:['action','contactId','name','alias','phone'],TR09:['action','recordId','person','amount','relatedTransactionId'],
+ TR06:['transferId','period','recipientId','receiptExport'],TR07:['transferId'],TR08:['action','contactId','name','alias','phone'],TR09:['action','recordId','person','amount','relatedTransactionId'],TR10:['action','invitee'],
  BI01:['period','accountId','merchant','category'],BI02:['period','accountId','merchant','category','baseline','cashOrNet'],BI03:['transactionId','category','scope'],BI04:['transactionId','period','prepareEvidence'],BI05:['period'],
  BI06:['period','narrative','peerComparison','share'],BI07:['source','file'],BI08:['action','period','category','amount','items'],BI09:['category','savePerPeriod','periodCount','interestAssumption'],BI10:['action','ledgerId','members'],
  SU01:['subscriptionId','channel','status'],SU02:['action','subscriptionId','name','channel','amount','cycle','nextChargeAt'],SU03:['action','subscriptionId','leadDays','notifyChannel'],
@@ -20,9 +20,9 @@ export const FIELDS: Record<string, string[]> = {
  CA01:['status'],CA02:['cardId','includeSafetyHistory'],CA03:['action','applicationId','productType','purpose'],CA04:['action','cardId','limitType','amount'],CA05:['cardId','action'],CA06:['action','cardId'],
  CA07:['action','cardId','expiryReminder'],CA08:['action','cardId','replacementId'],CA09:['oldCardId','newCardId','bindingId','action'],CA10:['action','name'],CA11:['action','merchant','limit'],CA12:['action','cardId','amount'],
 };
-export const LABELS: Record<string,string> = {headcount:'人数（含你）',archive:'凭证归档到',accountId:'账户',recipientId:'收款人',amount:'金额（元）',note:'备注（可选）',name:'名称',target:'目标金额（元）',deadline:'截止日期',direction:'存入或取出',goalId:'目标储蓄',productId:'产品',productIds:'对比产品',holdingId:'持仓',orderId:'订单',cardId:'银行卡',subscriptionId:'订阅',transactionId:'交易',category:'类目',period:'统计期间',baseline:'比较期间',action:'操作',schedule:'周期说明',limitType:'额度类型',assessmentId:'问卷',answers:'演示问卷答案',scope:'更正范围',channel:'通道',cycle:'扣款周期',nextChargeAt:'下次扣款日',leadDays:'提前提醒天数',notifyChannel:'通知方式',ruleId:'资金规则',planId:'定投计划',reminderId:'提醒',transferId:'转账记录',sessionId:'AA 收款',total:'AA 总额（元）',participants:'参与者',adjustments:'分摊调整',incomeDates:'到账日',savePerPeriod:'每期节省（元）',periodCount:'期数',riskLevel:'最高产品风险级别',productType:'卡片类型',purpose:'用途',oldCardId:'旧卡',newCardId:'新卡',bindingId:'绑定项',contactId:'联系人',recordId:'往来记录',person:'往来对象',phone:'手机号',alias:'别名',remindAt:'提醒时间',threshold:'提醒阈值',topic:'学习主题'};
+export const LABELS: Record<string,string> = {invitee:'邀请对象',headcount:'人数（含你）',archive:'凭证归档到',accountId:'账户',recipientId:'收款人',amount:'金额（元）',note:'备注（可选）',name:'名称',target:'目标金额（元）',deadline:'截止日期',direction:'存入或取出',goalId:'目标储蓄',productId:'产品',productIds:'对比产品',holdingId:'持仓',orderId:'订单',cardId:'银行卡',subscriptionId:'订阅',transactionId:'交易',category:'类目',period:'统计期间',baseline:'比较期间',action:'操作',schedule:'周期说明',limitType:'额度类型',assessmentId:'问卷',answers:'演示问卷答案',scope:'更正范围',channel:'通道',cycle:'扣款周期',nextChargeAt:'下次扣款日',leadDays:'提前提醒天数',notifyChannel:'通知方式',ruleId:'资金规则',planId:'定投计划',reminderId:'提醒',transferId:'转账记录',sessionId:'AA 收款',total:'AA 总额（元）',participants:'参与者',adjustments:'分摊调整',incomeDates:'到账日',savePerPeriod:'每期节省（元）',periodCount:'期数',riskLevel:'最高产品风险级别',productType:'卡片类型',purpose:'用途',oldCardId:'旧卡',newCardId:'新卡',bindingId:'绑定项',contactId:'联系人',recordId:'往来记录',person:'往来对象',phone:'手机号',alias:'别名',remindAt:'提醒时间',threshold:'提醒阈值',topic:'学习主题'};
 // Billing filters (merchant, category, period) have their own text check with a query-specific message.
-const TEXT_KEYS=new Set(['archive','note','name','schedule','deadline','topic','narrative','file','label','query','reason']);
+const TEXT_KEYS=new Set(['invitee','archive','note','name','schedule','deadline','topic','narrative','file','label','query','reason']);
 export function normalizedParams(id:string, input:Params):Params {
  const allowed=FIELDS[id]||[];const p:Params={};
  for(const [k,v]of Object.entries(input)){
@@ -62,11 +62,12 @@ export function normalizedParams(id:string, input:Params):Params {
 export const readAction=(p:Params)=>['list','get','query','status','guide'].includes(String(p.action));
 export function requiredFields(id:string,p:Params):string[]{
  const a=String(p.action||'');
- const base:Record<string,string[]>={TR03:['recipientId','accountId','amount'],TR04:['action'],TR05:['action'],TR07:['transferId'],TR08:['action'],TR09:['action'],BI03:['transactionId','category'],BI08:['action'],BI09:['savePerPeriod','periodCount'],SU02:['action'],SU03:['action','subscriptionId'],SU04:['subscriptionId'],SU05:['subscriptionId'],SU06:['subscriptionId'],IN01:['name','target','deadline'],IN02:['direction','goalId','accountId','amount'],IN03:['goalId'],IN04:['action','goalId'],IN07:['productIds'],IN08:['productId','accountId','amount'],IN09:['holdingId','accountId','amount'],IN12:['orderId'],IN13:['action'],IN14:['action'],CA02:['cardId'],CA03:['action'],CA04:['action','cardId'],CA05:['cardId','action'],CA06:['action','cardId'],CA07:['cardId','action'],CA08:['action','cardId'],CA09:['oldCardId','action']};
+ const base:Record<string,string[]>={TR03:['recipientId','accountId','amount'],TR04:['action'],TR05:['action'],TR07:['transferId'],TR08:['action'],TR09:['action'],TR10:['action'],BI03:['transactionId','category'],BI08:['action'],BI09:['savePerPeriod','periodCount'],SU02:['action'],SU03:['action','subscriptionId'],SU04:['subscriptionId'],SU05:['subscriptionId'],SU06:['subscriptionId'],IN01:['name','target','deadline'],IN02:['direction','goalId','accountId','amount'],IN03:['goalId'],IN04:['action','goalId'],IN07:['productIds'],IN08:['productId','accountId','amount'],IN09:['holdingId','accountId','amount'],IN12:['orderId'],IN13:['action'],IN14:['action'],CA02:['cardId'],CA03:['action'],CA04:['action','cardId'],CA05:['cardId','action'],CA06:['action','cardId'],CA07:['cardId','action'],CA08:['action','cardId'],CA09:['oldCardId','action']};
  const r=[...(base[id]||[])];
  if(id==='TR04'&&a==='create')r.push('recipientId','accountId','amount','schedule');
  if(id==='TR04'&&!['create','list'].includes(a))r.push('ruleId');
  if(id==='TR05'&&a==='create')r.push('total','participants');if(id==='TR05'&&!['create','list'].includes(a))r.push('sessionId');
+ if(id==='TR10'&&a==='create')r.push('invitee');
  if(id==='TR08'&&a==='create')r.push('name');if(id==='TR08'&&!['create','list'].includes(a))r.push('contactId');
  if(id==='TR09'&&a==='create')r.push('person','amount');if(id==='TR09'&&!['create','list'].includes(a))r.push('recordId');
  if(id==='BI08'&&a==='set')r.push('period','amount');if(id==='BI08'&&a==='estimate')r.push('items');
@@ -177,6 +178,7 @@ export function assertVoiceEvidence(state:BankState,task:Pick<FlowTask,'function
    if(task.functionId==='BI08'&&value==='set'&&familyBudgetAmount(text,true)!=null)continue;
    if(task.functionId==='IN05'&&/测评|问卷/.test(text)&&(value==='status'&&/查|有没有|是否|做过|记录|结果/.test(text)||value==='assess'&&/开始|做|重新|更新|继续/.test(text)))continue;
    if(task.functionId==='TR05'&&value==='create'&&/A\s*A|分摊|分账/i.test(text))continue;
+   if(task.functionId==='TR10'&&value==='create'&&/邀请/.test(text))continue;
    const verbs:Record<string,RegExp>={review:/复盘|回顾|看看/,note:/笔记|记下|记一下|写下|记录/,estimate:/预算|估算|算一?下|加起来|合计|一共/,list:/查|哪些|列表|看看/,get:/查|多少|看看/,query:/查|为什么|怎么|看看/,status:/查|进度|成功|怎么样/,guide:/办.*卡|用途|推荐|适合|选.*卡|怎么/,create:/建|新增|添加|设置|设个|定投|记下/,update:/改|更新|调整/,set:/设|调|改/,request:/申请|补卡|提额/,submit:/申请|提交|办.*卡/,withdraw:/撤回|取消申请/,supplement:/补充|补件/,pause:/停|暂停/,resume:/恢复|继续/,delete:/删除|取消|终止|关闭/,close:/关闭|终止/,unlock:/解|恢复.*使用/,freeze:/冻结|冻住|锁住/,unfreeze:/解冻|解开/,report:/挂失/,activate:/激活/,mark_done:/已.*换绑|换绑.*好了/,remind:/提醒|催/,reconcile:/已.*还|已.*付|核销/};
    if(verbs[String(value)]?.test(text))continue;
    throw new WorkflowError('操作类型缺少用户依据，请明确是查询还是变更。');

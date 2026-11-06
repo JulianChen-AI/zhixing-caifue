@@ -12,6 +12,7 @@ import { goalPlan } from './business-lite.ts';
 import { aaShares, reminderDrafts, type AaItem } from './aa.ts';
 import { delayedNotice } from '../demo/schedule.ts';
 import { redemptionQuote, transferView } from './presentation-lite.ts';
+import { inviteText } from './invite.ts';
 import { WorkflowError, type FlowTask, type Params, type WorkflowCommand } from './types.ts';
 import {isBillingQuery,resolveBillingQuery} from './billing-query.ts';
 
@@ -169,6 +170,7 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
   if(t.functionId==='IN13'&&t.params.action==='create'){const product=rows(s,'products').find(r=>r.id===t.params.productId),acc=s.accounts.find(a=>a.id===t.params.accountId);preview=`将建立定投规则：${t.params.schedule}从${acc?.name||'所选账户'}投${t.params.amount}元到${product?.name||'所选产品'}。这只是授权规则，现在不会扣款；每期执行、受理和份额确认分别记录，可随时暂停、修改或终止。确认后在卡片完成演示认证。`;}
   if(t.functionId==='SU04'){const sub=rows(s,'subscriptions').find(r=>r.id===t.params.subscriptionId)!,yuan=(c:unknown)=>(Number(c)/100).toFixed(Number(c)%100?2:0);t.result={name:sub.name,amount:sub.amount,cycle:sub.cycle,nextChargeAt:sub.nextChargeAt,benefitUntil:sub.benefitUntil,channel:sub.channel};preview=sub.channel==='bank'?`将停止${sub.name}（每月${yuan(sub.amount)}元${sub.nextChargeAt?`，下次${sub.nextChargeAt}续费`:''}）的后续续费。以前的扣款不会退还${sub.benefitUntil?`，本期权益到${sub.benefitUntil}`:''}。确认后在卡片完成演示认证。`:`${sub.name}需要到服务方那里取消，银行不能代你退订；确认后给出官方操作步骤。`;}
   if(t.functionId==='TR05'&&t.params.action==='remind'){const drafts=reminderDrafts(rows(s,'aa').find(r=>r.id===t.params.sessionId)!);t.result={reminders:drafts,channel:'模拟通道（演示）'};preview=`将分别给${drafts.map(d=>`${d.to}（${(d.amount/100).toFixed(d.amount%100?2:0)}元）`).join('、')}发一条私密提醒，内容：“${drafts[0].text.replace(/\d+(?:\.\d+)?元/,'……元')}”已付款的人不会收到。请确认后发送。`;}
+  if(t.functionId==='TR10'&&t.params.action==='create'){const name=String(t.params.invitee);preview=`将通过模拟通道（演示）给${name}发一条私密邀请：“${inviteText(name)}”只发给${name}一人，不读通讯录、不群发。请确认后发送。`;}
   if(t.functionId==='IN16'&&t.params.action==='note')preview=`将保存一条复盘笔记：“${t.params.note}”。笔记只给你自己回看，不进入风险画像，也不影响能买什么。请确认后保存。`;
   t.status='review';t.reviewToken=crypto.randomUUID();
   // Name what is being confirmed, so a listener knows without looking at the card.
@@ -294,7 +296,9 @@ function perform(original:BankState,id:string,legacy:LegacyReducer,code?:string)
    if(live.params.saveRecipient===true)step(live,'T14','仅明确请求保存时追加个人联系人',()=>rows(s,'contacts').push({id:crypto.randomUUID(),recipientId:live.params.recipientId,name:contactsOf(s).find(c=>c.id===live.params.recipientId)?.name||'',source:'用户确认保存'}));
   }else{
    const result=executeBusiness(s,t);
-   if(t.status!=='external')finish(t,result,'已完成当前沙箱操作。资金或订单的后续状态以明细为准。');
+   // Invitations and review notes say exactly what happened, with their own limits.
+   const notice=['TR10','IN16'].includes(t.functionId)&&result&&typeof result==='object'&&'notice' in result?String(result.notice):'';
+   if(t.status!=='external')finish(t,result,notice||'已完成当前沙箱操作。资金或订单的后续状态以明细为准。');
    else{t.result=result;t.message='请到官方平台亲自办理；当前未取消、未核验。';t.verificationId=null;}
   }
  }catch(error){s=structuredClone(original);markFailure(current(s,id)!,error);}

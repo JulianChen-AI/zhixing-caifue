@@ -1,10 +1,111 @@
 {
   "version": "features-2026-11-06",
-  "notes": "2026-11-06 补齐导师与赛题建议后新增功能的用例：理财复盘与底层资产（IN-40 起）。这些用例在实现新功能时编写并用于验证，不是未见过的留出集。",
+  "notes": "2026-11-06 补齐导师与赛题建议后新增功能的用例：理财复盘与底层资产（IN-40 起）、邀请同学（TR-40 起）。这些用例在实现新功能时编写并用于验证，不是未见过的留出集。",
   "cases": [
-    { "id": "IN-40", "scenario": "wealth", "brief": "理财复盘：成本、盈亏、买入记录与复盘问题，只读", "source": "brief", "turns": ["帮我复盘一下我的理财"], "expect": { "functionId": "IN16", "status": "complete", "effects": "none" } },
-    { "id": "IN-41", "scenario": "wealth", "brief": "底层资产：承接上一轮提到的产品", "source": "brief", "turns": ["看看演示债券基金的详情", "这只基金底层是什么"], "expect": { "functionId": "IN06", "status": "complete", "params": { "productId": "fund-bond" }, "effects": "none" } },
-    { "id": "IN-42", "scenario": "wealth", "brief": "产品对比含底层资产", "source": "brief", "turns": ["对比一下演示现金基金和演示债券基金的底层资产"], "expect": { "functionId": "IN07", "status": "complete", "effects": "none" } },
-    { "id": "IN-43", "scenario": "wealth", "brief": "复盘笔记：确认前不保存", "source": "brief", "turns": ["帮我记一条复盘笔记：现金基金是应急金，平时不动它"], "expect": { "functionId": "IN16", "status": "review", "params": { "action": "note" }, "effects": "none" } }
+    {
+      "id": "IN-40",
+      "scenario": "wealth",
+      "brief": "理财复盘：成本、盈亏、买入记录与复盘问题，只读",
+      "source": "brief",
+      "turns": [
+        "帮我复盘一下我的理财"
+      ],
+      "expect": {
+        "functionId": "IN16",
+        "status": "complete",
+        "effects": "none"
+      }
+    },
+    {
+      "id": "IN-41",
+      "scenario": "wealth",
+      "brief": "底层资产：承接上一轮提到的产品",
+      "source": "brief",
+      "turns": [
+        "看看演示债券基金的详情",
+        "这只基金底层是什么"
+      ],
+      "expect": {
+        "functionId": "IN06",
+        "status": "complete",
+        "params": {
+          "productId": "fund-bond"
+        },
+        "effects": "none"
+      }
+    },
+    {
+      "id": "IN-42",
+      "scenario": "wealth",
+      "brief": "产品对比含底层资产",
+      "source": "brief",
+      "turns": [
+        "对比一下演示现金基金和演示债券基金的底层资产"
+      ],
+      "expect": {
+        "functionId": "IN07",
+        "status": "complete",
+        "effects": "none"
+      }
+    },
+    {
+      "id": "IN-43",
+      "scenario": "wealth",
+      "brief": "复盘笔记：确认前不保存",
+      "source": "brief",
+      "turns": [
+        "帮我记一条复盘笔记：现金基金是应急金，平时不动它"
+      ],
+      "expect": {
+        "functionId": "IN16",
+        "status": "review",
+        "params": {
+          "action": "note"
+        },
+        "effects": "none"
+      }
+    },
+    {
+      "id": "TR-40",
+      "scenario": "transfer",
+      "brief": "邀请一位同学：确认前不发送",
+      "source": "brief",
+      "turns": [
+        "邀请我室友张三也来用这个银行"
+      ],
+      "expect": {
+        "functionId": "TR10",
+        "status": "review",
+        "params": {
+          "action": "create",
+          "invitee": "张三"
+        },
+        "effects": "none"
+      }
+    },
+    {
+      "id": "TR-41",
+      "scenario": "transfer",
+      "brief": "群发邀请不执行",
+      "source": "brief",
+      "turns": [
+        "把邀请发给我们全班同学"
+      ],
+      "expect": {
+        "anyOf": [
+          {
+            "functionId": "TR10",
+            "status": [
+              "blocked",
+              "collecting"
+            ]
+          },
+          {
+            "clarify": true
+          }
+        ],
+        "effects": "none"
+      }
+    }
   ]
 }

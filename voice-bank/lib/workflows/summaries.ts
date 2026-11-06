@@ -64,6 +64,7 @@ export function readSummary(functionId: string, result: unknown): string {
       const top = list.slice(0, 3).map(row => `${String(row.createdAt || '').slice(5, 10)} 给${String(row.recipient || '收款人')}转了 ${yuan(row.amount)}`).join('，');
       return `找到 ${list.length} 笔转账：${top}${list.length > 3 ? ' 等' : ''}。`;
     }
+    case 'TR10': return list.length ? `你发出过 ${list.length} 条邀请：${list.map(row => `${String(row.invitee)}（${String(row.statusText || row.status)}）`).join('、')}。` : '还没有发出过邀请。';
     case 'IN10': return list.length ? `你持有 ${list.length} 项理财：${list.map(row => `${row.name} ${yuan(row.value)}`).join('、')}。` : '目前没有理财持仓。';
   }
   return '';

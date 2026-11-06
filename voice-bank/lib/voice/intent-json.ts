@@ -101,7 +101,7 @@ export async function understandIntent(s: BankState, utterance: string, history:
  return { intent, ...result, fallback };
 }
 
-export const TEXT_FIELDS = new Set(['archive', 'note', 'name', 'merchant', 'category', 'period', 'baseline', 'schedule', 'deadline', 'topic', 'narrative', 'file', 'label', 'query', 'reason']);
+export const TEXT_FIELDS = new Set(['invitee', 'archive', 'note', 'name', 'merchant', 'category', 'period', 'baseline', 'schedule', 'deadline', 'topic', 'narrative', 'file', 'label', 'query', 'reason']);
 const MONEY = ['amount', 'target', 'balance', 'value', 'cost', 'limit'];
 const KEEP = ['id', 'name', 'tail', 'status', 'merchant', 'category', 'date', 'kind', 'accountId', 'productId', 'risk', 'type', 'channel', 'cycle', 'nextChargeAt', 'deadline', 'restriction', 'suspectedDuplicate', 'originalId', 'recipientId', 'note', 'createdAt', ...MONEY];
 /** Business objects the model may refer to, by id, with amounts shown in yuan like its own output. */
@@ -288,6 +288,8 @@ function clean(s: BankState, functionId: string, input: Record<string, unknown> 
   // Same-name payees: the user must have said what tells them apart (label, alias or tail), else ask.
   if (key === 'recipientId' && !distinguished(s, String(value), heard)) { dropped.push('recipientId:same_name'); continue; }
   if (key === 'accountId' && !s.accounts.some(a => a.id === value)) { dropped.push(key); continue; }
+  // An invitee is the name the user said; a contact id the model chose becomes that contact's name, and a name never said is dropped.
+  if (key === 'invitee') { const name = contactsOf(s).find(c => c.id === value)?.name ?? String(value); if (!heard.includes(name)) { dropped.push('invitee:unheard'); continue; } params[key] = name; continue; }
   // With several cards, “my card is lost” names none of them; a card the user never named is a guess, so ask.
   // A card is named in this sentence; earlier turns count only when the user points back (这张、那张).
   if (key === 'cardId' && !cardNamed(s, String(value), said && !/这张|那张|这卡|那卡|它/.test(said) ? said : heard)) { dropped.push('cardId:unnamed'); continue; }

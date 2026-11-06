@@ -275,6 +275,11 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
       return Array.isArray(value) ? <RulesViz rows={rows} bank={bank}/> : row.amount != null ? <RulesViz rows={[row]} bank={bank}/> : null;
     case 'TR06': return Array.isArray(value) ? <TransfersViz rows={rows}/> : null;
     case 'TR08': case 'TR09': return Array.isArray(value) ? <ContactsViz rows={rows}/> : null;
+    case 'TR10': {
+      const invites = Array.isArray(value) ? rows : row.invitee != null ? [row] : [];
+      if (Array.isArray(value) && !invites.length) return <EmptyViz title="还没有发出邀请" note="邀请只发给你点名的一位同学，不读通讯录、不群发。"/>;
+      return invites.length ? <ul className="viz-agenda">{invites.map(item => <li key={text(item.id)}><time>{localDate(text(item.createdAt))}</time><b>{text(item.invitee)}</b><small>{text(item.channel)}</small><strong>{text(item.statusText)}</strong></li>)}</ul> : null;
+    }
     case 'BI04': {
       const signals = list(row.signals);
       return <div className="viz-group"><Kpis items={[{ label: '需核实的线索', value: `${signals.length} 笔`, lead: true }, { label: '核对范围', value: `${list(row.transactions).length} 笔` }]}/>{signals.map(item => <p className="warn-line" key={text(item.transactionId)}><ShieldAlert aria-hidden size={15}/> {text(item.reason)}</p>)}</div>;

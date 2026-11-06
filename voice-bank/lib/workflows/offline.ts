@@ -104,6 +104,7 @@ export function offlineWorkflow(text:string,state?:BankState):VoiceCommand|null{
  else if(/卡片|银行卡|哪些卡|(?:借记卡|信用卡)(?:的)?(?:当前状态|状态|列表)/.test(text))id='CA01';
  else if(/风险测评/.test(text))id='IN05';
  else if(/建.*目标|创建.*储蓄|小金库/.test(text))id='IN01';
+ else if(/邀请/.test(text)&&!/AA|收款/.test(text)){id='TR10';if(/状态|进度|接受|回应|发过/.test(text))params.action='status';else{params.action='create';const who=text.match(/邀请(?:我的?)?(?:室友|同学|朋友)?([\u4e00-\u9fa5]{2,3}?)(?:也|一起|来|用|加入|$)/)?.[1];if(who)params.invitee=who;}}
  else if(/复盘/.test(text)&&/理财|基金|持仓|投资|笔记/.test(text)){id='IN16';const note=text.match(/笔记[：:]\s*(.+)$/)?.[1]?.trim();if(note){params.action='note';params.note=note;}}
  else if(/对比|比较/.test(text)&&/基金|理财|产品/.test(text))id='IN07';
  else if(/底层|投向|投了什么|买了什么资产/.test(text)&&/基金|理财|产品/.test(text))id='IN06';
