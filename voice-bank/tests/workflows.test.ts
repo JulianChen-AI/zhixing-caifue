@@ -76,8 +76,8 @@ test('card selection and fund product replies amend the existing checklist inste
  let fund=run(assessed,'IN08');const fundId=currentWorkflow(fund)!.id;fund=act(fund,workflowTextAction(fund,'演示债券基金')!);assert.equal(currentWorkflow(fund)!.id,fundId);assert.equal(currentWorkflow(fund)!.params.productId,'fund-bond');assert.ok(currentWorkflow(fund)!.missing.includes('amount'));
 });
 
-test('four-layer catalog covers 54 unique functions and 85 unique logical tools; every reference resolves',()=>{
- assert.equal(USER_FUNCTIONS.length,54);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.id)).size,54);assert.equal(LOGICAL_TOOLS.length,85);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.moduleId)).size,5);
+test('four-layer catalog covers 55 unique functions and 87 unique logical tools; every reference resolves',()=>{
+ assert.equal(USER_FUNCTIONS.length,55);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.id)).size,55);assert.equal(LOGICAL_TOOLS.length,87);assert.equal(new Set(USER_FUNCTIONS.map(f=>f.moduleId)).size,5);
  for(const f of USER_FUNCTIONS)for(const id of f.tools)assert.ok(LOGICAL_TOOLS.some(t=>t.id===id),id);
 });
 test('shared concrete readers are reusable without mutating state; catalog write IDs cannot bypass checklists',()=>{

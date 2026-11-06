@@ -3,10 +3,18 @@ const yuan = (value: unknown) => typeof value === 'number' && Number.isFinite(va
   ? `¥${(value / 100).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '';
 const CARD_STATUS: Record<string, string> = { active: '正常', frozen: '临时冻结中', lost: '已挂失', restricted: '受限' };
 
+const underlying = (product: Record<string, unknown>) => Array.isArray(product.underlying) && product.underlying.length
+  ? (product.underlying as { asset: string; share: number }[]).map(u => `${u.asset}${u.share}%`).join('、') : '';
 const object = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 
 /** Reads whose result is one record: a month report, a goal with its projection, a cancellation status. */
 function recordSummary(functionId: string, result: Record<string, unknown>): string {
+  if (functionId === 'IN16' && typeof result.spokenSummary === 'string') return result.spokenSummary;
+  if (functionId === 'IN07' && Array.isArray(result.products)) {
+    // Comparing what each product holds is part of the comparison, not a recommendation.
+    const products = result.products.map(object), held = products.map(p => `${String(p.name)}：${underlying(p) || '底层资产未提供'}`).join('；');
+    return `对比 ${products.length} 款产品：${products.map(p => `${String(p.name)}（R${String(p.risk)}）`).join('、')}。底层资产（合成数据）——${held}。这只是同口径对比，不构成买卖建议。`;
+  }
   if (functionId === 'BI06' && typeof object(result.summary).netExpenses === 'number') {
     // “花超了吗”: this month, the same days of last month, the difference, and whether a budget exists.
     const now = object(result.summary), was = object(result.comparison), change = Number(was.changeAmount);
@@ -49,7 +57,8 @@ export function readSummary(functionId: string, result: unknown): string {
       const active = list.filter(row => row.status === 'active'), monthly = active.filter(row => row.cycle === 'monthly').reduce((sum, row) => sum + (Number(row.amount) || 0), 0), stopped = list.length - active.length;
       return `生效中的订阅有 ${active.length} 项，每月固定支出 ${yuan(monthly)}${stopped ? `；另有 ${stopped} 项已解除` : ''}。`;
     }
-    case 'IN06': return list.length ? `共 ${list.length} 款产品：${list.map(row => `${row.name}${row.risk != null ? `（R${row.risk}）` : ''}`).join('、')}。` : '没有符合条件的产品。';
+    case 'IN06': if (list.length === 1 && underlying(list[0])) return `${list[0].name}（R${list[0].risk}）的底层资产（合成数据）：${underlying(list[0])}。底层资产说明钱投向哪里，不代表收益或保本。`;
+      return list.length ? `共 ${list.length} 款产品：${list.map(row => `${row.name}${row.risk != null ? `（R${row.risk}）` : ''}`).join('、')}。` : '没有符合条件的产品。';
     case 'TR06': {
       if (!list.length) return '这个范围里没有转账记录。';
       const top = list.slice(0, 3).map(row => `${String(row.createdAt || '').slice(5, 10)} 给${String(row.recipient || '收款人')}转了 ${yuan(row.amount)}`).join('，');

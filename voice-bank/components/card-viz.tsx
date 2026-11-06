@@ -212,6 +212,18 @@ function HoldingsViz({ rows }: { rows: Record<string, unknown>[] }) {
   </div>;
 }
 
+function PortfolioReviewViz({ row }: { row: Record<string, unknown> }) {
+  const items = list(row.holdings), questions = Array.isArray(row.questions) ? row.questions.map(text) : [];
+  if (!items.length) return <EmptyViz title="没有可复盘的持仓" note="已受理的申购在份额确认前不算持有。"/>;
+  return <div className="viz-group">
+    {items.map(item => <div className="viz-group" key={text(item.holdingId)}>
+      <Kpis items={[{ label: `${text(item.name)} · 盈亏（合成数据）`, value: `${num(item.profit) > 0 ? '+' : ''}${yuan(num(item.profit))}`, lead: true, note: `成本 ${yuan(num(item.cost))} · 市值 ${yuan(num(item.value))}` }, { label: '买入次数', value: `${num(item.buyCount)} 次` }, { label: '持有', value: item.holdingDays != null ? `${num(item.holdingDays)} 天` : '—' }]}/>
+      <ul className="viz-agenda">{list(item.buys).map((buy, index) => <li key={index}><time>{text(buy.date)}</time><b>买入</b><small>{text(buy.source)}</small><strong>{yuan(num(buy.amount))}</strong></li>)}</ul>
+    </div>)}
+    {questions.length ? <div className="viz-learn"><BookOpen aria-hidden size={22}/><div><b>复盘问题（只提问，不给买卖建议）</b><ol className="viz-learn-points">{questions.map(q => <li key={q}>{q}</li>)}</ol></div></div> : null}
+  </div>;
+}
+
 function OrdersViz({ rows }: { rows: Record<string, unknown>[] }) {
   if (!rows.length) return <EmptyViz title="还没有理财订单"/>;
   return <ul className="viz-orders">{rows.map(item => <li key={text(item.id)}><div className="viz-orders-head"><b>{item.action === 'redeem' ? '赎回' : '申购'} · {text(item.name)}</b><strong>{yuan(num(item.amount))}</strong></div><ProcessSteps label="订单进度" steps={orderSteps(item)}/>{item.createdAt != null && <small>{localDate(text(item.createdAt))} · 编号 …{text(item.id).slice(-8)}</small>}</li>)}</ul>;
@@ -286,6 +298,8 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
       return row.assessmentState === 'not_found' ? <EmptyViz title="还没有风险测评" note="正式测评不是课程，也不是游戏等级。"/> : null;
     }
     case 'IN10': return Array.isArray(value) ? <HoldingsViz rows={rows}/> : null;
+    case 'IN16': return Array.isArray(row.holdings) ? <PortfolioReviewViz row={row}/> : null;
+    case 'IN06': return rows.length === 1 && Array.isArray(rows[0].underlying) ? <StackBar label="底层资产构成（合成数据）" rows={list(rows[0].underlying).map(u => ({ label: text(u.asset), value: num(u.share) }))}/> : null;
     case 'IN08': case 'IN09': case 'IN11': case 'IN12': return Array.isArray(value) ? <OrdersViz rows={rows}/> : row.action != null ? <OrdersViz rows={[row]}/> : null;
     case 'IN14': case 'SU03': return Array.isArray(value) ? rows.length ? <RulesViz rows={rows}/> : <EmptyViz title="还没有提醒" note="提醒只是站内通知，不会开启扣款或申购。"/> : null;
     case 'IN15': {

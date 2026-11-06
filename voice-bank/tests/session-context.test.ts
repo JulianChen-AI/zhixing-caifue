@@ -15,11 +15,11 @@ test('context usage is the latest input window, not the sum of billed historical
  budget.usage({input_tokens:101});assert.equal(budget.reason(500),'input_tokens');budget.usage({input_tokens:50});assert.equal(budget.reason(500),undefined);assert.equal(budget.snapshot(500).peakInputTokens,101);
  budget.turn('b');budget.turn('c');assert.equal(budget.reason(500),'turns');assert.equal(new ContextBudget({inputTokens:100,turns:3,ageMs:1000},0).reason(1001),'age');
 });
-test('compaction keeps all 54 catalog entries and the exact operation receipt while removing duplicate copies',()=>{
+test('compaction keeps all 55 catalog entries and the exact operation receipt while removing duplicate copies',()=>{
  let s=apply(initialState(),{type:'plan',command:{operation:'create',source:'voice',utterance:'先做风险测评，然后查询订阅清单。'}}),before=s;
  s=apply(s,{type:'workflow',command:{operation:'list',source:'voice',utterance:'查看功能目录'}});
  const receipt=operationToolResult(before,s,{name:'bank_function',arguments:{operation:'list'}}),copy=structuredClone(receipt),compact=compactVoiceResult(receipt);
- assert.equal((compact.operationResult.workflow!.result as any[]).length,54);assert.deepEqual(compact.operationResult,receipt.operationResult);assert.deepEqual(receipt,copy);
+ assert.equal((compact.operationResult.workflow!.result as any[]).length,55);assert.deepEqual(compact.operationResult,receipt.operationResult);assert.deepEqual(receipt,copy);
  const duplicated={workflow:{taskId:'a',result:[1,2]},operationResult:{workflow:{taskId:'a',result:[1,2]}},plan:{completedResults:[{taskId:'a',result:[1,2]}]}};
  assert.equal((compactVoiceResult(duplicated).workflow as any).result,undefined);assert.deepEqual(compactVoiceResult(duplicated).operationResult.workflow.result,[1,2]);
 });

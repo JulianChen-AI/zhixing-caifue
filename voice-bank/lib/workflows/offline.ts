@@ -55,6 +55,14 @@ function selectedParams(text:string,id:string,state:BankState){
   if(matched.length===1)params.cardId=matched[0].id;
   else if(/尾号\s*\d/.test(text))throw new WorkflowError('银行卡信息有歧义，请明确卡名和完整尾号。');
  }
+ if(id==='IN07'){
+  const products=state.workflows?.records.products.filter(p=>text.includes(String(p.name)))||[];
+  if(products.length>=2)params.productIds=products.map(p=>p.id);
+ }
+ if(id==='IN06'){
+  const products=state.workflows?.records.products.filter(p=>text.includes(String(p.name))||text.includes(String(p.name).replace(/^演示/,'')))||[];
+  if(products.length===1)params.productId=products[0].id;
+ }
  if(id==='IN08'){
   const products=state.workflows?.records.products.filter(p=>text.includes(String(p.name))||text.includes(String(p.name).replace(/^演示/,'')))||[];
   if(products.length===1)params.productId=products[0].id;
@@ -96,6 +104,9 @@ export function offlineWorkflow(text:string,state?:BankState):VoiceCommand|null{
  else if(/卡片|银行卡|哪些卡|(?:借记卡|信用卡)(?:的)?(?:当前状态|状态|列表)/.test(text))id='CA01';
  else if(/风险测评/.test(text))id='IN05';
  else if(/建.*目标|创建.*储蓄|小金库/.test(text))id='IN01';
+ else if(/复盘/.test(text)&&/理财|基金|持仓|投资|笔记/.test(text)){id='IN16';const note=text.match(/笔记[：:]\s*(.+)$/)?.[1]?.trim();if(note){params.action='note';params.note=note;}}
+ else if(/对比|比较/.test(text)&&/基金|理财|产品/.test(text))id='IN07';
+ else if(/底层|投向|投了什么|买了什么资产/.test(text)&&/基金|理财|产品/.test(text))id='IN06';
  else if(/持仓|赚了|亏了/.test(text))id='IN10';
  else if(/基金|理财产品/.test(text))id=/买|申购/.test(text)?'IN08':'IN06';
  else if(/账单|支出|花了|收入/.test(text))id=/明细|哪笔|最大/.test(text)?'BI01':'BI02';

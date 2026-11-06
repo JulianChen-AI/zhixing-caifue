@@ -766,6 +766,23 @@
       ]
     },
     {
+      "id": "IN16",
+      "moduleId": "M4",
+      "moduleName": "理财操作与目标储蓄",
+      "title": "理财复盘",
+      "example": "帮我复盘一下我的理财。",
+      "description": "读取持仓与已结算订单 → 计算成本、市值、盈亏、买入次数与持有时长 → 列出每次买入的日期和金额 → 提出复盘问题；不给买卖建议、不预测收益；用户可另存本人复盘笔记（确认后保存，不进入风险画像）",
+      "scope": "扩展",
+      "parameters": "action?（review/note），holdingId?，note?",
+      "tools": [
+        "I19",
+        "I15",
+        "I20",
+        "S05",
+        "S03"
+      ]
+    },
+    {
       "id": "CA01",
       "moduleId": "M5",
       "moduleName": "卡片管理",
@@ -1720,6 +1737,26 @@
       "output": "分支、学习记录及可选展示事件",
       "effect": "交互",
       "when": "可选内容，不写正式风险画像"
+    },
+    {
+      "id": "I19",
+      "title": "持仓复盘",
+      "alias": "portfolio.review",
+      "group": "理财工具",
+      "input": "持仓 ID（可选）",
+      "output": "成本、市值、盈亏、买入记录、持有时长及复盘问题",
+      "effect": "只读",
+      "when": "不给买卖建议，不预测收益；未确认份额不计入"
+    },
+    {
+      "id": "I20",
+      "title": "保存复盘笔记",
+      "alias": "review_note.save",
+      "group": "理财工具",
+      "input": "笔记文字、持仓 ID（可选）、用户确认",
+      "output": "笔记记录",
+      "effect": "受控写",
+      "when": "仅本人回看；不进入风险画像或适当性判断"
     },
     {
       "id": "C01",

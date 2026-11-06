@@ -3,7 +3,7 @@ import type { BankState } from '../bank/types.ts';
 import type { FlowTask } from './types.ts';
 import { choices, LABELS } from './fields.ts';
 
-export const ACTION_LABELS:Record<string,string>={assess:'开始测评',estimate:'分项估算',guide:'按用途选择办卡路径',list:'查看列表',get:'查询',query:'查询',status:'查询进度',create:'创建',update:'修改',pause:'暂停',resume:'恢复',delete:'删除/终止',set:'设置',request:'提交申请',submit:'提交申请',withdraw:'撤回申请',supplement:'补充材料',unlock:'申请解除',freeze:'临时冻结',unfreeze:'解冻',report:'正式挂失',activate:'激活',mark_done:'标记已换绑',remind:'请求提醒',reconcile:'手动核销',close:'关闭'};
+export const ACTION_LABELS:Record<string,string>={review:'复盘持仓',note:'保存复盘笔记',assess:'开始测评',estimate:'分项估算',guide:'按用途选择办卡路径',list:'查看列表',get:'查询',query:'查询',status:'查询进度',create:'创建',update:'修改',pause:'暂停',resume:'恢复',delete:'删除/终止',set:'设置',request:'提交申请',submit:'提交申请',withdraw:'撤回申请',supplement:'补充材料',unlock:'申请解除',freeze:'临时冻结',unfreeze:'解冻',report:'正式挂失',activate:'激活',mark_done:'标记已换绑',remind:'请求提醒',reconcile:'手动核销',close:'关闭'};
 const money=new Set(['amount','target','total','savePerPeriod']);
 const labels:Record<string,string>={saveRecipient:'保存收款人',autoSave:'自动转存',share:'分享',receiptExport:'导出回执',interestAssumption:'利率假设',incomeDates:'到账日',includeProjection:'附带进度估算',narrative:'附带简述',peerComparison:'群体参照',includeSafetyHistory:'附带守护记录',verifyReminder:'建立核验提醒',prepareEvidence:'整理核对材料',includeProjected:'包含未来估算',reserveReminder:'资金预留提醒',expiryReminder:'到期提醒',cashOrNet:'统计口径',file:'文件'};
 /** One representation for the visible card and the model's spoken review. Params use yuan. */

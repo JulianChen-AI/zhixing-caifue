@@ -8,10 +8,11 @@ import {billingScope,billingSpeech,inBillingPeriod,PERIOD} from './billing-query
 import { goalPlan, replanGoalRules, assertCancellation, cancellationDeadline, assertAaLimit, appendTransaction, monthlyReport } from './business-lite.ts';
 import { standingLimits } from './limits.ts';
 import { aaShares, reminderDrafts, type AaItem } from './aa.ts';
+import { portfolioReview, reviewNote } from './portfolio-review.ts';
 import { productDetail, compareProducts, redemptionQuote, cardApplicationGuide, judicialGuide, transferView, ruleView, orderView, subscriptionView, lossView } from './presentation-lite.ts';
 export { appendTransaction } from './business-lite.ts';
 
-export const ACTIONS:Record<string,string[]>={IN05:['status','assess'],TR04:['list','create','update','pause','resume','delete'],TR05:['list','create','update','status','remind','reconcile'],TR08:['list','create','update','delete'],TR09:['list','create','update','reconcile','delete'],BI08:['get','set','estimate'],SU02:['create','update'],SU03:['list','create','update','delete'],IN04:['update','pause','resume','close'],IN13:['list','create','update','pause','resume','delete'],IN14:['list','create','update','delete'],CA03:['list','guide','submit','status','supplement','withdraw'],CA04:['get','set','request'],CA05:['query','unlock'],CA06:['freeze','unfreeze'],CA07:['report','status'],CA08:['list','request','status','activate'],CA09:['list','mark_done']};
+export const ACTIONS:Record<string,string[]>={IN05:['status','assess'],TR04:['list','create','update','pause','resume','delete'],TR05:['list','create','update','status','remind','reconcile'],TR08:['list','create','update','delete'],TR09:['list','create','update','reconcile','delete'],BI08:['get','set','estimate'],SU02:['create','update'],SU03:['list','create','update','delete'],IN04:['update','pause','resume','close'],IN13:['list','create','update','pause','resume','delete'],IN14:['list','create','update','delete'],CA03:['list','guide','submit','status','supplement','withdraw'],CA04:['get','set','request'],CA05:['query','unlock'],CA06:['freeze','unfreeze'],CA07:['report','status'],CA08:['list','request','status','activate'],CA09:['list','mark_done'],IN16:['review','note']};
 export function step<T>(t:FlowTask,id:string,reason:string,fn:()=>T):T{
  const x=t.steps.find(x=>x.toolId===id);if(!x)throw new WorkflowError('工具不在当前 checklist 的白名单：'+id);
  try{const value=fn();x.status='passed';x.reason=reason;return value;}catch(e){x.status='blocked';x.reason=e instanceof Error?e.message:'工具失败';throw e;}
@@ -23,7 +24,7 @@ const num=(r:Row,key:string)=>Number(r[key]||0);
 const uuid=(prefix:string)=>prefix+'-'+crypto.randomUUID();
 const now=(s:BankState)=>businessISO(s);
 function account(s:BankState,id:unknown){const a=s.accounts.find(x=>x.id===id);if(!a)throw new WorkflowError('请明确选择付款/到账账户。');return a;}
-function add(s:BankState,kind:string,row:Row){s.workflows!.records[kind].push(row);return row;}
+function add(s:BankState,kind:string,row:Row){(s.workflows!.records[kind]||=[]).push(row);return row;}
 function record(s:BankState,amount:number,accountId:string,kind:string,merchant:string,relatedId:string,category='转账'){
  return appendTransaction(s,{id:uuid('txn'),date:s.demoClock == null ? now(s).slice(0,10) : businessDay(s),amount,accountId,kind,merchant,relatedId,category,source:'沙箱执行记录'});
 }
@@ -98,6 +99,8 @@ export function readTool(s:BankState,id:string,params:Params={}){
 
 export function isWrite(t:Pick<FlowTask,'functionId'|'params'>):boolean{
  const a=String(t.params.action||'');
+ // A portfolio review only reads; saving the user's own review note is the one write.
+ if(t.functionId==='IN16')return t.params.action==='note';
  if(['TR04','TR05','TR08','TR09','BI08','SU03','IN05','IN13','IN14','CA03','CA04','CA05','CA07','CA08','CA09'].includes(t.functionId)&&['list','get','query','status','guide'].includes(a))return false;
  return ['TR03','TR04','TR05','TR07','TR08','TR09','BI03','BI08','SU02','SU03','SU04','SU06','IN01','IN02','IN04','IN05','IN08','IN09','IN12','IN13','IN14','CA03','CA04','CA05','CA06','CA07','CA08','CA09'].includes(t.functionId);
 }
@@ -242,6 +245,7 @@ export function queryBusiness(s:BankState,t:FlowTask):unknown{
   case 'IN11':return step(t,'I13','查询订单实际状态',()=>rows(s,'orders').filter(r=>(!p.orderId||r.id===p.orderId)&&(!p.period||String(r.createdAt).startsWith(String(p.period)))).map(orderView));
   case 'IN13':return step(t,'I16','读取定投规则及当前状态',()=>rows(s,'rules').filter(r=>r.kind==='investment'));
   case 'IN14':return step(t,'I17','读取用户自设提醒',()=>rows(s,'reminders').filter(r=>r.kind==='investment'));
+  case 'IN16':return step(t,'I19','按持仓与已结算订单复盘；不给买卖建议、不预测收益',()=>portfolioReview(s,p));
   case 'IN15':return step(t,'I18','演示投教内容不写入风险画像',()=>learnResult(s,p));
   case 'CA01':return step(t,'C01','读取本行沙箱卡片列表',()=>readTool(s,'C01',p));
   case 'CA02':return step(t,'C01','按会话权限披露沙箱卡片信息',()=>readTool(s,'C01',p));
@@ -267,6 +271,7 @@ export function executeBusiness(s:BankState,t:FlowTask):unknown{
   case 'IN08':return step(t,'I12','提交沙箱申购，资金与订单原子写入',()=>{const acc=account(s,p.accountId),c=cents(p.amount),product=getRow(s,'products',p.productId);acc.held=(acc.held||0)+c;const order=add(s,'orders',{id:uuid('order'),action:'subscribe',productId:product.id,name:product.name,accountId:acc.id,amount:c,held:true,status:'pending',createdAt:ts,cancelUntil:cancellationDeadline(businessNow(s)),cancellationPolicy:'演示按北京时间当日24:00；真实规则须机构确认',synthetic:true});return {...orderView(order),balance:acc.balance,available:availableBalance(acc),held:acc.held,message:'已受理，资金已占用、尚未扣款；份额待确认，不是已确认持仓'};});
   case 'IN09':return step(t,'I12','沙箱赎回受理，到账前不增加账户余额',()=>{const h=getRow(s,'holdings',p.holdingId),c=cents(p.amount),reservedCost=Math.round(num(h,'cost')*c/num(h,'value'));h.value=num(h,'value')-c;h.cost=num(h,'cost')-reservedCost;const o=add(s,'orders',{id:uuid('order'),action:'redeem',holdingId:h.id,productId:h.productId,accountId:p.accountId,amount:c,reservedCost,status:'pending',createdAt:ts,synthetic:true});return {...orderView(o),...redemptionQuote(s,p),message:'赎回已受理，资金尚未到账。可在沙箱推进结算后查询。'};});
   case 'IN12':return step(t,'I14','只撤销 pending 订单并恢复对应资金/持仓',()=>{const o=getRow(s,'orders',p.orderId);if(o.action==='subscribe'){const acc=account(s,o.accountId);if(o.held)acc.held=(acc.held||0)-num(o,'amount');else acc.balance+=num(o,'amount');}else{const h=getRow(s,'holdings',o.holdingId);h.value=num(h,'value')+num(o,'amount');h.cost=num(h,'cost')+num(o,'reservedCost');}o.status='cancelled';return o;});
+  case 'IN16':return step(t,'I20','保存本人复盘笔记；不进入风险画像',()=>{const n=add(s,'reviewNotes',{id:uuid('note'),...reviewNote(p,ts)});return {...n,notice:'复盘笔记已保存，只供你自己回看，不改变风险测评或可购买范围。'};});
   case 'BI03':return step(t,'B04','默认仅更正本笔；未来规则另存',()=>{const r=getRow(s,'transactions',p.transactionId);r.category=p.category;r.classificationSource='user-confirmed';r.needsCategoryConfirmation=false;if(p.scope==='future'){const existing=rows(s,'categories').find(x=>x.merchant===r.merchant);if(existing){existing.category=p.category;existing.source='用户明确选择未来规则';}else add(s,'categories',{id:uuid('map'),merchant:r.merchant,category:p.category,source:'用户明确选择未来规则'});}return {transaction:r,scope:p.scope||'single'};});
   case 'BI08':if(a==='estimate')return step(t,'B09','保存用户估算的分项预算',()=>add(s,'budgets',{id:uuid('estimate'),kind:'estimate',name:p.category||'出行预算',...estimate(p.items as EstimateItem[]),createdAt:ts}));
    return step(t,'B09','保存用户确认的预算',()=>{let b=rows(s,'budgets').find(r=>r.period===p.period&&r.category===(p.category||'全部'));if(!b)b=add(s,'budgets',{id:uuid('budget'),period:p.period,category:p.category||'全部'});b.amount=cents(p.amount);return b;});

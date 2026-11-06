@@ -27,6 +27,7 @@ export function compareProducts(products: Row[]): object {
   { field: 'risk', label: '风险等级', read: (product: Row) => product.risk },
   { field: 'liquidity', label: '流动性', read: (product: Row) => product.liquidity },
   { field: 'fee', label: '当前合成交易费率', read: (product: Row) => product.synthetic === true && typeof product.feeRate === 'number' ? product.feeRate : null },
+  { field: 'underlying', label: '底层资产构成（合成）', read: (product: Row) => Array.isArray(product.underlying) && product.underlying.length ? (product.underlying as { asset: string; share: number }[]).map(u => `${u.asset}${u.share}%`).join('、') : null },
  ];
  const differences: { field: string; label: string; values: { productId: string; productName: unknown; reading: unknown }[] }[] = [];
  const missing: { field: string; productId: string; productName: unknown; label: string; reason: string }[] = [];

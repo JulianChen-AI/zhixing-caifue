@@ -16,7 +16,7 @@ export const FIELDS: Record<string, string[]> = {
  SU04:['subscriptionId','verifyReminder','evidenceExport'],SU05:['subscriptionId','prepareEvidence'],SU06:['subscriptionId'],SU07:['period','includeProjected'],SU08:['period','incomeDates','reserveReminder'],
  IN01:['name','target','deadline','autoSave','accountId','amount','schedule'],IN02:['direction','goalId','accountId','amount','note'],IN03:['goalId','includeProjection'],IN04:['action','goalId','target','deadline','accountId','amount','schedule','ruleId'],
  IN05:['action','assessmentId','answers'],IN06:['productId','riskLevel','type'],IN07:['productIds'],IN08:['productId','accountId','amount'],IN09:['holdingId','amount','accountId'],IN10:['holdingId'],
- IN11:['orderId','period','receiptExport'],IN12:['orderId'],IN13:['action','planId','productId','accountId','amount','schedule'],IN14:['action','reminderId','productId','threshold','remindAt','notifyChannel'],IN15:['topic','choice'],
+ IN11:['orderId','period','receiptExport'],IN12:['orderId'],IN13:['action','planId','productId','accountId','amount','schedule'],IN14:['action','reminderId','productId','threshold','remindAt','notifyChannel'],IN15:['topic','choice'],IN16:['action','holdingId','note'],
  CA01:['status'],CA02:['cardId','includeSafetyHistory'],CA03:['action','applicationId','productType','purpose'],CA04:['action','cardId','limitType','amount'],CA05:['cardId','action'],CA06:['action','cardId'],
  CA07:['action','cardId','expiryReminder'],CA08:['action','cardId','replacementId'],CA09:['oldCardId','newCardId','bindingId','action'],CA10:['action','name'],CA11:['action','merchant','limit'],CA12:['action','cardId','amount'],
 };
@@ -51,6 +51,8 @@ export function normalizedParams(id:string, input:Params):Params {
  if(Object.hasOwn(p,'note')){if(typeof p.note==='string'&&/密码|验证码|身份证|\d{6,}/.test(p.note))throw new WorkflowError('备注不能包含认证或身份信息。');if(p.note==='')p.note=null;}
  for(const k of ['deadline','nextChargeAt','remindAt'])if(p[k]&&!/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}.*)?$/.test(String(p[k])))throw new WorkflowError('请使用明确日期，例如 2027-06-01。');
  for(const k of ['deadline','nextChargeAt','remindAt'])if(p[k]&&(!Number.isFinite(Date.parse(String(p[k])))||new Date(String(p[k])).toISOString().slice(0,10)!==String(p[k]).slice(0,10)))throw new WorkflowError('日期不存在或格式不正确。');
+ // A review never takes a note: note text means the user asked to save one, so it is never silently dropped.
+ if(id==='IN16'&&typeof p.note==='string'&&p.note)p.action='note';
  if(['BI01','BI02'].includes(id)){
   for(const key of ['period','baseline','accountId','merchant','category'])if(p[key]!=null&&typeof p[key]!=='string')throw new WorkflowError('查询条件需填写文本或选择具体选项。',400,key);
   for(const key of ['period','baseline'])if(p[key]&&!PERIOD.test(String(p[key])))throw new WorkflowError('统计期间请填写有效年份或月份，例如 2026-10。',400,key);
@@ -72,6 +74,7 @@ export function requiredFields(id:string,p:Params):string[]{
  if(id==='SU03'&&a==='create')r.push('leadDays','notifyChannel');
  if(id==='IN01'&&p.autoSave===true)r.push('accountId','schedule');
  if(id==='IN05'&&p.action!=='status')r.push('answers');
+ if(id==='IN16'&&a==='note')r.push('note');
  if(id==='IN13'&&a==='create')r.push('productId','accountId','amount','schedule');if(id==='IN13'&&!['create','list'].includes(a))r.push('planId');
  if(id==='IN14'&&a==='create')r.push('remindAt','notifyChannel');if(id==='IN14'&&!['create','list'].includes(a))r.push('reminderId');
  if(id==='CA03'&&a==='submit')r.push('productType','purpose');if(id==='CA03'&&!['submit','list','guide'].includes(a))r.push('applicationId');
@@ -174,7 +177,7 @@ export function assertVoiceEvidence(state:BankState,task:Pick<FlowTask,'function
    if(task.functionId==='BI08'&&value==='set'&&familyBudgetAmount(text,true)!=null)continue;
    if(task.functionId==='IN05'&&/测评|问卷/.test(text)&&(value==='status'&&/查|有没有|是否|做过|记录|结果/.test(text)||value==='assess'&&/开始|做|重新|更新|继续/.test(text)))continue;
    if(task.functionId==='TR05'&&value==='create'&&/A\s*A|分摊|分账/i.test(text))continue;
-   const verbs:Record<string,RegExp>={estimate:/预算|估算|算一?下|加起来|合计|一共/,list:/查|哪些|列表|看看/,get:/查|多少|看看/,query:/查|为什么|怎么|看看/,status:/查|进度|成功|怎么样/,guide:/办.*卡|用途|推荐|适合|选.*卡|怎么/,create:/建|新增|添加|设置|设个|定投|记下/,update:/改|更新|调整/,set:/设|调|改/,request:/申请|补卡|提额/,submit:/申请|提交|办.*卡/,withdraw:/撤回|取消申请/,supplement:/补充|补件/,pause:/停|暂停/,resume:/恢复|继续/,delete:/删除|取消|终止|关闭/,close:/关闭|终止/,unlock:/解|恢复.*使用/,freeze:/冻结|冻住|锁住/,unfreeze:/解冻|解开/,report:/挂失/,activate:/激活/,mark_done:/已.*换绑|换绑.*好了/,remind:/提醒|催/,reconcile:/已.*还|已.*付|核销/};
+   const verbs:Record<string,RegExp>={review:/复盘|回顾|看看/,note:/笔记|记下|记一下|写下|记录/,estimate:/预算|估算|算一?下|加起来|合计|一共/,list:/查|哪些|列表|看看/,get:/查|多少|看看/,query:/查|为什么|怎么|看看/,status:/查|进度|成功|怎么样/,guide:/办.*卡|用途|推荐|适合|选.*卡|怎么/,create:/建|新增|添加|设置|设个|定投|记下/,update:/改|更新|调整/,set:/设|调|改/,request:/申请|补卡|提额/,submit:/申请|提交|办.*卡/,withdraw:/撤回|取消申请/,supplement:/补充|补件/,pause:/停|暂停/,resume:/恢复|继续/,delete:/删除|取消|终止|关闭/,close:/关闭|终止/,unlock:/解|恢复.*使用/,freeze:/冻结|冻住|锁住/,unfreeze:/解冻|解开/,report:/挂失/,activate:/激活/,mark_done:/已.*换绑|换绑.*好了/,remind:/提醒|催/,reconcile:/已.*还|已.*付|核销/};
    if(verbs[String(value)]?.test(text))continue;
    throw new WorkflowError('操作类型缺少用户依据，请明确是查询还是变更。');
   }
@@ -185,7 +188,8 @@ export function assertVoiceEvidence(state:BankState,task:Pick<FlowTask,'function
   if(label&&label.split(/ · /).some(s=>s.length>1&&text.includes(s.replace(/尾号/,''))))continue;
   if(typeof value==='string'&&text.includes(value))continue;
   if(typeof value==='number'&&([...text.matchAll(/[-−]?\d+(?:\.\d+)?/g)].some(m=>Number(m[0])===value)||chineseAmount(text)===Math.round(value*100)))continue;
-  if(Array.isArray(value)&&value.every(v=>text.includes(String(v))))continue;
+  // A list of records (two products to compare) is grounded when each one was named.
+  if(Array.isArray(value)&&value.every(v=>text.includes(String(v))||choices(state,key).find(c=>c.value===v)?.label.split(/ · /).some(s=>s.length>1&&text.includes(s))))continue;
   if(value===false&&/不|不用|不要|别/.test(text))continue;
   if(value===true&&((key==='saveRecipient'&&/保存|存为.*联系人/.test(text))||(key==='autoSave'&&/自动.*存|自动转/.test(text))||(key==='share'&&/分享|海报/.test(text))))continue;
   throw new WorkflowError('“'+(LABELS[key]||key)+'”缺少可核对的用户依据，请询问或在卡片中选择。');

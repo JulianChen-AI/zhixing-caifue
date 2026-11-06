@@ -37,7 +37,8 @@ const caseSet = args.cases || 'cases';
 // tricky-dev / tricky-holdout: hard phrasings added 2026-11-02; fixes are tuned on dev only, holdout is run once.
 // prompts28: the 28 demo prompts handed to judges.
 // lifecycle: multi-turn exits, blocks and follow-up requests (issues #1, #3, #9).
-if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout', 'prompts28', 'lifecycle'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev、tricky-holdout、prompts28 或 lifecycle');
+// features: cases for the functions added on 2026-11-06 (portfolio review and onward), written while building them.
+if (!['cases', 'holdout', 'tricky-dev', 'tricky-holdout', 'prompts28', 'lifecycle', 'features'].includes(caseSet)) throw new Error('--cases 只能是 cases、holdout、tricky-dev、tricky-holdout、prompts28、lifecycle 或 features');
 // --clock=now runs default-scene cases on data anchored at today, as a live session sees it.
 const clockNow = args.clock === 'now';
 const file = caseFile.parse(JSON.parse(readFileSync(new URL(`${caseSet}.json`, here), 'utf8')));
