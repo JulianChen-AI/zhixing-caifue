@@ -1,9 +1,9 @@
 import {taskChecklist} from './checklist.ts';
 import { z } from 'zod';
 import type { BankState } from '../bank/types.ts';
-import { currentWorkflow } from './engine.ts';
+import { currentWorkflow } from './current.ts';
 import { choices, FIELDS, LABELS, requiredFields } from './fields.ts';
-import { ACTIONS } from './adapters.ts';
+import { ACTIONS } from './write-kind.ts';
 import type { FlowTask } from './types.ts';
 import { workflowReview } from './review.ts';
 

@@ -1,6 +1,6 @@
 import type {BankState} from '../bank/types.ts';
 import {inferFunction,extractParams} from '../plans/decompose.ts';
-import {familyBudgetAmount,hasFamilyBudgetContext} from '../plans/monthly.ts';
+import {familyBudgetAmount,hasFamilyBudgetContext} from '../workflows/fields.ts';
 
 /** Feedback for the executing model, never an action or execution permission. */
 export function delegationGaps(state:BankState,text:string){

@@ -3,7 +3,7 @@ import { CONTACTS, type Contact } from '../bank/types.ts';
 import type { WorkflowToolArguments } from '../workflows/realtime.ts';
 import { USER_FUNCTIONS } from '../workflows/catalog.ts';
 import { FIELDS, LABELS } from '../workflows/fields.ts';
-import { ACTIONS } from '../workflows/adapters.ts';
+import { ACTIONS } from '../workflows/write-kind.ts';
 import type { PlanToolArguments } from '../plans/schema.ts';
 import { BankRequestError } from '../bank/request-error.ts';
 import {compactVoiceResult,ContextBudget,type ContextLimits} from './session-context.ts';

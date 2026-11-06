@@ -238,7 +238,7 @@ function assertItemEvidence(items:AaItem[],text:string){
  }
 }
 // Numeric grounding shares the existing Chinese amount parser without changing conversational routing.
-import { amountFromText } from '../checklists/routing.ts';
+import { amountFromText } from '../checklists/amount.ts';
 import { contactsOf, recipientCandidates, recipientIdentityMentioned, ambiguousRecipients, recipientChoiceQuestion } from '../bank/recipients.ts';
 import { accountCandidates } from '../bank/accounts.ts';
 const monetaryFields=new Set(['amount','target','total','savePerPeriod']);

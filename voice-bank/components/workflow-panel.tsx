@@ -8,9 +8,9 @@ import {dailyNet,writeSteps} from '@/lib/ui/viz';
 
 import { Fragment, useContext, useState } from 'react';
 import type { BankAction, BankState } from '@/lib/bank/types';
-import { currentWorkflow } from '@/lib/workflows/engine';
+import { currentWorkflow } from '@/lib/workflows/current';
 import { USER_FUNCTIONS, UNSUPPORTED_FUNCTIONS } from '@/lib/workflows/catalog';
-import { ACTIONS, isWrite, needsAuth } from '@/lib/workflows/adapters';
+import { ACTIONS, isWrite, needsAuth } from '@/lib/workflows/write-kind';
 import { choices, FIELDS, LABELS, requiredFields } from '@/lib/workflows/fields';
 import type { FlowTask, Params, WorkflowCommand } from '@/lib/workflows/types';
 import { ACTION_LABELS as actionLabel } from '@/lib/workflows/review';

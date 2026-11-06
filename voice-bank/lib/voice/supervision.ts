@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import type {BankState} from '../bank/types.ts';
-import {bankToolResult} from '../bank/realtime-tools.ts';
+import {bankToolResult} from '../bank/tool-state.ts';
 import {recoveryFacts} from '../workflows/recovery.ts';
 import {replyReviewInput} from './reply-review.ts';
 import {explicitWorkflowCancellation} from '../workflows/offline.ts';

@@ -3,7 +3,7 @@ import type { BankState } from '../bank/types.ts';
 import { contactsOf, recipientCandidates } from '../bank/recipients.ts';
 import { accountCandidates } from '../bank/accounts.ts';
 import { cardCandidates } from '../bank/cards.ts';
-import { amountFromText } from '../checklists/routing.ts';
+import { amountFromText } from '../checklists/amount.ts';
 import { offlineWorkflow } from '../workflows/offline.ts';
 import { functionById } from '../workflows/catalog.ts';
 import { choices, normalizedParams } from '../workflows/fields.ts';

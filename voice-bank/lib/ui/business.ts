@@ -1,7 +1,7 @@
 import type { BankState } from '../bank/types.ts';
 import type { FlowTask, Params } from '../workflows/types.ts';
 import { workflowReview } from '../workflows/review.ts';
-import { isWrite } from '../workflows/adapters.ts';
+import { isWrite } from '../workflows/write-kind.ts';
 
 export function reviewEntries(bank: BankState, task: FlowTask) {
   return workflowReview(bank, task).entries.filter(entry =>

@@ -1,9 +1,9 @@
 import type {BankState} from '../bank/types.ts';
 import {inferFunction,extractParams,isComplexRequest} from '../plans/decompose.ts';
-import {isWrite} from '../workflows/adapters.ts';
+import {isWrite} from '../workflows/write-kind.ts';
 import {publicValue} from '../workflows/realtime.ts';
 import {parseBillingQuery} from '../workflows/billing-query.ts';
-import {amountFromText} from '../checklists/routing.ts';
+import {amountFromText} from '../checklists/amount.ts';
 
 export const isQueryRequest=(text:string,id?:string)=>/查|查看|显示|有没有|哪些|看看|看一下/.test(text)||!!id&&['BI01','BI02'].includes(id)&&/多少|花了|花费|收支|消费|支出|收入|账单/.test(text);
 

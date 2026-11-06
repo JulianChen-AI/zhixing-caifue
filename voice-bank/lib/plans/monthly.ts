@@ -4,18 +4,15 @@ import { WorkflowError, type FlowTask } from '../workflows/types.ts';
 import { assertVoiceEvidence, validateVoiceDraft, familyBudgetAmount, hasFamilyBudgetContext } from '../workflows/fields.ts';
 import { materialize } from './materialize.ts';
 import { contactsOf } from '../bank/recipients.ts';
-import { amountFromText } from '../checklists/routing.ts';
+import { amountFromText } from '../checklists/amount.ts';
 import type { PlanStep, TaskPlan } from './types.ts';
+import { monthlyBudgetTotal, savedMonthlyPlans } from './monthly-facts.ts';
+export { monthlyBudgetTotal, savedMonthlyPlans };
 
 /** Only an explicit request selects the saved plan; it is never an authorization. */
 export const isMonthlyRequest = (text:string) => /老规矩|(?:本月|这个月|这月|月度)的?(?:安排|计划)/.test(text) && !/不要|别|不按|不是|取消|如果|假设|[?？]/.test(text);
 /** Discovery facts let the model select a saved plan without a magic phrase.
  * A saved template is a preference, never salary verification or permission. */
-export function savedMonthlyPlans(s:BankState){
- const period=businessDay(s).slice(0,7),saved=s.plan?.monthly?.period===period?s.plan:s.monthlyHistory?.[period];
- const template=s.workflows?.records.rules?.find(r=>r.kind==='monthly_template'&&r.status==='template');
- return saved||template?[{kind:'monthly',period,title:'已保存的月度安排',source:saved?'本月已保存的安排与进度':'已保存的月度模板',notice:'可查看金额、对象、依据和进度；展示不授权付款，不证明工资已到账。',openRequest:{name:'bank_plan',arguments:{operation:'open_saved'}}}]:[];
-}
 export function openMonthlyPlan(previous:BankState, requestId:string):BankState {
  if(previous.recentRequestIds.includes(requestId))return previous;
  const s=structuredClone(previous), period=businessDay(s).slice(0,7);
@@ -77,16 +74,6 @@ export function appendFamilyBudget(previous:BankState,text:string,requestId:stri
 }
 
 /** Latest non-cancelled budget per period/category; planned only, never a hold. */
-export function monthlyBudgetTotal(plan:TaskPlan):number {
- const latest=new Map<string,number>();
- for(const step of plan.steps){
-  if(step.functionId!=='BI08'||step.params.action!=='set'||step.status==='cancelled'||(step.result as {status?:string}|null)?.status==='failed')continue;
-  const amount=Number(step.params.amount),cents=Math.round(amount*100);
-  if(!Number.isFinite(amount)||!Number.isSafeInteger(cents)||amount<=0)continue;
-  latest.set(JSON.stringify([step.params.period,step.params.category]),cents);
- }
- return [...latest.values()].reduce((total,amount)=>total+amount,0);
-}
 
 /** “下个月的钱安排一下”: a plan for a month to come, not this month's saved template. */
 export const isNextMonthPlan = (text:string) => /(?:下个?月|每个?月)的?(?:钱|收入|生活费|工资)?.{0,6}(?:安排|规划|计划|分配|怎么花|怎么分)|(?:安排|规划)(?:一下)?(?:下个?月|每个?月)/.test(text) && !/取消|不要|别/.test(text);

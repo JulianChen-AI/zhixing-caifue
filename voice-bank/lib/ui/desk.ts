@@ -1,7 +1,7 @@
 import type { BankState } from '../bank/types.ts';
 import type { FlowTask } from '../workflows/types.ts';
 import type { PlanStep } from '../plans/types.ts';
-import { isWrite } from '../workflows/adapters.ts';
+import { isWrite } from '../workflows/write-kind.ts';
 import { taskIdentity } from './business.ts';
 import { contactsOf } from '../bank/recipients.ts';
 

@@ -17,10 +17,7 @@ import {delegationCheckpoint,type DelegationCheckpoint,type DelegationStopReason
 export const DELEGATE_TOOL = { type: 'function', function: { name: 'bank_delegate', description: '把本轮业务交给后台办理：查询、建立或补充任务、改口、确认、取消、计划都用它。后台按用户原话办理并返回已核实的结果。等待时不要自行续答。', parameters: { type: 'object', additionalProperties: false, properties: {
  request: { type: 'string', description: '用一句话复述用户本轮要求，仅供后台参考；后台以用户原话为准，不要补充用户没说的金额或对象。' },
 } } } };
-export const SPEAKER_INSTRUCTIONS = `${VOICE_PERSONA}
-你只负责听和说。应用已在播报前通过bank_delegate把本轮业务、补充、查询及解释交给后台；你不负责决定是否办理，也不再调用工具。用户原话只用于理解表达；本轮查询不能用历史余额或旧任务代替。
-只播报本轮最新后台返回的summary和facts。后台尚未返回时保持安静，不承诺将去查询，不发出呻吟叹气或无意义语气词。
-bank_delegate返回后，只依据summary和facts用一两句口语说明实际结果和一个下一步；需要用户选择或补充时只问一个问题。不把草稿、受理中或外部待办说成已完成；authenticate时只引导页面认证，永远不能语音代填验证码。金额以人民币元计。查询先简短概括，详细结果可展开任务清单查看。不讲解模型权限、内部参数或检查机制。`;
+export { SPEAKER_INSTRUCTIONS } from './speaker-instructions.ts';
 export const BACKEND_INSTRUCTIONS = `你是知行银行语音助手的后台办理模型。前台语音模型负责和用户说话；你只收到用户原话转写和近期历史，转写可能有误、未说完或稍后被纠正，以最新的话为准；缺少必要信息时返回需要问用户的问题，不猜。
 ${VOICE_BUSINESS_RULES}
 先区分用户要查看安排、解释依据，还是要执行具体业务。savedPlans列出可打开的已保存安排；用户要看工资/月度安排和依据时，可用bank_plan open_saved展示保存的模板或本月进度，不要求用户说“老规矩”，不调用IN08购买或IN11订单查询代替安排。模板和已核实工资到账是不同事实。只看安排不resume、不confirm。

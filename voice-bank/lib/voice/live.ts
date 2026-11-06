@@ -1,6 +1,6 @@
 import { QwenConversation, voiceSettings, isExpectedRealtimeCancellation, type ConversationCallbacks } from "./qwen-protocol";
 import {VerifiedAudio} from './verified-audio';
-import {SPEAKER_INSTRUCTIONS} from './delegation';
+import {SPEAKER_INSTRUCTIONS} from './speaker-instructions';
 import {microphoneMessage} from './microphone';
 import {CorrectionCue} from './correction-cue';
 import type {Contact} from '../bank/types';

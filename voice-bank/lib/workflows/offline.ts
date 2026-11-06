@@ -3,7 +3,7 @@ import type { WorkflowCommand } from './types.ts';
 import type { BankState } from '../bank/types.ts';
 import { cardCandidates } from '../bank/cards.ts';
 import { accountCandidates } from '../bank/accounts.ts';
-import { amountFromText } from '../checklists/routing.ts';
+import { amountFromText } from '../checklists/amount.ts';
 import { WorkflowError } from './types.ts';
 import {parseBillingQuery,isBillingQuery} from './billing-query.ts';
 import { acknowledgesReview } from './review.ts';

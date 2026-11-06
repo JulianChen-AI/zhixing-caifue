@@ -1,6 +1,6 @@
 import type { BankState } from '../bank/types.ts';
 import type { FlowTask } from '../workflows/types.ts';
-import { isWrite } from '../workflows/adapters.ts';
+import { isWrite } from '../workflows/write-kind.ts';
 import { contactsOf } from '../bank/recipients.ts';
 import { outcomeBadge, type Badge, type Tone } from './desk.ts';
 import { businessTitle } from './presentation.ts';

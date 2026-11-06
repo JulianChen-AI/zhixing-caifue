@@ -12,8 +12,9 @@ import { portfolioReview, reviewNote } from './portfolio-review.ts';
 import { existingInvite, inviteeName, inviteText, inviteView, INVITE_PERK } from './invite.ts';
 import { productDetail, compareProducts, redemptionQuote, cardApplicationGuide, judicialGuide, transferView, ruleView, orderView, subscriptionView, lossView } from './presentation-lite.ts';
 export { appendTransaction } from './business-lite.ts';
+import { ACTIONS, isWrite, needsAuth } from './write-kind.ts';
+export { ACTIONS, isWrite, needsAuth };
 
-export const ACTIONS:Record<string,string[]>={IN05:['status','assess'],TR04:['list','create','update','pause','resume','delete'],TR05:['list','create','update','status','remind','reconcile'],TR08:['list','create','update','delete'],TR09:['list','create','update','reconcile','delete'],BI08:['get','set','estimate'],SU02:['create','update'],SU03:['list','create','update','delete'],IN04:['update','pause','resume','close'],IN13:['list','create','update','pause','resume','delete'],IN14:['list','create','update','delete'],CA03:['list','guide','submit','status','supplement','withdraw'],CA04:['get','set','request'],CA05:['query','unlock'],CA06:['freeze','unfreeze'],CA07:['report','status'],CA08:['list','request','status','activate'],CA09:['list','mark_done'],IN16:['review','note'],TR10:['create','status']};
 export function step<T>(t:FlowTask,id:string,reason:string,fn:()=>T):T{
  const x=t.steps.find(x=>x.toolId===id);if(!x)throw new WorkflowError('工具不在当前 checklist 的白名单：'+id);
  try{const value=fn();x.status='passed';x.reason=reason;return value;}catch(e){x.status='blocked';x.reason=e instanceof Error?e.message:'工具失败';throw e;}
@@ -98,14 +99,6 @@ export function readTool(s:BankState,id:string,params:Params={}){
  return READERS[id](s,params);
 }
 
-export function isWrite(t:Pick<FlowTask,'functionId'|'params'>):boolean{
- const a=String(t.params.action||'');
- // A portfolio review only reads; saving the user's own review note is the one write.
- if(t.functionId==='IN16')return t.params.action==='note';
- if(['TR04','TR05','TR08','TR09','TR10','BI08','SU03','IN05','IN13','IN14','CA03','CA04','CA05','CA07','CA08','CA09'].includes(t.functionId)&&['list','get','query','status','guide'].includes(a))return false;
- return ['TR03','TR04','TR05','TR07','TR08','TR09','TR10','BI03','BI08','SU02','SU03','SU04','SU06','IN01','IN02','IN04','IN05','IN08','IN09','IN12','IN13','IN14','CA03','CA04','CA05','CA06','CA07','CA08','CA09'].includes(t.functionId);
-}
-export function needsAuth(t:FlowTask){return isWrite(t)&&(t.functionId==='IN01'&&t.params.autoSave===true||['TR03','TR04','SU04','SU06','IN02','IN08','IN09','IN12','IN13','CA03','CA04','CA05','CA06','CA07','CA08','CA09'].includes(t.functionId));}
 
 /** Re-run these from server-owned state both before review and immediately before effect. */
 export function preflight(s:BankState,t:FlowTask){

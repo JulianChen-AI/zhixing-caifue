@@ -7,6 +7,7 @@ import { WorkflowError, type FlowTask, type Params } from '../workflows/types.ts
 import { ambiguousRecipients, contactsOf, recipientChoiceQuestion } from '../bank/recipients.ts';
 import { decompose, extractParams, inferFunction, isComplexRequest, hasFunctionScope } from './decompose.ts';
 import type { Calculation, PlanCommand, PlanStep, TaskPlan } from './types.ts';
+import { activePlan, currentPlanStep } from './current.ts';
 import { workflowTextAction } from '../workflows/offline.ts';
 import {isBillingQuery,resolveBillingQuery} from '../workflows/billing-query.ts';
 import { appendFamilyBudget, familyBudgetAmount, hasFamilyBudgetContext, isMonthlyRequest, openMonthlyPlan } from './monthly.ts';
@@ -14,8 +15,7 @@ import { appendFamilyBudget, familyBudgetAmount, hasFamilyBudgetContext, isMonth
 type Reducer=(s:BankState,a:BankAction,id:string)=>BankState;
 const terminal=(p:TaskPlan)=>['complete','cancelled'].includes(p.status);
 export const STALE_PLAN_MS=10*60*1000;
-export const activePlan=(s:BankState)=>s.plan&&!terminal(s.plan)?s.plan:undefined;
-export const currentPlanStep=(s:BankState)=>activePlan(s)?.steps.find(x=>x.kind==='clarify'&&!['complete','cancelled'].includes(x.status))||activePlan(s)?.steps.find(x=>!['complete','cancelled'].includes(x.status));
+export { activePlan, currentPlanStep };
 const child=(s:BankState,step:PlanStep)=>s.workflows?.tasks.find(t=>t.id===step.taskId);
 function calculationEvidence(task:FlowTask,binding:string){
  task.fieldEvidence||={};for(const key of ['amount','accountId'])task.fieldEvidence[key]={source:'calculation',quote:'外层步骤 '+binding+' 的账户余额比较和比例计算结果'};

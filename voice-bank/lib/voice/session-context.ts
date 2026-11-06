@@ -1,5 +1,5 @@
 import type {BankState} from '../bank/types.ts';
-import {bankToolResult} from '../bank/realtime-tools.ts';
+import {bankToolResult} from '../bank/tool-state.ts';
 import {FIELDS} from '../workflows/fields.ts';
 import {productExplanationFacts} from './explanation-review.ts';
 

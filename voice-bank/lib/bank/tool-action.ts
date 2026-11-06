@@ -4,7 +4,7 @@ import { realtimeToolArgumentsEnvelope, realtimeToolArgumentsFor, realtimeToolDe
 import { workflowToolArguments } from '../workflows/realtime.ts';
 import { planToolArguments } from '../plans/schema.ts';
 import { isComplexRequest } from '../plans/decompose.ts';
-import { activePlan } from '../plans/engine.ts';
+import { activePlan } from '../plans/current.ts';
 import { contactsOf } from './recipients.ts';
 
 const context = { utterance: z.string().max(2000), history: z.array(z.string().max(1000)).max(8).optional(), turnId: z.string().min(1).max(200).optional() };

@@ -7,11 +7,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUp, ArrowUpRight, Check, CheckCheck, ChevronDown, ChevronLeft, CircleHelp, CreditCard, Ellipsis, Headphones, Keyboard, List, LoaderCircle, LockKeyhole, MessageCircle, Mic, MicOff, RotateCcw, ShieldCheck, Volume2, VolumeX, Wallet, X } from "lucide-react";
 import { type BankAction, type BankState } from "@/lib/bank/types";
 import { contactsOf } from '@/lib/bank/recipients';
-import { money } from "@/lib/bank/engine";
-import { DEMO_POLICY } from '@/lib/checklists/catalog';
+import { money } from "@/lib/bank/money";
+import { MAX_TRANSFER_CENTS } from '@/lib/checklists/limits';
 import { LiveVoice } from "@/lib/voice/live";
 import { stopOnPageExit } from '@/lib/voice/lifecycle';
-import { bankToolResult } from "@/lib/bank/realtime-tools";
+import { bankToolResult } from "@/lib/bank/tool-state";
 import type { NativeToolArguments,SpeechVerdict,StalledTurn,ObserverVerdict } from '@/lib/voice/qwen-protocol';
 import type { ToolContext } from "@/lib/voice/qwen-protocol";
 import { businessTitle, cardCaption, replyForState, userMessage } from '@/lib/ui/presentation';
@@ -33,8 +33,8 @@ import {queryReviewFacts,QUERY_REPAIR_INSTRUCTION} from '@/lib/voice/query-revie
 import type {ContextRenewal} from '@/lib/voice/qwen-protocol';
 import {SCENE_MANIFEST} from '@/lib/demo/scenes';
 import {businessDay} from '@/lib/demo/clock';
-import {demoControlReplay} from '@/lib/demo/control';
-import {isWrite} from '@/lib/workflows/adapters';
+import {demoControlReplay} from '@/lib/demo/control-receipt';
+import {isWrite} from '@/lib/workflows/write-kind';
 
 type Message = { id: string; speaker: "user" | "assistant"; text: string; start?: number; end?: number };
 type Mode = "idle" | "demo" | "live";
@@ -88,7 +88,7 @@ export default function Home() {
   const confirmationIndex = bank?.checklist?.checks.findIndex(check => check.id.endsWith(".user.confirmed")) ?? -1;
   const canConfirm = confirmationIndex >= 0 && !bank?.routing?.unresolved.length && bank!.checklist!.checks.slice(0,confirmationIndex).every(check=>check.status === "passed");
   const amountCents=/^\d+(?:\.\d{1,2})?$/.test(amount.trim())?Math.round(Number(amount.trim())*100):null;
-  const amountValid=amountCents!=null&&Number.isSafeInteger(amountCents)&&amountCents>0&&amountCents<=DEMO_POLICY.maxTransferCents;
+  const amountValid=amountCents!=null&&Number.isSafeInteger(amountCents)&&amountCents>0&&amountCents<=MAX_TRANSFER_CENTS;
   const amountDirty=amount.trim()!==''&&(!amountValid||amountCents!==task?.amount);
 
   const showError = useCallback((text: string) => {

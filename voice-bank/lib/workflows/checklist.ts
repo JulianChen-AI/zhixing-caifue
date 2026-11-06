@@ -1,7 +1,7 @@
 import type { BankState } from '../bank/types.ts';
 import type { FlowTask } from './types.ts';
 import {FIELDS,LABELS,requiredFields,choices} from './fields.ts';
-import {ACTIONS} from './adapters.ts';
+import {ACTIONS} from './write-kind.ts';
 import {questionnaire} from './questionnaire.ts';
 
 /** A live view of the persisted task, not another copy of its business facts. */

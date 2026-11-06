@@ -340,6 +340,6 @@ function finalized(s:BankState,cmd:WorkflowCommand,requestId:string,id:string){
  s.workflows!.tasks=[...s.workflows!.tasks.filter(x=>terminal.includes(x.status)).slice(-30),...pending];
  return s;
 }
-export const currentWorkflow=(s:BankState)=>s.workflows?current(s):undefined;
+export { currentWorkflow } from './current.ts';
 export { ACTIONS };
 

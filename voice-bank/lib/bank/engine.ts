@@ -45,7 +45,8 @@ export function normalizeState(previous: BankState): BankState {
   flattenPlan(s);s.audit ||= []; s.routing ||= null; s.checklist = transferChecklist(s);
   return s;
 }
-export const money = (cents: number) => (cents / 100).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+import { money } from './money.ts';
+export { money };
 function validAmount(cents: number) { if (!Number.isSafeInteger(cents) || cents <= 0 || cents > DEMO_POLICY.maxTransferCents) throw new BankError('请输入 0.01 至 100,000 元的演示转账金额。'); }
 function requireTask(s: BankState) { if (!s.task || ['complete','cancelled'].includes(s.task.step)) throw new BankError('请先发起一笔新的转账。'); return s.task; }
 export function transferChecklist(s: BankState, through?: string): ChecklistRun | null {

@@ -3,7 +3,7 @@ import {useState} from 'react';
 import type {BankAction,BankState} from '@/lib/bank/types';
 import type {PlanStep} from '@/lib/plans/types';
 import {availableBalance} from '@/lib/bank/accounts';
-import {monthlyBudgetTotal} from '@/lib/plans/monthly';
+import {monthlyBudgetTotal} from '@/lib/plans/monthly-facts';
 import {FlowSelect} from './flow-select';
 
 type Props={bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>};

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { WORKFLOWS, POLICY_VERSION, DEMO_POLICY } from '../lib/checklists/catalog.ts';
+import { MAX_TRANSFER_CENTS } from '../lib/checklists/limits.ts';
 import { evaluateChecklist } from '../lib/checklists/evaluate.ts';
 import { routeRequest, amountFromText } from '../lib/checklists/routing.ts';
 import { initialState, reduceBank, normalizeState } from '../lib/bank/engine.ts';
@@ -158,4 +159,8 @@ test('a model repeating the known amount while filling a payee does not erase th
  let s=say(initialState(),'我要转500元');s=say(s,'给室友张三转账',{kind:'amend',amount:50000,recipientId:'zhang-roommate',accountId:null,note:null});assert.equal(s.task!.amount,50000);assert.equal(s.task!.recipientId,'zhang-roommate');assert.equal(s.task!.accountId,null);
  assert.ok(s.routing!.evidence.some(e=>e.field==='amount'&&e.source==='existing-task'));
  const mismatch=say(s,'用日常账户',{kind:'amend',amount:60000,recipientId:'zhang-roommate',accountId:'daily',note:null});assert.equal(mismatch.task!.amount,null);assert.equal(mismatch.routing!.outcome,'clarify');
+});
+
+test('the page transfer ceiling equals the rule catalog', () => {
+  assert.equal(MAX_TRANSFER_CENTS, DEMO_POLICY.maxTransferCents);
 });

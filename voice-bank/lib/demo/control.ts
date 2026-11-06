@@ -4,22 +4,9 @@ import { WorkflowError } from '../workflows/types.ts';
 import { buildScene, SCENE_IDS, SCENE_VERSION } from './scenes.ts';
 import { runGoalRules, settleDueTransfers } from './schedule.ts';
 
-type Control = Extract<BankAction,{type:'load_scene'|'advance_clock'|'reset'}>;
-export function isDemoControl(state:BankState,action:BankAction):action is Control {
- return action.type==='load_scene'||action.type==='advance_clock'||action.type==='reset'&&!!state.sceneEpoch;
-}
-function fingerprint(action:Control):string {
- return JSON.stringify(action.type==='load_scene'?{type:action.type,sceneId:action.sceneId}:action.type==='advance_clock'?{type:action.type,to:action.to}:{type:action.type});
-}
-export function assertSceneEpoch(state:BankState,expectedEpoch?:string){
- if((state.sceneEpoch??null)!==(expectedEpoch??null))throw new WorkflowError('演示场景已改变，请刷新后重试。',409,'sceneEpoch');
-}
-export function demoControlReplay(state:BankState,action:BankAction,requestId:string,sourceEpoch?:string):boolean {
- const receipt=state.lastDemoControl;
- if(!receipt||receipt.requestId!==requestId)return false;
- if(!isDemoControl(state,action)||receipt.actionFingerprint!==fingerprint(action)||receipt.sourceEpoch!==(sourceEpoch??null)||state.sceneEpoch!==receipt.resultEpoch)throw new WorkflowError('控制请求与原结果不一致，请刷新后重试。',409,'sceneEpoch');
- return true;
-}
+import { assertSceneEpoch, demoControlReplay, fingerprint, isDemoControl, type Control } from './control-receipt.ts';
+export { assertSceneEpoch, demoControlReplay, isDemoControl };
+
 function validInstant(value:string){
  const m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.exec(value);
  if(!m||!Number.isFinite(Date.parse(value)))return false;
