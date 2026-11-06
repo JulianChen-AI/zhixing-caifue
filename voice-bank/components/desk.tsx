@@ -69,7 +69,7 @@ function MonthlyBasis({ bank }: { bank: BankState }) {
   return <section className="monthly-basis" aria-label="资金依据">
     <div className="card-head"><h3>资金依据</h3><span className="card-head-end"><Chip badge={{ label: '每项都能修改或删除', tone: 'info' }}/></span></div>
     <dl>
-      <div><dt>工资到账</dt><dd>{income ? basisMoney(income) : '未核实'}</dd><Chip badge={income ? { label: '事实 · 沙箱入账', tone: 'muted' } : { label: '未查到入账', tone: 'wait' }}/></div>
+      <div><dt>工资到账</dt><dd>{income ? basisMoney(income) : '未核实'}</dd><Chip badge={income ? { label: '已入账', tone: 'muted' } : { label: '未查到入账', tone: 'wait' }}/></div>
       {out.map(step => <div key={step.id}><dt>− {step.title}</dt><dd>{basisMoney(Math.round(Number(step.params.amount) * 100))}</dd><Chip badge={{ label: BASIS_TAG[step.functionId!], tone: 'muted' }}/></div>)}
       {income > 0 && <div className="is-total"><dt>= 余下</dt><dd>{basisMoney(left)}</dd><Chip badge={{ label: '确定性计算', tone: 'ok' }}/></div>}
       {budgets.map(step => <div key={step.id}><dt>新增 · {String(step.params.category || '预算')}</dt><dd>{basisMoney(Math.round(Number(step.params.amount) * 100))}</dd><Chip badge={{ label: '预算草稿 · 不付款 · 不冻结', tone: 'wait' }}/></div>)}
@@ -99,7 +99,7 @@ export function InvestRisk({ bank, task }: { bank: BankState; task: Pick<FlowTas
     <div className="risk-pair">
       <div><small>你的风险测评</small><b>C{match.profileLevel}</b><span>{match.expired ? '已过期，需要重新测评' : `有效期至 ${localDate(match.validUntil).slice(0, 10)}`}</span></div>
       <div><small>{match.productName}</small><b>R{match.productRisk}</b><span>非存款 · 不保本</span></div>
-      <div><small>机构规则匹配结果</small><Chip badge={match.within ? { label: '匹配（模拟）', tone: 'ok' } : { label: match.expired ? '测评已过期' : '不匹配', tone: 'risk' }}/><span>确定性规则 · 非模型判断</span></div>
+      <div><small>机构规则匹配结果</small><Chip badge={match.within ? { label: '匹配', tone: 'ok' } : { label: match.expired ? '测评已过期' : '不匹配', tone: 'risk' }}/><span>确定性规则 · 非模型判断</span></div>
     </div>
     <LevelScale prefix="C" level={match.profileLevel} comparePrefix="R" compareLevel={match.productRisk} caption="产品风险不高于测评等级才可受理；等级不是收益承诺"/>
     {!match.within && <p className="risk-verdict is-outside">{match.expired ? '测评已过期，系统不会受理这笔申购。' : '产品风险高于你的测评，系统不会受理这笔申购。'}</p>}

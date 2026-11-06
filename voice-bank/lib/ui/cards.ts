@@ -10,7 +10,7 @@ export type CardHeadView = { title: string; icon: CardIcon; badge?: Badge };
 
 const record = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const WAIT_MANUAL: Badge = { label: '待你手动确认', tone: 'wait' };
-const SIMULATED: Badge = { label: '模拟回执', tone: 'sim' };
+const SIMULATED: Badge = { label: '回执', tone: 'ok' };
 
 function subscriptionName(bank: BankState, task: Pick<FlowTask, 'params'>) {
   const row = bank.workflows?.records.subscriptions?.find(item => item.id === task.params.subscriptionId);
@@ -29,7 +29,7 @@ function cardAction(task: Pick<FlowTask, 'functionId' | 'params'>) {
 export function cardHead(bank: BankState, task: FlowTask): CardHeadView {
   const { functionId: id, status, params } = task;
   const name = businessTitle(id, task.title);
-  if (status === 'authenticate') return { title: `演示认证 · ${['CA06', 'CA07'].includes(id) ? cardAction(task) : name}`, icon: 'lock', badge: { label: '模拟认证', tone: 'info' } };
+  if (status === 'authenticate') return { title: `验证身份 · ${['CA06', 'CA07'].includes(id) ? cardAction(task) : name}`, icon: 'lock', badge: { label: '待验证', tone: 'info' } };
   if (status === 'review') {
     if (id === 'TR03') return { title: '转账确认页', icon: 'shield', badge: WAIT_MANUAL };
     if (id === 'TR05' && params.action === 'create') return { title: 'AA 分摊计算', icon: 'users', badge: { label: '确定性计算', tone: 'calc' } };
@@ -66,7 +66,7 @@ export function receiptStatus(bank: BankState, task: FlowTask): { label: string;
   const badge = outcomeBadge(bank, task);
   const accepted = record(task.result).businessStage === 'accepted' || record(task.result).status === 'pending';
   if (task.status === 'complete' && accepted && task.functionId === 'IN08') return { label: '申请已受理 · 份额待确认', tone: 'pending', note: '受理 ≠ 成交' };
-  return { label: badge.label, tone: badge.tone, note: badge.tone === 'ok' ? '沙箱' : '' };
+  return { label: badge.label, tone: badge.tone, note: '' };
 }
 
 /** What a review card must say beyond its fields, so the consequence is read before confirming. */
@@ -105,7 +105,7 @@ export function aaView(bank: BankState, value: unknown): AaView | null {
 }
 
 const SUBSCRIPTION_STATE: Record<string, { label: string; tone: Tone }> = {
-  cancelled: { label: '已解除（模拟回执）', tone: 'ok' }, active: { label: '生效中', tone: 'info' }, unverified: { label: '未核验', tone: 'wait' },
+  cancelled: { label: '已解除', tone: 'ok' }, active: { label: '生效中', tone: 'info' }, unverified: { label: '未核验', tone: 'wait' },
   unknown: { label: '未确认', tone: 'wait' }, bank_mandate_stopped: { label: '待进行', tone: 'pending' },
 };
 
@@ -114,9 +114,9 @@ export function subscriptionStates(value: unknown): { key: string; label: string
   const row = record(value);
   const read = (key: string) => SUBSCRIPTION_STATE[String(row[key])] || SUBSCRIPTION_STATE.unknown;
   return [
-    { key: 'bank', label: '银行通道授权', state: read('bankAgreementState').label, tone: read('bankAgreementState').tone },
-    { key: 'merchant', label: '商户退订', state: read('merchantSubscriptionState').label, tone: read('merchantSubscriptionState').tone },
+    { key: 'bank', label: '银行代扣', state: read('bankAgreementState').label, tone: read('bankAgreementState').tone },
+    { key: 'merchant', label: '商户订阅', state: read('merchantSubscriptionState').label, tone: read('merchantSubscriptionState').tone },
     { key: 'refund', label: '退款', state: '未发起', tone: 'muted' },
-    { key: 'charge', label: '原应扣日后核验', state: read('chargeState').label, tone: read('chargeState').tone },
+    { key: 'charge', label: '下次扣款', state: read('chargeState').label, tone: read('chargeState').tone },
   ];
 }

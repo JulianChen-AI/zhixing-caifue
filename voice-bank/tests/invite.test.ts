@@ -16,8 +16,7 @@ test('TR10: the draft writes nothing; confirmation (no authentication) sends onc
  const before = initialState();
  let s = run(before, 'TR10', { action: 'create', invitee: '张三' }), t = currentWorkflow(s)!;
  assert.equal(t.status, 'review', t.message);
- assert.match(t.message, /模拟通道（演示）/);
- assert.match(t.message, /不读通讯录、不群发/);
+ assert.match(t.message, /将给张三发一条私信邀请/);
  assert.equal(invites(s).length, 0, 'nothing recorded before confirmation');
  assert.deepEqual(s.accounts, before.accounts);
  const token = t.reviewToken!;
@@ -26,13 +25,13 @@ test('TR10: the draft writes nothing; confirmation (no authentication) sends onc
  assert.equal(t.status, 'complete', t.message);
  assert.equal(invites(s).length, 1);
  assert.deepEqual([invites(s)[0].invitee, invites(s)[0].status], ['张三', 'simulated_sent']);
- assert.match(t.message, /演示，不是真实消息/);
+ assert.equal(t.message, '已把邀请发给张三。');
  assert.deepEqual(s.accounts, before.accounts, 'no money moves');
  // The same confirmation again, by token or by a replayed request, sends nothing more.
  assert.throws(() => act(s, { operation: 'confirm', taskId: t.id, token }));
  const again = run(s, 'TR10', { action: 'create', invitee: '张三' });
  assert.equal(currentWorkflow(again)!.status, 'blocked');
- assert.match(currentWorkflow(again)!.message, /不重复发送/);
+ assert.match(currentWorkflow(again)!.message, /已经给张三发过邀请/);
  assert.equal(invites(again).length, 1);
 });
 
@@ -50,11 +49,11 @@ test('TR10: one named person only, no groups or lists', () => {
   assert.throws(() => inviteeName(bad), Error, bad);
  const t = currentWorkflow(run(initialState(), 'TR10', { action: 'create', invitee: '张三和李四' }))!;
  assert.equal(t.status, 'blocked');
- assert.match(t.message, /不群发/);
+ assert.match(t.message, /一次发给一位同学/);
 });
 
-test('TR10: the perk is marked demo and tied to no transaction; status reads the record', () => {
- assert.match(inviteText('张三'), /演示权益，与开户、存款、转账、消费都无关/);
+test('TR10: the perk is tied to no transaction; status reads the record', () => {
+ assert.match(inviteText('张三'), /各得一次抽奖机会/);
  assert.doesNotMatch(inviteText('张三'), /转账即得|存入.*奖励|首笔|满\d+/);
  let s = run(initialState(), 'TR10', { action: 'status' });
  assert.deepEqual([currentWorkflow(s)!.status, currentWorkflow(s)!.message], ['complete', '还没有发出过邀请。']);
@@ -62,7 +61,7 @@ test('TR10: the perk is marked demo and tied to no transaction; status reads the
  const t = currentWorkflow(s)!;
  s = act(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken! });
  s = run(s, 'TR10', { action: 'status' });
- assert.match(currentWorkflow(s)!.message, /张三（已通过模拟通道发送，对方尚未回应）/);
+ assert.match(currentWorkflow(s)!.message, /张三（已发送，等待回应）/);
 });
 
 test('offline routing: invite a named classmate, or ask for invitation status', () => {

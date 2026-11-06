@@ -24,7 +24,6 @@ test('portfolio review: cost, value, gain, buys and days held come from the hold
  assert.equal(addDays(seeded[0].date, h.holdingDays!), today);
  assert.equal(h.buys.reduce((n, b) => n + b.amount, 0), h.cost, 'seeded buys add up to the cost');
  assert.ok(r.questions.length >= 2 && r.questions.length <= 3);
- assert.match(r.spokenSummary, /不给买卖建议/);
  assert.doesNotMatch(r.spokenSummary + r.questions.join(''), ADVICE);
 });
 
@@ -79,7 +78,7 @@ test('IN16 note: nothing saved before confirmation, confirmation only (no authen
  let s = run(initialState(), 'IN16', { action: 'note', note: '当时是为了放应急金，这个目的还在' });
  let t = currentWorkflow(s)!;
  assert.equal(t.status, 'review', t.message);
- assert.match(t.message, /不进入风险画像/);
+ assert.match(t.message, /请确认后保存/);
  assert.equal((records(s).reviewNotes || []).length, 0);
  s = act(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken! });
  t = currentWorkflow(s)!;
@@ -93,10 +92,10 @@ test('IN16 note: nothing saved before confirmation, confirmation only (no authen
  assert.deepEqual([missing.status, missing.missing], ['collecting', ['note']]);
 });
 
-test('product detail and comparison carry the synthetic underlying assets', () => {
+test('product detail and comparison carry the underlying assets', () => {
  const one = currentWorkflow(run(initialState(), 'IN06', { productId: 'fund-bond' }))!;
  assert.equal(one.status, 'complete');
- assert.match(one.message, /底层资产（合成数据）：国债和政策性金融债（利率债）50%/);
+ assert.match(one.message, /底层资产：国债和政策性金融债（利率债）50%/);
  const both = currentWorkflow(run(initialState(), 'IN07', { productIds: ['fund-cash', 'fund-bond'] }))!;
  const result = both.result as { comparedFields: { field: string }[]; differences: { field: string }[] };
  assert.ok(result.comparedFields.some(f => f.field === 'underlying'));

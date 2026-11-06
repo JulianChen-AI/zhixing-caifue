@@ -20,7 +20,7 @@ test('TR11: ordering from a merchant is guidance only, external, never complete'
  const s = reduceBank(before, { type: 'workflow', command: { source: 'card', operation: 'run', functionId: 'TR11', params: { item: '生日蛋糕' } } }, crypto.randomUUID());
  const t = currentWorkflow(s)!;
  assert.equal(t.status, 'external');
- assert.match(t.message, /生日蛋糕需要你在商户官方 App 或小程序自己下单；暂未接入商户开放接口，我没有下单，也没有付款/);
+ assert.match(t.message, /生日蛋糕在商户官方 App 或小程序下单/);
  assert.doesNotMatch(t.message, /已订好|已下单|已为你预订|订好了/);
  assert.deepEqual(s.accounts, before.accounts);
  assert.deepEqual(s.receipts, before.receipts);

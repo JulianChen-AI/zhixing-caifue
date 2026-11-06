@@ -9,6 +9,9 @@ import { localDate } from '@/lib/ui/business';
 import { clampRatio, cumulativeSteps, dailyNet, eventMonths, monthGrid, orderSteps, segments } from '@/lib/ui/viz';
 import { Chip, InvestRisk } from './desk';
 import { standingLimits } from '@/lib/workflows/limits';
+import { businessDay } from '@/lib/demo/clock';
+import { inviteText } from '@/lib/workflows/invite';
+import { DateCountdown, InviteCard, InviteList, MerchantGuideCard, NotePreview, PortfolioReviewCard, ReminderCard, TransferRiskBanner, UpperAmount } from './card-viz-more';
 
 /** Opens a new card for the user to review; it never executes anything by itself. */
 export const FollowUp = createContext<((functionId: string, params: Record<string, unknown>) => void) | null>(null);
@@ -73,7 +76,7 @@ export function Columns({ rows, label }: { rows: { key: string; tick: string; va
   const every = Math.max(1, Math.ceil(rows.length / 8));
   return <figure className={`viz-columns ${anyNegative ? 'has-negative' : ''} ${rows.length > 12 ? 'is-dense' : ''}`} aria-label={label}><figcaption>{label}</figcaption><div>{rows.map((row, index) => <div key={row.key} data-tip={row.tip} title={row.tip}>
     <span className="viz-col-plot"><i className={`${row.value < 0 ? 'is-negative' : ''} ${row.emphasis ? 'is-emphasis' : ''}`} style={{ height: `${Math.max(Math.abs(row.value) / largest * 100, 2)}%` }}/></span>
-    <small aria-hidden={index % every !== 0}>{index % every === 0 || index === rows.length - 1 ? row.tick : ''}</small>
+    <small aria-hidden={index % every !== 0}>{index % every === 0 ? row.tick : ''}</small>
   </div>)}</div></figure>;
 }
 
@@ -159,7 +162,7 @@ function SubscriptionRows({ rows }: { rows: Record<string, unknown>[] }) {
   </li></Fragment>)}</ul>;
 }
 export function SubscriptionRadar({ rows, inference }: { rows: Record<string, unknown>[]; inference?: string }) {
-  if (!rows.length) return <EmptyViz title="没有查到订阅" note="这里只显示已授权范围内的周期扣费。"/>;
+  if (!rows.length) return <EmptyViz title="没有查到订阅"/>;
   const active = rows.filter(item => item.status === 'active' && item.cycle === 'monthly');
   const month = active.reduce((sum, item) => sum + num(item.amount), 0);
   return <div className="viz-group">
@@ -203,24 +206,12 @@ export function ProductScale({ risk }: { risk: unknown }) {
 }
 
 function HoldingsViz({ rows }: { rows: Record<string, unknown>[] }) {
-  if (!rows.length) return <EmptyViz title="当前没有持仓" note="已受理的申购在份额确认前不算持有。"/>;
+  if (!rows.length) return <EmptyViz title="当前没有持仓"/>;
   const total = rows.reduce((sum, item) => sum + num(item.value), 0), profit = rows.reduce((sum, item) => sum + num(item.profit), 0);
   return <div className="viz-group">
-    <Kpis items={[{ label: '持仓市值（合成数据）', value: yuan(total), lead: true }, { label: '累计收益', value: `${profit > 0 ? '+' : ''}${yuan(profit)}`, note: '合成数据，不代表未来' }]}/>
+    <Kpis items={[{ label: '持仓市值', value: yuan(total), lead: true }, { label: '累计收益', value: `${profit > 0 ? '+' : ''}${yuan(profit)}` }]}/>
     <StackBar label="持仓构成" rows={rows.map(item => ({ label: text(item.name), value: num(item.value) }))}/>
     <ul className="viz-agenda">{rows.map(item => <li key={text(item.id)}><time><TrendingUp aria-hidden size={14}/></time><b>{text(item.name)}</b><small>成本 {yuan(num(item.cost))}</small><strong>{yuan(num(item.value))}</strong></li>)}</ul>
-  </div>;
-}
-
-function PortfolioReviewViz({ row }: { row: Record<string, unknown> }) {
-  const items = list(row.holdings), questions = Array.isArray(row.questions) ? row.questions.map(text) : [];
-  if (!items.length) return <EmptyViz title="没有可复盘的持仓" note="已受理的申购在份额确认前不算持有。"/>;
-  return <div className="viz-group">
-    {items.map(item => <div className="viz-group" key={text(item.holdingId)}>
-      <Kpis items={[{ label: `${text(item.name)} · 盈亏（合成数据）`, value: `${num(item.profit) > 0 ? '+' : ''}${yuan(num(item.profit))}`, lead: true, note: `成本 ${yuan(num(item.cost))} · 市值 ${yuan(num(item.value))}` }, { label: '买入次数', value: `${num(item.buyCount)} 次` }, { label: '持有', value: item.holdingDays != null ? `${num(item.holdingDays)} 天` : '—' }]}/>
-      <ul className="viz-agenda">{list(item.buys).map((buy, index) => <li key={index}><time>{text(buy.date)}</time><b>买入</b><small>{text(buy.source)}</small><strong>{yuan(num(buy.amount))}</strong></li>)}</ul>
-    </div>)}
-    {questions.length ? <div className="viz-learn"><BookOpen aria-hidden size={22}/><div><b>复盘问题（只提问，不给买卖建议）</b><ol className="viz-learn-points">{questions.map(q => <li key={q}>{q}</li>)}</ol></div></div> : null}
   </div>;
 }
 
@@ -230,7 +221,7 @@ function OrdersViz({ rows }: { rows: Record<string, unknown>[] }) {
 }
 
 function RulesViz({ rows, bank }: { rows: Record<string, unknown>[]; bank?: BankState }) {
-  if (!rows.length) return <EmptyViz title="还没有规则" note="规则最长期限和次数都由你确认，不会自动续期。"/>;
+  if (!rows.length) return <EmptyViz title="还没有规则"/>;
   return <ul className="viz-rules">{rows.map(item => {
     const contact = bank && contactsOf(bank).find(c => c.id === item.recipientId);
     return <li key={text(item.id)}><AlarmClock aria-hidden size={18}/><div><b>{contact ? `${contact.name} · ${contact.label}` : text(item.name) || text(item.productId) || '周期规则'}</b><small>{cycle(item.schedule)}{item.executionState === 'scheduled_not_connected' ? ' · 自动执行尚未启用' : ''}</small></div><strong>{yuan(num(item.amount))}</strong><Chip badge={item.status === 'active' ? { label: '生效', tone: 'ok' } : item.status === 'paused' ? { label: '已暂停', tone: 'wait' } : { label: '已结束', tone: 'muted' }}/></li>;
@@ -248,7 +239,7 @@ function TransfersViz({ rows, }: { rows: Record<string, unknown>[] }) {
 }
 
 export function SimpleScale({ level, validUntil }: { level: number; validUntil?: string }) {
-  return <div className="viz-group"><LevelScale prefix="C" level={level} caption="风险测评等级（沙箱）"/>{validUntil && <small className="viz-goal-deadline">有效期至 {localDate(validUntil).slice(0, 10)}</small>}</div>;
+  return <div className="viz-group"><LevelScale prefix="C" level={level} caption="风险测评等级"/>{validUntil && <small className="viz-goal-deadline">有效期至 {localDate(validUntil).slice(0, 10)}</small>}</div>;
 }
 
 export function EmptyViz({ title, note }: { title: string; note?: string }) {
@@ -275,11 +266,10 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
       return Array.isArray(value) ? <RulesViz rows={rows} bank={bank}/> : row.amount != null ? <RulesViz rows={[row]} bank={bank}/> : null;
     case 'TR06': return Array.isArray(value) ? <TransfersViz rows={rows}/> : null;
     case 'TR08': case 'TR09': return Array.isArray(value) ? <ContactsViz rows={rows}/> : null;
-    case 'TR10': {
-      const invites = Array.isArray(value) ? rows : row.invitee != null ? [row] : [];
-      if (Array.isArray(value) && !invites.length) return <EmptyViz title="还没有发出邀请" note="邀请只发给你点名的一位同学，不读通讯录、不群发。"/>;
-      return invites.length ? <ul className="viz-agenda">{invites.map(item => <li key={text(item.id)}><time>{localDate(text(item.createdAt))}</time><b>{text(item.invitee)}</b><small>{text(item.channel)}</small><strong>{text(item.statusText)}</strong></li>)}</ul> : null;
-    }
+    case 'TR10': return Array.isArray(value) ? <InviteList rows={rows}/> : row.invitee != null ? <InviteCard invitee={text(row.invitee)} message={text(row.text)} sent createdAt={text(row.createdAt)}/> : null;
+    case 'TR11': return row.guide != null ? <MerchantGuideCard value={row}/> : null;
+    case 'SU02': return row.name != null ? <SubscriptionTile sub={row}/> : null;
+    case 'CA08': return row.status != null && !Array.isArray(value) ? <ProcessSteps label="补卡进度" steps={[{ label: '已申请', state: 'done' }, { label: '制卡寄送', state: row.status === 'activated' || row.tail != null ? 'done' : 'void' }, { label: '激活新卡', state: row.status === 'activated' || row.tail != null ? 'done' : 'todo' }]}/> : null;
     case 'BI04': {
       const signals = list(row.signals);
       return <div className="viz-group"><Kpis items={[{ label: '需核实的线索', value: `${signals.length} 笔`, lead: true }, { label: '核对范围', value: `${list(row.transactions).length} 笔` }]}/>{signals.map(item => <p className="warn-line" key={text(item.transactionId)}><ShieldAlert aria-hidden size={15}/> {text(item.reason)}</p>)}</div>;
@@ -287,11 +277,11 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
     case 'BI05': return <SubscriptionRadar rows={list(row.subscriptions)} inference={text(row.inference)}/>;
     case 'BI08': {
       const spending = record(row.spending), budgets = list(row.budgets);
-      if (Array.isArray(row.budgets)) return budgets.length ? <div className="viz-group">{budgets.filter(item => typeof item.amount === 'number').map(item => <Meter key={text(item.id)} label={`${text(item.period) || text(item.name)} · ${text(item.category) || '全部'}`} value={num(spending.netExpenses)} max={num(item.amount)} tone={num(spending.netExpenses) > num(item.amount) ? 'risk' : 'blue'} note="已用来自统计范围内的净支出"/>)}</div> : <EmptyViz title="还没有预算" note="预算只是标记，不扣款也不冻结。"/>;
-      if (typeof row.amount === 'number') return <Kpis items={[{ label: `${text(row.period)} · ${text(row.category) || '全部'}预算`, value: yuan(row.amount), lead: true, note: '不扣款 · 不冻结' }]}/>;
+      if (Array.isArray(row.budgets)) return budgets.length ? <div className="viz-group">{budgets.filter(item => typeof item.amount === 'number').map(item => <Meter key={text(item.id)} label={`${text(item.period) || text(item.name)} · ${text(item.category) || '全部'}`} value={num(spending.netExpenses)} max={num(item.amount)} tone={num(spending.netExpenses) > num(item.amount) ? 'risk' : 'blue'} />)}</div> : <EmptyViz title="还没有预算"/>;
+      if (typeof row.amount === 'number') return <Kpis items={[{ label: `${text(row.period)} · ${text(row.category) || '全部'}预算`, value: yuan(row.amount), lead: true }]}/>;
       return null;
     }
-    case 'BI09': return typeof row.total === 'number' ? <div className="viz-group"><Kpis items={[{ label: `${num(row.periodCount)} 期累计本金（试算）`, value: yuan(row.total), lead: true, note: '不含收益，未实际存入' }]}/><Columns label="本金累计" rows={cumulativeSteps(row.total, num(row.periodCount)).map(step => ({ key: String(step.period), tick: String(step.period), value: step.value, tip: `第 ${step.period} 期 ${yuan(step.value)}` }))}/></div> : null;
+    case 'BI09': return typeof row.total === 'number' ? <div className="viz-group"><Kpis items={[{ label: `${num(row.periodCount)} 期累计本金（试算）`, value: yuan(row.total), lead: true }]}/><Columns label="本金累计" rows={cumulativeSteps(row.total, num(row.periodCount)).map(step => ({ key: String(step.period), tick: String(step.period), value: step.value, tip: `第 ${step.period} 期 ${yuan(step.value)}` }))}/></div> : null;
     case 'SU01': return Array.isArray(value) ? <SubscriptionRadar rows={rows}/> : null;
     case 'SU07': return <div className="viz-group"><Kpis items={[{ label: `${text(record(row.actual).period)} 实际订阅支出`, value: yuan(num(record(row.actual).netExpenses)), lead: true }, { label: '预计每月少支出', value: yuan(num(row.projectedMonthlyReduction)), note: '尚未发生' }]}/><RankBars label="订阅金额" rows={list(row.subscriptions).map(item => ({ label: text(item.name), value: num(item.amount), note: cycle(item.cycle) }))}/></div>;
     case 'SU08': return <ChargeCalendar value={value}/>;
@@ -300,17 +290,16 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
     case 'IN05': {
       const profile = record(row.profile || row);
       if (typeof profile.level === 'number') return <SimpleScale level={profile.level} validUntil={text(profile.validUntil)}/>;
-      return row.assessmentState === 'not_found' ? <EmptyViz title="还没有风险测评" note="正式测评不是课程，也不是游戏等级。"/> : null;
+      return row.assessmentState === 'not_found' ? <EmptyViz title="还没有风险测评"/> : null;
     }
     case 'IN10': return Array.isArray(value) ? <HoldingsViz rows={rows}/> : null;
-    case 'IN16': return Array.isArray(row.holdings) ? <PortfolioReviewViz row={row}/> : null;
-    case 'IN06': return rows.length === 1 && Array.isArray(rows[0].underlying) ? <StackBar label="底层资产构成（合成数据）" rows={list(rows[0].underlying).map(u => ({ label: text(u.asset), value: num(u.share) }))}/> : null;
+    case 'IN16': return Array.isArray(row.holdings) ? <PortfolioReviewCard value={row} bank={bank}/> : row.note != null ? <NotePreview note={text(row.note)}/> : null;
     case 'IN08': case 'IN09': case 'IN11': case 'IN12': return Array.isArray(value) ? <OrdersViz rows={rows}/> : row.action != null ? <OrdersViz rows={[row]}/> : null;
-    case 'IN14': case 'SU03': return Array.isArray(value) ? rows.length ? <RulesViz rows={rows}/> : <EmptyViz title="还没有提醒" note="提醒只是站内通知，不会开启扣款或申购。"/> : null;
+    case 'IN14': case 'SU03': return Array.isArray(value) ? rows.length ? <RulesViz rows={rows}/> : <EmptyViz title="还没有提醒"/> : null;
     case 'IN15': {
       const points = Array.isArray(row.points) ? row.points.map(text) : [], product = record(row.product);
       return <div className="viz-group">
-        <div className="viz-learn"><BookOpen aria-hidden size={22}/><div><b>投教小课（自愿 · 可跳过）<span className="viz-learn-tag">不是购买门槛</span></b>{points.length ? <ol className="viz-learn-points">{points.map(point => <li key={point}>{point}</li>)}</ol> : <p>{text(row.content)}</p>}<small><Lightbulb aria-hidden size={13}/> 学不学都不改变风险测评；能否交易只看有效正式测评、机构适当性规则和产品规则</small></div></div>
+        <div className="viz-learn"><BookOpen aria-hidden size={22}/><div><b>理财小课</b>{points.length ? <ol className="viz-learn-points">{points.map(point => <li key={point}>{point}</li>)}</ol> : <p>{text(row.content)}</p>}</div></div>
         {bank ? <AssessmentPair bank={bank} productId={product.id ? text(product.id) : undefined}/> : null}
         <LessonNext assessed={row.profile != null}/>
       </div>;
@@ -322,7 +311,7 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
       const card = record(row.card || row);
       return card.tail ? <div className="viz-plates is-single"><CardPlate card={card}/></div> : null;
     }
-    case 'CA09': return Array.isArray(row.bindings) ? (list(row.bindings).length ? <ul className="viz-agenda">{list(row.bindings).map((item, index) => <li key={index}><time><Goal aria-hidden size={14}/></time><b>{text(item.name) || text(item.merchant)}</b><small>{text(item.status)}</small></li>)}</ul> : <EmptyViz title="没有已记录的绑定" note="不承诺掌握完整的第三方绑定。"/>) : null;
+    case 'CA09': return Array.isArray(row.bindings) ? (list(row.bindings).length ? <ul className="viz-agenda">{list(row.bindings).map((item, index) => <li key={index}><time><Goal aria-hidden size={14}/></time><b>{text(item.name) || text(item.merchant)}</b><small>{text(item.status)}</small></li>)}</ul> : <EmptyViz title="没有已记录的绑定"/>) : null;
     default: return null;
   }
 }
@@ -358,12 +347,12 @@ export function BillDetail({ rows }: { rows: Record<string, unknown>[] }) {
     {follow && !mine ? <button className="pill-button" onClick={() => follow('BI03', { transactionId: item.id })}>纠正</button> : <i/>}
   </li>; };
   return <div className="viz-group">
-    {guessed.length > 0 && <p className="bill-chip"><Check aria-hidden size={14}/> 分类：{guessed.length} 笔 {yuan(guessed.reduce((sum, item) => sum + num(item.amount), 0))} 按商户推断 · 不代表实际商品</p>}
+    {guessed.length > 0 && <p className="bill-chip"><Check aria-hidden size={14}/> 分类：{guessed.length} 笔 {yuan(guessed.reduce((sum, item) => sum + num(item.amount), 0))} 按商户推断</p>}
     <section className="bill-detail" aria-label="明细 · 可纠正分类">
       <b className="bill-detail-title">明细 · 可纠正分类</b>
       <ul>{shown.map(line)}</ul>
       {rest.length > 0 && <details className="bill-detail-more"><summary>还有 {rest.length} 笔</summary><ul>{rest.map(line)}</ul></details>}
-      <small>默认只改这一笔 · 不批量改同类商户历史 · 原始流水不变</small>
+      
     </section>
   </div>;
 }
@@ -388,7 +377,7 @@ export function ReviewViz({ bank, task, receipt }: { bank: BankState; task: Flow
   if (id === 'TR03' || id === 'TR04') {
     const contact = contactsOf(bank).find(item => item.id === p.recipientId);
     if (!contact) return null;
-    return <div className="viz-group"><MoneyFlow from={from} to={{ title: contact.name, sub: `${contact.label} · 尾号 ${contact.tail}` }} amount={amount} note={id === 'TR04' ? cycle(p.schedule) : text(p.note)}/>{id === 'TR03' && !receipt && budgetAfter}</div>;
+    return <div className="viz-group">{!receipt && <TransferRiskBanner bank={bank} task={task}/>}<MoneyFlow from={from} to={{ title: contact.name, sub: `${contact.label} · 尾号 ${contact.tail}` }} amount={amount} note={id === 'TR04' ? cycle(p.schedule) : text(p.note)}/><UpperAmount cents={cents}/>{id === 'TR03' && !receipt && budgetAfter}</div>;
   }
   if (id === 'TR05' && p.action === 'create') {
     const shares = list(record(task.result).participants);
@@ -401,7 +390,10 @@ export function ReviewViz({ bank, task, receipt }: { bank: BankState; task: Flow
     const goalNode = { icon: <Target size={16}/>, title: text(goal.name), sub: '目标账户' };
     return <div className="viz-group"><MoneyFlow from={p.direction === 'deposit' ? from : goalNode} to={p.direction === 'deposit' ? goalNode : from} amount={amount}/><GoalViz goal={goal} plan={{ amount: cents, direction: text(p.direction) }}/></div>;
   }
-  if (id === 'IN01' && p.target != null) return <GoalViz goal={{ name: p.name, target: Math.round(Number(p.target) * 100), balance: 0, deadline: p.deadline }}/>;
+  if (id === 'IN01' && p.target != null) return <div className="viz-group"><GoalViz goal={{ name: p.name, target: Math.round(Number(p.target) * 100), balance: 0, deadline: p.deadline }}/>{typeof p.deadline === 'string' && <DateCountdown date={p.deadline} title={`${text(p.name) || '目标'}截止`} today={businessDay(bank)}/>}</div>;
+  if (id === 'TR10' && p.action === 'create' && typeof p.invitee === 'string') return <InviteCard invitee={p.invitee} message={inviteText(p.invitee)} sent={false}/>;
+  if (id === 'IN16' && p.action === 'note' && typeof p.note === 'string') return <NotePreview note={p.note}/>;
+  if (id === 'IN14' && p.action === 'create') return <ReminderCard bank={bank} task={task}/>;
   if (id === 'IN04') {
     const goal = records?.goals?.find(item => item.id === p.goalId);
     if (!goal) return null;
@@ -412,23 +404,23 @@ export function ReviewViz({ bank, task, receipt }: { bank: BankState; task: Flow
     const source: FlowNode = payer ? { icon: <CreditCard size={16}/>, title: payer.name, sub: `尾号 ${payer.tail}${p.accountId ? '' : ' · 默认'}` } : from;
     return <div className="viz-group"><MoneyFlow from={source} to={{ icon: <Target size={16}/>, title: text(goal.name), sub: '本人目标账户' }} amount={amount} note={text(p.schedule)}/>
       <div className="viz-limits"><Kpis items={[{ label: '单笔', value: whole(limits.perRun), lead: true }, { label: '次数', value: `${limits.runs} 次` }, { label: '累计上限', value: whole(limits.cap) }, { label: '期限', value: `${limits.days} 天` }]}/></div>
-      <small className="viz-limits-note">到期不自动续期 · 随时暂停 · 修改账户或金额将作废旧授权并重新确认{limits.capped ? ' · 超过 90 天的部分不在本次授权内' : ''}</small></div>;
+      {limits.capped && <small className="viz-limits-note">本次授权覆盖 90 天</small>}</div>;
   }
   if (id === 'IN08' || id === 'IN13') {
     const product = records?.products?.find(item => item.id === p.productId);
-    return product ? <MoneyFlow from={from} to={{ icon: <TrendingUp size={16}/>, title: text(product.name), sub: `风险 R${text(product.risk)}` }} amount={amount} note={id === 'IN13' ? cycle(p.schedule) : '受理 ≠ 成交'}/> : null;
+    return product ? <MoneyFlow from={from} to={{ icon: <TrendingUp size={16}/>, title: text(product.name), sub: `风险 R${text(product.risk)}` }} amount={amount} note={id === 'IN13' ? cycle(p.schedule) : undefined}/> : null;
   }
   if (id === 'IN09') {
     const holding = records?.holdings?.find(item => item.id === p.holdingId);
-    return holding ? <MoneyFlow from={{ icon: <TrendingUp size={16}/>, title: text(holding.name), sub: `市值 ${yuan(num(holding.value))}` }} to={from} amount={amount} note="到账前不增加余额"/> : null;
+    return holding ? <MoneyFlow from={{ icon: <TrendingUp size={16}/>, title: text(holding.name), sub: `市值 ${yuan(num(holding.value))}` }} to={from} amount={amount}/> : null;
   }
   if (id === 'IN12') { const order = records?.orders?.find(item => item.id === p.orderId); return order ? <OrdersViz rows={[order]}/> : null; }
   if (id === 'SU04' || id === 'SU06') { const sub = records?.subscriptions?.find(item => item.id === p.subscriptionId); return sub ? <SubscriptionTile sub={sub}/> : null; }
   if (id === 'BI03') {
     const tx = records?.transactions?.find(item => item.id === p.transactionId);
-    return tx ? <div className="viz-recat"><div><b>{text(tx.merchant)}</b><small>{text(tx.date)} · {yuan(num(tx.amount))}</small></div><span><s>{text(tx.category)}</s><ArrowRight aria-hidden size={15}/><b>{text(p.category) || '待选择'}</b></span><small>默认只改这一笔 · 原始流水不变</small></div> : null;
+    return tx ? <div className="viz-recat"><div><b>{text(tx.merchant)}</b><small>{text(tx.date)} · {yuan(num(tx.amount))}</small></div><span><s>{text(tx.category)}</s><ArrowRight aria-hidden size={15}/><b>{text(p.category) || '待选择'}</b></span></div> : null;
   }
-  if (id === 'BI08' && typeof p.amount !== 'undefined') return <Kpis items={[{ label: `${text(p.period)} · ${text(p.category) || '全部'}预算`, value: amount, lead: true, note: '不扣款 · 不冻结' }]}/>;
+  if (id === 'BI08' && typeof p.amount !== 'undefined') return <Kpis items={[{ label: `${text(p.period)} · ${text(p.category) || '全部'}预算`, value: amount, lead: true }]}/>;
   if (['CA02', 'CA04', 'CA05', 'CA06', 'CA07', 'CA08'].includes(id)) {
     const card = records?.cards?.find(item => item.id === p.cardId);
     if (!card) return null;
@@ -438,6 +430,6 @@ export function ReviewViz({ bank, task, receipt }: { bank: BankState; task: Flow
   return null;
 }
 
-function SubscriptionTile({ sub }: { sub: Record<string, unknown> }) {
+export function SubscriptionTile({ sub }: { sub: Record<string, unknown> }) {
   return <div className="viz-tile"><Avatar name={text(sub.name)}/><div><b>{text(sub.name)}</b><small>{[cycle(sub.cycle), sub.channel === 'bank' ? '银行代扣通道' : '外部平台', sub.nextChargeAt ? `下次 ${text(sub.nextChargeAt)}` : ''].filter(Boolean).join(' · ')}</small></div><strong>{yuan(num(sub.amount))}</strong></div>;
 }

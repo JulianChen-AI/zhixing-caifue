@@ -292,9 +292,10 @@ body{font-variant-numeric:tabular-nums}
 .compact-main{flex:1;min-width:0}.compact-main strong{display:block;font-size:15px;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
 .compact-main span{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
 .compact-amount{flex:none;font-size:15px;color:var(--ink)}.compact-amount.is-positive{color:var(--ok)}
-.four-state{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:8px 0}
-.four-state>div{display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:var(--tint);border-radius:14px;padding:12px;min-width:0}
-.four-state small{font-size:13px;color:var(--muted)}.four-state .desk-chip{white-space:normal}
+.four-state{display:grid;margin:4px 0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.four-state>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;min-width:0}
+.four-state>div+div{border-top:1px solid var(--line)}
+.four-state small{font-size:14px;color:#3d4a5c}.four-state .desk-chip{white-space:nowrap}
 
 /* Investment */
 .invest-risk{background:none;padding:0;margin:8px 0 10px;gap:8px}
@@ -318,7 +319,7 @@ body{font-variant-numeric:tabular-nums}
 .station-body b{font-size:14px}
 
 @media(max-width:600px){
- .four-state{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .four-state{grid-template-columns:1fr}
  .scope-grid,.serial-app .risk-pair{grid-template-columns:minmax(0,1fr)}
  .task-map ol,.desk-center .task-map ol{grid-template-columns:repeat(2,minmax(0,1fr))}
  .card-head-end{max-width:52%}

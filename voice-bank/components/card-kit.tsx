@@ -54,7 +54,7 @@ export function AaStatus({ bank, value, busy, onRemind }: { bank: BankState; val
     <table className="aa-table"><thead><tr><th>成员</th><th className="r">应付</th><th>到账状态</th><th>提醒发送状态</th></tr></thead>
       <tbody>{others.map(member => <tr key={member.name}><td>{member.name}</td><td className="r">{yuan(member.amount)}</td>
         <td><Chip badge={member.paid ? { label: '已到账', tone: 'ok' } : { label: '未到账', tone: 'wait' }}/></td>
-        <td>{member.reminder === 'sent' ? <Chip badge={{ label: '已发送 · 模拟', tone: 'info' }}/> : <span className="muted">{member.paid ? '无需提醒' : '未发送'}</span>}</td></tr>)}</tbody></table>
+        <td>{member.reminder === 'sent' ? <Chip badge={{ label: '已发送', tone: 'info' }}/> : <span className="muted">{member.paid ? '无需提醒' : '未发送'}</span>}</td></tr>)}</tbody></table>
     {onRemind && aa.unpaid.length > 0 && <div className="card-actions"><button className="secondary-button" disabled={busy} onClick={() => onRemind(aa.id)}>提醒待付的 {aa.unpaid.join('、')}</button></div>}
     <p className="note-line">提醒前重查付款状态，已付者不再提醒；“已发送”不等于“已到账”。</p>
   </section>;

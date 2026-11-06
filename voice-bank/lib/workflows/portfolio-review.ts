@@ -64,12 +64,12 @@ function reviewQuestions(s: BankState, items: ReviewItem[]): string[] {
 function reviewSpeech(items: ReviewItem[], pending: number, questions: string[]) {
  if (!items.length) return `目前没有理财持仓，暂时没有可复盘的内容${pending ? `；有 ${pending} 笔申购已受理但份额未确认，确认后再复盘` : ''}。`;
  const facts = items.map(i => `${i.name}成本${yuan(i.cost)}、市值${yuan(i.value)}、${i.profit > 0 ? `赚了${yuan(i.profit)}` : i.profit < 0 ? `亏了${yuan(-i.profit)}` : '不赚不亏'}，买过${i.buyCount}次${i.holdingDays != null ? `，持有${i.holdingDays}天` : ''}`).join('；');
- return `复盘${items.length}项持仓（合成数据）：${facts}。想一想：${questions.slice(0, 2).join('')}这里只回顾事实，不给买卖建议，也不预测收益。`;
+ return `复盘${items.length}项持仓：${facts}。想一想：${questions.slice(0, 2).join('')}`;
 }
 
 /** A note the user writes for their own review. It never enters the risk profile or any eligibility check. */
 export function reviewNote(p: Params, at: string) {
- return { holdingId: p.holdingId ?? null, note: String(p.note), createdAt: at, usage: '仅供本人复盘，不进入风险画像，不影响能买什么' };
+ return { holdingId: p.holdingId ?? null, note: String(p.note), createdAt: at };
 }
 
 /** Underlying assets in one line, for speech and comparison. */

@@ -109,7 +109,7 @@ function pump(input:BankState,reducer:Reducer):BankState{
  if(unclear){unclear.status='collecting';p.status='collecting';focus(s,unclear);p.message=unclear.question||'请先明确业务用途，尚未执行。';s.lastReply=p.message;return s;}
  for(let remaining=24;remaining>0;remaining--){
   p=s.plan!;const entry=p.steps.find(unfinished);
-  if(!entry){p.status=p.steps.every(x=>x.status==='cancelled')?'cancelled':'complete';p.currentTaskId=undefined;p.message=p.monthly?'月度计划各项已处理；投资申请若已受理仍待结算，并非持仓确认。':(p.announcements||[]).join('')+'这份任务清单已结束，各任务结果已保存。';s.lastReply=p.message;trimHistory(p);return s;}
+  if(!entry){p.status=p.steps.every(x=>x.status==='cancelled')?'cancelled':'complete';p.currentTaskId=undefined;p.message=p.monthly?'月度计划各项已处理；投资申请若已受理仍待结算，并非持仓确认。':singleRead(s,p)??(p.announcements||[]).join('')+'这份任务清单已结束，各任务结果已保存。';s.lastReply=p.message;trimHistory(p);return s;}
   if(entry.dependsOn.some(id=>p.steps.find(x=>x.id===id)?.status!=='complete')){p.status='blocked';p.message='前序任务未完成，后续任务暂停。';s.lastReply=p.message;return s;}
   const switching=p.currentTaskId!==(entry.taskId||entry.id);p.status='running';p.currentTaskId=entry.taskId||entry.id;
   if(entry.kind==='calculation'){
@@ -131,11 +131,11 @@ function pump(input:BankState,reducer:Reducer):BankState{
   const live=s.plan!.steps.find(x=>x.id===entry.id)!;if(switching&&task.status!=='queued'&&!['complete','cancelled'].includes(task.status)&&!s.plan!.announcements!.some(x=>x.includes(live.title)))s.plan!.announcements!.push('继续办理“'+live.title+'”，已填信息保留。');focus(s,live);
   const external=p.monthly&&task.functionId==='IN08'&&task.status==='complete'?false:waitingExternal(s,task);live.status=external==='cancelled'?'blocked':external?'external':task.status==='unsupported'?'blocked':task.status==='queued'?'pending':task.status;live.result=task.result;
   if(live.status==='complete'||live.status==='cancelled'){
-   s.plan!.announcements!.push('“'+live.title+'”'+(live.status==='complete'?(s.plan!.monthly&&live.functionId==='IN08'?'已受理，等待结算。':!isWrite(task)&&task.message&&s.plan!.steps.some(unfinished)?'：'+task.message.trim().replace(/[。.]?$/,'。'):'已完成。'):'已取消。'));log(s.plan!,live.status,'后台检查清单中的下一项。',live.id);
+   s.plan!.announcements!.push('“'+live.title+'”'+(live.status==='complete'?(s.plan!.monthly&&live.functionId==='IN08'?'已受理，等待结算。':!isWrite(task)&&task.message?'：'+task.message.trim().replace(/[。.]?$/,'。'):'已完成。'):'已取消。'));log(s.plan!,live.status,'后台检查清单中的下一项。',live.id);
    if((live.pauseAfter||live.status==='cancelled'&&!live.inserted)&&s.plan!.steps.some(unfinished)){s.plan!.status='paused';focus(s,s.plan!.steps.find(unfinished));s.plan!.message=(s.plan!.announcements||[]).join('')+'任务清单仍暂停，进度已保留。';s.lastReply=s.plan!.message;return s;}
    continue;
   }
-  if(['blocked','external'].includes(live.status)){s.plan!.status='blocked';s.plan!.message=external?'当前任务仍在等待实际结算或外部办理。':task.message;}
+  if(['blocked','external'].includes(live.status)){s.plan!.status='blocked';s.plan!.message=external?(task.status==='external'&&task.message?task.message:'当前任务仍在等待实际结算或外部办理。'):task.message;}
   else s.plan!.message=(s.plan!.announcements||[]).join('')+task.message;
   s.lastReply=s.plan!.message;trimHistory(s.plan!);return s;
  }
@@ -150,6 +150,12 @@ function selectTask(s:BankState,id:string){
  const index=p.steps.findIndex(unfinished);p.steps.splice(p.steps.indexOf(entry),1);p.steps.splice(index,0,entry);focus(s,entry);p.taskIds=p.steps.filter(x=>x.taskId).map(x=>x.taskId!);return entry;
 }
 
+/** A one-item read answers with its result, not with a list announcement around it. */
+function singleRead(s:BankState,p:NonNullable<BankState['plan']>):string|undefined{
+ if(p.steps.length!==1||p.steps[0].status!=='complete')return;
+ const task=s.workflows?.tasks.find(t=>t.id===p.steps[0].taskId);
+ return task&&!isWrite(task)&&task.message?task.message:undefined;
+}
 export function assertPlanAccess(s:BankState,a:BankAction){
  const p=activePlan(s);if(!p||a.type==='plan'||['home','reset'].includes(a.type))return;
  if(a.type==='workflow'&&['status','list','describe','settle'].includes(a.command.operation))return;

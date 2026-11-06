@@ -166,7 +166,7 @@ export function preflight(s:BankState,t:FlowTask){
   aaShares(cents(p.total),p.participants as string[],(p.adjustments as AaItem[])||[]);
  }
  // One named person per invitation, sent once: a second request for the same person is answered from the record.
- if(id==='TR10'&&a==='create'){const name=inviteeName(p.invitee),sent=existingInvite(s,name);if(sent)throw new WorkflowError(`已经给${name}发过邀请（${String(sent.createdAt).slice(0,10)}，模拟通道），不重复发送。可以说“看看邀请状态”。`);}
+ if(id==='TR10'&&a==='create'){const name=inviteeName(p.invitee),sent=existingInvite(s,name);if(sent)throw new WorkflowError(`${String(sent.createdAt).slice(0,10)}已经给${name}发过邀请了，可以说“看看邀请状态”。`);}
  if(id==='TR05'&&a==='remind'&&!reminderDrafts(getRow(s,'aa',p.sessionId)).length)throw new WorkflowError('名单里的人都已付款，没有需要提醒的对象。');
  if(id==='BI09'&&(!Number.isInteger(p.periodCount)||Number(p.periodCount)<1||Number(p.periodCount)>600))throw new WorkflowError('期数应为 1 至 600 的整数。');
  // A zero or false rate is the principal-only estimate that is implemented.
@@ -205,8 +205,7 @@ function learnResult(s:BankState,p:Params){
 export function merchantGuide(p:Params){
  const item=typeof p.item==='string'&&p.item.trim()?p.item.trim():'这件商品';
  return {item,guide:['打开商户的官方 App 或小程序','自己挑选、核对价格和配送时间','在商户页面由你本人确认付款'],connected:false,
-  notice:'暂未接入商户开放接口：银行没有下单，也没有付款，不会显示“已订好”。',
-  message:`${item}需要你在商户官方 App 或小程序自己下单；暂未接入商户开放接口，我没有下单，也没有付款。付款后可以回来查账单。`};
+  message:`${item}在商户官方 App 或小程序下单，付款后可以回来查账单。`};
 }
 export function queryBusiness(s:BankState,t:FlowTask):unknown{
  const p=t.params,id=t.functionId;
@@ -276,7 +275,7 @@ export function executeBusiness(s:BankState,t:FlowTask):unknown{
   case 'IN08':return step(t,'I12','提交沙箱申购，资金与订单原子写入',()=>{const acc=account(s,p.accountId),c=cents(p.amount),product=getRow(s,'products',p.productId);acc.held=(acc.held||0)+c;const order=add(s,'orders',{id:uuid('order'),action:'subscribe',productId:product.id,name:product.name,accountId:acc.id,amount:c,held:true,status:'pending',createdAt:ts,cancelUntil:cancellationDeadline(businessNow(s)),cancellationPolicy:'演示按北京时间当日24:00；真实规则须机构确认',synthetic:true});return {...orderView(order),balance:acc.balance,available:availableBalance(acc),held:acc.held,message:'已受理，资金已占用、尚未扣款；份额待确认，不是已确认持仓'};});
   case 'IN09':return step(t,'I12','沙箱赎回受理，到账前不增加账户余额',()=>{const h=getRow(s,'holdings',p.holdingId),c=cents(p.amount),reservedCost=Math.round(num(h,'cost')*c/num(h,'value'));h.value=num(h,'value')-c;h.cost=num(h,'cost')-reservedCost;const o=add(s,'orders',{id:uuid('order'),action:'redeem',holdingId:h.id,productId:h.productId,accountId:p.accountId,amount:c,reservedCost,status:'pending',createdAt:ts,synthetic:true});return {...orderView(o),...redemptionQuote(s,p),message:'赎回已受理，资金尚未到账。可在沙箱推进结算后查询。'};});
   case 'IN12':return step(t,'I14','只撤销 pending 订单并恢复对应资金/持仓',()=>{const o=getRow(s,'orders',p.orderId);if(o.action==='subscribe'){const acc=account(s,o.accountId);if(o.held)acc.held=(acc.held||0)-num(o,'amount');else acc.balance+=num(o,'amount');}else{const h=getRow(s,'holdings',o.holdingId);h.value=num(h,'value')+num(o,'amount');h.cost=num(h,'cost')+num(o,'reservedCost');}o.status='cancelled';return o;});
-  case 'IN16':return step(t,'I20','保存本人复盘笔记；不进入风险画像',()=>{const n=add(s,'reviewNotes',{id:uuid('note'),...reviewNote(p,ts)});return {...n,notice:'复盘笔记已保存，只供你自己回看，不改变风险测评或可购买范围。'};});
+  case 'IN16':return step(t,'I20','保存本人复盘笔记；不进入风险画像',()=>{const n=add(s,'reviewNotes',{id:uuid('note'),...reviewNote(p,ts)});return {...n,notice:'复盘笔记已保存。'};});
   case 'BI03':return step(t,'B04','默认仅更正本笔；未来规则另存',()=>{const r=getRow(s,'transactions',p.transactionId);r.category=p.category;r.classificationSource='user-confirmed';r.needsCategoryConfirmation=false;if(p.scope==='future'){const existing=rows(s,'categories').find(x=>x.merchant===r.merchant);if(existing){existing.category=p.category;existing.source='用户明确选择未来规则';}else add(s,'categories',{id:uuid('map'),merchant:r.merchant,category:p.category,source:'用户明确选择未来规则'});}return {transaction:r,scope:p.scope||'single'};});
   case 'BI08':if(a==='estimate')return step(t,'B09','保存用户估算的分项预算',()=>add(s,'budgets',{id:uuid('estimate'),kind:'estimate',name:p.category||'出行预算',...estimate(p.items as EstimateItem[]),createdAt:ts}));
    return step(t,'B09','保存用户确认的预算',()=>{let b=rows(s,'budgets').find(r=>r.period===p.period&&r.category===(p.category||'全部'));if(!b)b=add(s,'budgets',{id:uuid('budget'),period:p.period,category:p.category||'全部'});b.amount=cents(p.amount);return b;});
@@ -308,7 +307,7 @@ export function executeBusiness(s:BankState,t:FlowTask):unknown{
   });
   case 'TR10':{
    const name=inviteeName(p.invitee),text=step(t,'T17','按用户点名的一位同学生成私密邀请文案；不读通讯录',()=>inviteText(name));
-   return step(t,'T18','模拟通道发送一次；同一人不重复发送',()=>{const r=add(s,'invites',{id:uuid('invite'),invitee:name,text,perk:INVITE_PERK,channel:'模拟通道（演示）',status:'simulated_sent',createdAt:ts});return {...inviteView(r),notice:`已通过模拟通道把邀请发给${name}（演示，不是真实消息）。对方是否接受要由对方操作，演示里不会自动变化。`};});
+   return step(t,'T18','模拟通道发送一次；同一人不重复发送',()=>{const r=add(s,'invites',{id:uuid('invite'),invitee:name,text,perk:INVITE_PERK,channel:'私信',status:'simulated_sent',createdAt:ts});return {...inviteView(r),notice:`已把邀请发给${name}。`};});
   }
   case 'TR07':throw new WorkflowError('已提交转账的延迟撤销通道未接入；可取消未完成草稿。',501);
   case 'CA03':return step(t,'C02','仅模拟收件和申请跟踪，不审批发卡',()=>{if(a==='submit')return add(s,'applications',{id:uuid('application'),productType:p.productType,purpose:p.purpose,status:'received',createdAt:ts,notice:'沙箱收件，尚未审批'});const app=getRow(s,'applications',p.applicationId);if(a==='withdraw')app.status='withdrawn';if(a==='supplement')app.status='supplement_received';return app;});

@@ -123,6 +123,8 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
  if(t.functionId==='TR05'&&required.includes('sessionId')&&t.params.sessionId==null&&rows(s,'aa').length===1)t.params.sessionId=rows(s,'aa')[0].id;
  // With exactly one own account there is nothing to choose; it is still shown for review.
  if(required.includes('accountId')&&t.params.accountId==null&&s.accounts.length===1){t.params.accountId=s.accounts[0].id;(t.fieldEvidence||={}).accountId={source:'calculation',quote:'当前只有一个付款账户，自动带入'};}
+ // In-app is the only notification channel this sandbox has, so there is nothing to ask; it is still shown for review.
+ if(required.includes('notifyChannel')&&t.params.notifyChannel==null){t.params.notifyChannel='in_app';(t.fieldEvidence||={}).notifyChannel={source:'calculation',quote:'本沙箱只支持站内提醒，自动带入'};}
  // Risk wording stops a transfer before collecting the rest; it is never completed by asking more.
  if(['TR03','TR04'].includes(t.functionId)&&t.riskSignals?.length&&required.some(k=>t.params[k]==null||t.params[k]==='')){t.status='blocked';t.missing=[];t.message=`这笔涉及“${t.riskSignals.join('、')}”：向个人账户先付钱，不是平台订单付款。请先核实交易、收款信息和退还条件。本次转账没有提交，也没有扣款。`;return s;}
  // An unsuitable purchase stops before its amount is asked; the message names the assessment so the prerequisite flow can offer it.
@@ -173,12 +175,12 @@ function prepare(s:BankState,t:FlowTask,legacy:LegacyReducer):BankState{
   if(t.functionId==='IN13'&&t.params.action==='create'){const product=rows(s,'products').find(r=>r.id===t.params.productId),acc=s.accounts.find(a=>a.id===t.params.accountId);preview=`将建立定投规则：${t.params.schedule}从${acc?.name||'所选账户'}投${t.params.amount}元到${product?.name||'所选产品'}。这只是授权规则，现在不会扣款；每期执行、受理和份额确认分别记录，可随时暂停、修改或终止。确认后在卡片完成演示认证。`;}
   if(t.functionId==='SU04'){const sub=rows(s,'subscriptions').find(r=>r.id===t.params.subscriptionId)!,yuan=(c:unknown)=>(Number(c)/100).toFixed(Number(c)%100?2:0);t.result={name:sub.name,amount:sub.amount,cycle:sub.cycle,nextChargeAt:sub.nextChargeAt,benefitUntil:sub.benefitUntil,channel:sub.channel};preview=sub.channel==='bank'?`将停止${sub.name}（每月${yuan(sub.amount)}元${sub.nextChargeAt?`，下次${sub.nextChargeAt}续费`:''}）的后续续费。以前的扣款不会退还${sub.benefitUntil?`，本期权益到${sub.benefitUntil}`:''}。确认后在卡片完成演示认证。`:`${sub.name}需要到服务方那里取消，银行不能代你退订；确认后给出官方操作步骤。`;}
   if(t.functionId==='TR05'&&t.params.action==='remind'){const drafts=reminderDrafts(rows(s,'aa').find(r=>r.id===t.params.sessionId)!);t.result={reminders:drafts,channel:'模拟通道（演示）'};preview=`将分别给${drafts.map(d=>`${d.to}（${(d.amount/100).toFixed(d.amount%100?2:0)}元）`).join('、')}发一条私密提醒，内容：“${drafts[0].text.replace(/\d+(?:\.\d+)?元/,'……元')}”已付款的人不会收到。请确认后发送。`;}
-  if(t.functionId==='TR10'&&t.params.action==='create'){const name=String(t.params.invitee);preview=`将通过模拟通道（演示）给${name}发一条私密邀请：“${inviteText(name)}”只发给${name}一人，不读通讯录、不群发。请确认后发送。`;}
-  if(t.functionId==='IN16'&&t.params.action==='note')preview=`将保存一条复盘笔记：“${t.params.note}”。笔记只给你自己回看，不进入风险画像，也不影响能买什么。请确认后保存。`;
+  if(t.functionId==='TR10'&&t.params.action==='create'){const name=String(t.params.invitee);preview=`将给${name}发一条私信邀请：“${inviteText(name)}”请确认后发送。`;}
+  if(t.functionId==='IN16'&&t.params.action==='note')preview=`将保存这条复盘笔记：“${t.params.note}”。请确认后保存。`;
   t.status='review';t.reviewToken=crypto.randomUUID();
   // Name what is being confirmed, so a listener knows without looking at the card.
   const facts=workflowReview(s,t).entries.filter(e=>!['无','否',''].includes(e.value)&&!['note','saveRecipient','autoSave'].includes(e.key)).slice(0,4).map(e=>e.label+'：'+e.value).join('；');
-  t.message='请核对“'+t.title+'”'+(facts?'——'+facts+'。':'的当前信息。')+(t.functionId==='SU04'?'解除代扣不等于商户退订或退款。':t.functionId==='CA07'?'正式挂失后旧卡不可临时解冻恢复。':t.functionId==='IN08'?'产品和费率均为合成数据；可能亏损，申购受理不等于份额确认。':'本次仅操作沙箱数据。')+'确认后'+(needsAuth(t)?'在专门卡片完成演示认证。':'提交。');
+  t.message='请核对“'+t.title+'”'+(facts?'——'+facts+'。':'的当前信息。')+(t.functionId==='SU04'?'解除代扣不等于商户退订或退款。':t.functionId==='CA07'?'正式挂失后旧卡不可临时解冻恢复。':t.functionId==='IN08'?'可能亏损；申购受理后份额确认才算持有。':'')+'确认后'+(needsAuth(t)?'在专门卡片完成演示认证。':'提交。');
   // Freezing a card that is already restricted: say what the restriction is and that freezing does not lift it.
   if(t.functionId==='CA06'&&t.params.action==='freeze'){const card=rows(s,'cards').find(r=>r.id===t.params.cardId);if(card?.status==='restricted'){const why=card.restriction==='judicial'?'司法限制（需按司法机关要求处理）':'保护性风控（核实身份后可申请解除）';t.message=`${card.name}（尾号${card.tail}）目前因${why}受限。临时冻结会再停掉它的全部交易，但不会解除原来的限制。`+t.message;}}
   if(preview)t.message=preview;

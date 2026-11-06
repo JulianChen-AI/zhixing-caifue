@@ -8,7 +8,7 @@ import {FlowSelect} from './flow-select';
 
 type Props={bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>};
 const money=(n:number)=>(n/100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
-const labels:Record<string,string>={pending:'未执行',queued:'未执行',collecting:'待补充',review:'待确认',authenticate:'待演示认证',complete:'已返回结果',blocked:'失败 / 暂停',external:'待核对',cancelled:'未办理'};
+const labels:Record<string,string>={pending:'未执行',queued:'未执行',collecting:'待补充',review:'待确认',authenticate:'待认证',complete:'已返回结果',blocked:'失败 / 暂停',external:'待核对',cancelled:'未办理'};
 /** A saved template is visibly distinct from a payment and each inner authorization. */
 export function MonthlyPlan({bank,busy,onAction}:Props){
  const p=bank.plan;if(!p?.monthly)return null;
@@ -20,7 +20,7 @@ export function MonthlyPlan({bank,busy,onAction}:Props){
   <p className="monthly-note" aria-label="安排依据">逐项确认，不是汇总授权。金额和对象沿用已保存的模板；模板与预算不扣款，投资仅受理。</p>
   <ol className="plan-steps">{p.steps.map(step=><MonthlyItem key={step.id+JSON.stringify(step.params)} {...{bank,busy,onAction,step}}/>)}</ol>
   <p role="status">{p.message}</p>{p.monthly.rentUnknown&&<p className="card-description">账面为最近已确认的记录；房租结果未知不代表已确认未扣款，资金步骤保持暂停。</p>}
-  <div className="details-list"><div><span>活期账面 / 可用</span><strong>¥{money(cash)} / ¥{money(available)}</strong></div><div><span>目标余额 / 模拟资产合计</span><strong>¥{money(goals)} / ¥{money(cash+goals)}</strong></div><div><span>计划未分配（可用减本计划预算，非银行余额）</span><strong>¥{money(available-budgets)}</strong></div></div>
+  <div className="details-list"><div><span>活期账面 / 可用</span><strong>¥{money(cash)} / ¥{money(available)}</strong></div><div><span>目标余额 / 资产合计</span><strong>¥{money(goals)} / ¥{money(cash+goals)}</strong></div><div><span>计划未分配（可用减本计划预算，非银行余额）</span><strong>¥{money(available-budgets)}</strong></div></div>
  </details>;
 }
 function MonthlyItem({bank,busy,onAction,step}:Props&{step:PlanStep}){

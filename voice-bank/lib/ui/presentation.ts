@@ -4,7 +4,21 @@ import { taskIdentity } from './business.ts';
 import { readSummary } from '../workflows/summaries.ts';
 
 /** Public wording only. Raw tool messages and execution state stay unchanged. */
-export function userMessage(message: string): string {
+// Words that only say “this is a demo / not real / not advice”. The rules behind them stay in the engine; the
+// screen shows what happened, not caveats about the prototype.
+const CAVEAT = /本次仅操作沙箱数据|演示数据|合成数据|合成演示|不代表|不构成|不承诺|不给买卖建议|不预测收益|非真实|不是真实|暂未接入|尚未接入|未接入|仅为|仅供|仅反映|只回顾事实|演示中|演示里|演示环境|不读通讯录|不群发|与交易无关|与开户、存款/;
+const WORDS: [RegExp, string][] = [[/通过模拟通道/g, ''], [/模拟通道（演示）|模拟通道/g, '私信'], [/演示验证码/g, '验证码'], [/沙箱(?:银行)?/g, ''], [/合成(?=产品|交易|单位|费率)/g, ''], [/演示(?=订单|认证|卡|权益|邀请)/g, ''], [/模拟(?=回执|认证|结算|调度)/g, '']];
+/** Strips caveat parentheses and caveat-only clauses; keeps every fact, amount and question. */
+export function plain(text: string): string {
+  if (!text) return '';
+  let out = text.replace(/[（(][^（）()]*?(?:演示|模拟|沙箱|合成|非真实|不是真实|未接入|不代表)[^（）()]*?[）)]/g, '');
+  out = out.split(/(?<=[。！？；])/).filter(part => !CAVEAT.test(part) || /[？?]|请/.test(part)).join('');
+  for (const [from, to] of WORDS) out = out.replace(from, to);
+  return out.replace(/，(?=[。；])/g, '').replace(/^[，；。\s]+/, '').trim();
+}
+
+export function userMessage(message: string): string { return plain(userMessageRaw(message)); }
+function userMessageRaw(message: string): string {
   if (!message) return '';
   if (/命中转账风险信号|升级核验尚未接入/.test(message)) return '这笔转账存在风险，暂时无法继续。请核对收款信息。';
   if (/请明确要取消哪项任务/.test(message)) return '请指定要取消的业务，或说“取消全部剩余任务”。';
@@ -39,7 +53,8 @@ export function businessTitle(functionId: string, fallback: string): string {
   return titles[functionId] || fallback.replace(/^查询(?![和及与])/, '');
 }
 
-export function workflowMessage(task: FlowTask): string {
+export function workflowMessage(task: FlowTask): string { return plain(workflowMessageRaw(task)); }
+function workflowMessageRaw(task: FlowTask): string {
   if (task.status === 'review') {
     if (task.functionId === 'SU04') return '停止银行代扣后，商户订阅和退款需另行处理。';
     if (task.functionId === 'CA07') return '挂失后旧卡将无法恢复。';
@@ -139,7 +154,8 @@ export const fieldLabels: Record<string, string> = {
   ledgerId: '账本', members: '成员', choice: '选项', note: '备注',
 };
 
-export function resultMessage(field: string, text: string): string {
+export function resultMessage(field: string, text: string): string { return plain(resultMessageRaw(field, text)); }
+function resultMessageRaw(field: string, text: string): string {
   if (field === 'liquidity' && /沙箱手动推进/.test(text)) return '赎回预计 T+1 工作日到账，演示订单需手动结算。';
   if (field === 'calendarNotice') return '预计到账日未计入法定节假日，实际到账以订单状态为准。';
   if (field === 'executionNotice' || field === 'execution') {

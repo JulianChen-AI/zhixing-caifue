@@ -88,7 +88,7 @@ test('card heads call a result a receipt only once the task has really finished'
   assert.equal(receiptStatus(s, currentWorkflow(s)!), null);
   const t = currentWorkflow(s)!;
   s = card(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken });
-  assert.equal(cardHead(s, currentWorkflow(s)!).badge?.label, '模拟认证');
+  assert.equal(cardHead(s, currentWorkflow(s)!).badge?.label, '待验证');
   const auth = currentWorkflow(s)!;
   s = card(s, { operation: 'authenticate', taskId: auth.id, token: auth.verificationId, code: '123456' });
   const done = currentWorkflow(s)!;
@@ -121,7 +121,7 @@ test('AA keeps sent reminders apart from money received, and re-totals the split
 
 test('cancelling a bank mandate shows four separate facts, not one "cancelled"', () => {
   const states = subscriptionStates({ bankAgreementState: 'cancelled', merchantSubscriptionState: 'unknown', chargeState: 'bank_mandate_stopped' });
-  assert.deepEqual(states.map(item => item.label), ['银行通道授权', '商户退订', '退款', '原应扣日后核验']);
+  assert.deepEqual(states.map(item => item.label), ['银行代扣', '商户订阅', '退款', '下次扣款']);
   assert.equal(states[0].tone, 'ok');
   assert.ok(states.slice(1).every(item => item.tone !== 'ok'));
 });
