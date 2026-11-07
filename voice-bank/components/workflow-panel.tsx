@@ -22,7 +22,6 @@ import { CancelTask } from './cancel-task';
 import { FraudStop, SuitabilityStop } from './stop-cards';
 import { cardHead, reviewNotes } from '@/lib/ui/cards';
 import { contactsOf } from '@/lib/bank/recipients';
-import { CardExplanation } from './card-explanation';
 
 const statusLabel:Record<string,string>={collecting:'补充信息',review:'待确认',authenticate:'验证身份',complete:'办理结果',cancelled:'未办理',blocked:'暂无法办理',unsupported:'暂不可用',external:'待你处理'};
 const resultLabels:Record<string,string>={grossExpenses:'支出合计（退款前）',netExpenses:'净支出（已扣退款）',expenseCount:'消费笔数',refundCount:'退款笔数',countBasis:'笔数口径',autoSave:'自动转存',monthlyAmount:'每月计划金额',reservedCost:'对应成本',protected:'保护类代扣',confirmed:'条目已确认',issuer:'发卡机构',replacementId:'补卡申请',lostAt:'挂失时间',settledAt:'结算时间',relatedId:'关联业务',originalId:'原交易',suspectedDuplicate:'疑似重复',id:'编号',taskId:'任务',functionId:'功能',title:'名称',name:'名称',tail:'尾号',accountId:'账户',amount:'金额',balance:'余额',target:'目标金额',remaining:'剩余目标',progress:'完成比例',value:'市值',cost:'成本',profit:'收益',period:'期间',category:'类别',merchant:'商户',date:'日期',kind:'类型',status:'状态',restriction:'限制类型',limit:'交易限额',channel:'通道',cycle:'周期',nextChargeAt:'下次扣款日',benefitUntil:'权益截止',coverage:'数据范围',source:'来源',asOf:'数据时间',basis:'统计口径',expenses:'净支出',refunds:'退款',income:'收入',count:'笔数',current:'本期',baseline:'比较期',summary:'统计',notice:'说明',message:'说明',guide:'操作指引',assumption:'计算假设',total:'总额',periodCount:'期数',subscriptions:'订阅',transactions:'交易明细',cancellations:'取消记录',actual:'实际记录',projectedMonthlyReduction:'预计每月少支出',risk:'产品风险级别',feeRate:'费率',price:'单位净值',type:'产品类型',liquidity:'流动性',synthetic:'数据来源',level:'风险级别',validUntil:'有效期',answers:'答案',direction:'资金方向',moved:'移动金额',calendar:'扣款日历',protection:'保护范围',explanation:'说明',canSelfUnlock:'是否可自助解除',createdAt:'创建时间',productId:'产品',holdingId:'持仓',goalId:'目标',schedule:'周期',authorizedAt:'授权时间',delivery:'交付范围',execution:'执行范围',participants:'参与者',budgets:'预算',spending:'当前支出',content:'内容',topic:'主题',assessmentChanged:'是否改变测评',bindings:'绑定项',sourceType:'来源',narrative:'叙事',peerComparison:'群体参照'};
@@ -221,7 +220,7 @@ export function WorkflowOutcome({bank,task,busy,onRun}:{bank:BankState;task:Flow
   if(['TR01','TR02'].includes(task.functionId)&&Array.isArray(task.result))return <BusinessResult functionId={task.functionId} value={task.result} bank={bank}/>;
   return <><ReceiptStatus bank={bank} task={task}/><BusinessResult functionId={task.functionId} value={task.result} bank={bank}/>{isWrite(task)&&task.status==='complete'&&<details className="result-details"><summary>办理内容</summary><WorkflowSummary bank={bank} task={task} compact/></details>}{task.functionId==='CA06'&&task.status==='complete'&&task.params.action!=='unfreeze'&&<p className="warn-line">临时冻结 ≠ 正式挂失。</p>}{task.functionId==='IN08'&&task.status==='complete'&&<p className="note-line">份额确认后计入持仓。</p>}</>;
  })();
- return <FollowUp.Provider value={onRun||null}><div className="flow-result" role="region" aria-label="办理结果">{body}<CardExplanation task={task} sceneEpoch={bank.sceneEpoch}/></div></FollowUp.Provider>;
+ return <FollowUp.Provider value={onRun||null}><div className="flow-result" role="region" aria-label="办理结果">{body}</div></FollowUp.Provider>;
 }
 
 type PanelProps={bank:BankState;busy:boolean;onAction:(a:BankAction)=>Promise<void>;serial?:boolean;catalog?:boolean;onClose?:()=>void};

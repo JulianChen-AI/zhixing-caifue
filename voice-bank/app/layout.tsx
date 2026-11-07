@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./theme.css";
 import "./card-viz.css";
-import { CardExplanationProvider } from '@/components/card-explanation';
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', interactiveWidget: 'resizes-content' };
 
@@ -23,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="antialiased"><CardExplanationProvider>{children}</CardExplanationProvider></body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
