@@ -16,6 +16,7 @@ import { inviteText } from './invite.ts';
 import { VOICE_REFUSED } from './risk.ts';
 import { WorkflowError, type FlowTask, type Params, type WorkflowCommand } from './types.ts';
 import {isBillingQuery,resolveBillingQuery} from './billing-query.ts';
+import { mergeFraudSignals } from '../bank/fraud-risk.ts';
 
 type LegacyReducer=(s:BankState,a:BankAction,id:string)=>BankState;
 const current=(s:BankState,id?:string)=>s.workflows!.tasks.find(t=>t.id===(id||s.workflows!.currentTaskId));
@@ -26,7 +27,7 @@ function evidence(t:FlowTask,params:Record<string,unknown>,cmd:WorkflowCommand){
   t.fieldEvidence![key]={value,source:cmd.source==='card'?'user-card':'utterance',quote:cmd.source==='card'?'用户在问卷明确选择':(cmd.utterance||'').replace(/\d{6,}/g,'[已脱敏]').slice(-400)};
  });
  for(const key of Object.keys(params))if(!['answers','code'].includes(key))t.fieldEvidence[key]={source:cmd.source==='card'?'user-card':'model-proposal',quote:cmd.source==='card'?'用户在业务卡片明确输入或选择':([...(cmd.history||[]),cmd.utterance||''].join('\n').replace(/\d{6,}/g,'[已脱敏]').slice(-400))};
- if(['TR03','TR04'].includes(t.functionId))t.riskSignals=[...new Set([...(t.riskSignals||[]),...([...(cmd.history||[]),cmd.utterance||'',String(params.note||'')].join(' ').match(FRAUD_WORDS)||[])])];
+ if(['TR03','TR04'].includes(t.functionId))t.riskSignals=mergeFraudSignals(t.riskSignals||[],...(cmd.history||[]),cmd.utterance||'',String(params.note||''));
 }
 // Scam scripts a transfer must never follow: paying to “unfreeze” or “verify” funds, or impersonated police.
 export const FRAUD_WORDS=/刷单|解冻费|安全账户|保证金|跑分|兼职返利|洗钱|涉嫌|配合调查|公检法|网恋|网上认识|才能见面/g;
@@ -230,6 +231,14 @@ export function reduceWorkflow(previous:BankState,cmd:WorkflowCommand,requestId:
   evidence(task,evidenceParams(task.params,validated.unverifiedParticipants),cmd);store.tasks.push(task);store.currentTaskId=task.id;s=prepare(s,task,legacy);clarifyUnverifiedAa(current(s,task.id)!);askRecipient(current(s,task.id)!,validated.recipientChoice);
  }else{
   if(!task)throw new WorkflowError('找不到当前办理任务，请先选择功能。');
+  if(['TR03','TR04'].includes(task.functionId)&&!['complete','cancelled','external'].includes(task.status)&&!['amend','cancel'].includes(cmd.operation)){
+   const count=task.riskSignals?.length||0;evidence(task,{},cmd);
+   if((task.riskSignals?.length||0)>count){
+    s=shareTransferRisk(s,task,legacy);task=current(s,task.id)!;invalidate(task);task.status='blocked';
+    task.message='这笔转账出现了诈骗常见说法，已先暂停。请先停止和对方联系，核实清楚再办理。';
+    return finalized(s,cmd,requestId,task.id);
+   }
+  }
   if(task.status==='queued'&&cmd.source!=='plan'&&!['status','cancel'].includes(cmd.operation))throw new WorkflowError('请通过任务清单进入待开始任务。');
   store.currentTaskId=task.id;
   if(cmd.operation==='status'){task.message=task.message||'当前状态已读取。';}
@@ -345,4 +354,3 @@ function finalized(s:BankState,cmd:WorkflowCommand,requestId:string,id:string){
 }
 export { currentWorkflow } from './current.ts';
 export { ACTIONS };
-

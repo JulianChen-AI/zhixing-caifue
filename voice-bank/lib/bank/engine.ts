@@ -17,6 +17,7 @@ import { availableBalance } from './accounts.ts';
 import { interceptMonthlyAction } from '../plans/monthly.ts';
 import { delayedNotice, scheduleDelayedTransfer } from '../demo/schedule.ts';
 import { prerequisiteAction } from '../workflows/prerequisites.ts';
+import { mergeFraudSignals } from './fraud-risk.ts';
 
 export class BankError extends Error { constructor(message: string, public status = 400) { super(message); } }
 /** Tests and evaluations use the fixed default anchor; live sessions pass the current business day. */
@@ -36,7 +37,7 @@ export function normalizeState(previous: BankState): BankState {
     if (s.task && !['complete','cancelled'].includes(s.task.step)) {
       s.task.policyVersion = POLICY_VERSION; s.task.amountNeedsConfirmation = false;
       s.task.accountId = null; s.task.confirmedRevision = null; s.task.verificationId = null;
-      s.task.riskSignals = []; s.task.step = s.task.recipientId ? 'details' : 'recipient';
+      s.task.riskSignals ||= []; s.task.step = s.task.recipientId ? 'details' : 'recipient';
       s.lastReply = '办理规则已更新，请重新选择付款账户并核对这笔演示转账。';
     }
     s.policyVersion = POLICY_VERSION;
@@ -115,6 +116,8 @@ function applyIntent(s: BankState, intent: Intent) {
   const active = s.task && !['complete','cancelled'].includes(s.task.step);
   if (!active) s.task = { policyVersion: POLICY_VERSION, id: crypto.randomUUID(), step: 'recipient', recipientId: null, amount: null, accountId: null, riskSignals: [], note: '', confirmedRevision: null, verificationId: null };
   const t = requireTask(s);
+  const priorRiskCount = t.riskSignals.length;
+  t.riskSignals = mergeFraudSignals(t.riskSignals, intent.note || '');
   const priorDetails=[t.recipientId,t.accountId,t.amount,t.note,!!t.amountNeedsConfirmation];
   if (intent.amount != null) { validAmount(intent.amount); t.amount = intent.amount; t.amountNeedsConfirmation=!!intent.amountInferred; }
   if (intent.recipientId) { if (!contactsOf(s).some(c=>c.id===intent.recipientId)) throw new BankError('找不到这位演示联系人，请从卡片选择。'); t.recipientId = intent.recipientId; }
@@ -122,7 +125,7 @@ function applyIntent(s: BankState, intent: Intent) {
   if (intent.note !== undefined) { if (intent.note && /密码|验证码|身份证|\d{6,}/.test(intent.note)) throw new BankError('备注不能包含敏感身份或认证信息。'); t.note = (intent.note || '').slice(0,60); }
   s.view = 'transfer';
   const details=[t.recipientId,t.accountId,t.amount,t.note,!!t.amountNeedsConfirmation];
-  if(active&&priorDetails.every((v,i)=>v===details[i])){
+  if(active&&t.riskSignals.length===priorRiskCount&&priorDetails.every((v,i)=>v===details[i])){
     if(['review','authenticate'].includes(t.step)&&transferChecklist(s,'balance.sufficient')!.outcome!=='proceed'){prepare(s);return;}
     if(t.step==='authenticate'){s.lastReply='信息已经确认，请直接在卡片完成演示认证，无需重新提供收款人或金额。';return;}
     if(t.step==='review'&&t.reviewToken){s.lastReply=transferSummary(s);return;}

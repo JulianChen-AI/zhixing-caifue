@@ -3,13 +3,14 @@ import { amountFromText } from './amount.ts';
 import { POLICY_VERSION, DEMO_POLICY, workflowById } from './catalog.ts';
 import type { CheckResult, ChecklistRun } from './evaluate.ts';
 import { contactsOf, recipientCandidates, recipientIdentityMentioned, recipientNamesMentioned, recipientAliasQuote, recipientChoiceQuestion, hasRecipientTail } from '../bank/recipients.ts';
+import { fraudSignals } from '../bank/fraud-risk.ts';
 export type Evidence = { field: string; value: string | number; quote: string; source: 'utterance' | 'existing-task' | 'user-card' | 'model-proposal' };
 export type RoutingDecision = ChecklistRun & { candidates: string[]; evidence: Evidence[]; unresolved: string[]; draft?: Intent; riskSignals: string[] };
 const source = (id: string) => workflowById(id)?.sources || [];
 export { amountFromText };
 export function routeRequest(text: string, state: BankState, proposal?: Intent): RoutingDecision {
   const contacts = contactsOf(state), raw = text.trim(), active = state.task && !['complete','cancelled'].includes(state.task.step);
-  const evidence: Evidence[] = [], checks: CheckResult[] = [], riskSignals = [...new Set(raw.match(/刷单|解冻费|安全账户|保证金|跑分|兼职返利|洗钱|涉嫌|配合调查|公检法/g) || [])];
+  const evidence: Evidence[] = [], checks: CheckResult[] = [], riskSignals = fraudSignals(raw);
   const finish = (workflowId: string, candidates: string[], outcome: RoutingDecision['outcome'], question: string | null, unresolved: string[], draft?: Intent): RoutingDecision => ({ workflowId, candidates, outcome, question, unresolved, draft, evidence, checks, riskSignals, policyVersion: POLICY_VERSION });
   const stop = (question: string, candidates: string[] = [], field='intent') => finish('',candidates,'clarify',question,[field]);
   if (!raw) return stop('请说说想办理什么业务。');
