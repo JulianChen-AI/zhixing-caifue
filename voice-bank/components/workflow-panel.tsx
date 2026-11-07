@@ -7,6 +7,8 @@ import {CompareCard,ProductsCard} from './card-viz-more';
 import {SubscriptionTile} from './card-viz';
 import {BillDetail,SpendCharts,businessViz,Columns,FollowUp,GuideSteps,Kpis,LevelScale,ProcessSteps,ReviewViz} from './card-viz';
 import {dailyNet,writeSteps} from '@/lib/ui/viz';
+import {AiExplain} from './ai-explain';
+import {canExplain} from '@/lib/ai/explain';
 
 import { Fragment, useContext, useState } from 'react';
 import type { BankAction, BankState } from '@/lib/bank/types';
@@ -180,7 +182,10 @@ function Notes({value}:{value:unknown}){
  const row=record(value),lines=[...new Set(NOTE_KEYS.map(key=>typeof row[key]==='string'?resultMessage(key,row[key] as string):'').filter(Boolean))];
  return lines.length?<div className="viz-notes">{lines.map(line=><p key={line}>{line}</p>)}</div>:null;
 }
-export function BusinessResult({functionId,value,bank}:{functionId:string;value:unknown;bank?:BankState}){
+export function BusinessResult(props:{functionId:string;value:unknown;bank?:BankState}){
+ return <><BusinessResultBody {...props}/>{canExplain(props.functionId)&&props.value!=null&&<AiExplain functionId={props.functionId} value={props.value}/>}</>;
+}
+function BusinessResultBody({functionId,value,bank}:{functionId:string;value:unknown;bank?:BankState}){
  if(functionId==='BI01'&&Array.isArray(record(value).transactions)||functionId==='BI02'&&record(value).current){
   const result=record(value),scope=record(result.scope);
   const totals=record(result.current);
