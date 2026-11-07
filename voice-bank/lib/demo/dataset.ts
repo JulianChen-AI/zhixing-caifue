@@ -147,7 +147,7 @@ export function demoDataset(anchor = DEFAULT_ANCHOR): DemoDataset {
       cards: [
         { id: 'card-daily', name: '日常借记卡', tail: '8021', accountId: 'daily', status: 'active', restriction: 'none', limit: 500000, issuer: '本行沙箱' },
         { id: 'card-risk', name: '储蓄借记卡', tail: '3609', accountId: 'savings', status: 'restricted', restriction: 'risk', limit: 1000000, issuer: '本行沙箱' },
-        { id: 'card-judicial', name: '司法限制演示卡', tail: '9012', accountId: 'daily', status: 'restricted', restriction: 'judicial', limit: 100000, issuer: '本行沙箱' },
+        { id: 'card-judicial', name: '备用借记卡', tail: '9012', accountId: 'daily', status: 'restricted', restriction: 'judicial', limit: 100000, issuer: '本行沙箱' },
       ],
     },
   };

@@ -98,10 +98,10 @@ export function InvestRisk({ bank, task }: { bank: BankState; task: Pick<FlowTas
   return <section className="invest-risk" aria-label="风险匹配">
     <div className="risk-pair">
       <div><small>你的风险测评</small><b>C{match.profileLevel}</b><span>{match.expired ? '已过期，需要重新测评' : `有效期至 ${localDate(match.validUntil).slice(0, 10)}`}</span></div>
-      <div><small>{match.productName}</small><b>R{match.productRisk}</b><span>非存款 · 不保本</span></div>
-      <div><small>机构规则匹配结果</small><Chip badge={match.within ? { label: '匹配', tone: 'ok' } : { label: match.expired ? '测评已过期' : '不匹配', tone: 'risk' }}/><span>确定性规则 · 非模型判断</span></div>
+      <div><small>{match.productName}</small><b>R{match.productRisk}</b></div>
+      <div><small>机构规则匹配结果</small><Chip badge={match.within ? { label: '匹配', tone: 'ok' } : { label: match.expired ? '测评已过期' : '不匹配', tone: 'risk' }}/></div>
     </div>
-    <LevelScale prefix="C" level={match.profileLevel} comparePrefix="R" compareLevel={match.productRisk} caption="产品风险不高于测评等级才可受理；等级不是收益承诺"/>
+    <LevelScale prefix="C" level={match.profileLevel} comparePrefix="R" compareLevel={match.productRisk} caption="产品风险不高于测评等级才可购买"/>
     {!match.within && <p className="risk-verdict is-outside">{match.expired ? '测评已过期，系统不会受理这笔申购。' : '产品风险高于你的测评，系统不会受理这笔申购。'}</p>}
     <details className="risk-learn"><summary>R 级和 C 级是什么意思？</summary><p>R1–R5 表示产品风险由低到高，C1–C5 表示你能承受的风险由低到高。只能买不高于自己测评等级的产品；测评有有效期，过期要重新做。等级不是收益承诺。</p></details>
   </section>;

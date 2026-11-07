@@ -150,11 +150,11 @@ function selectTask(s:BankState,id:string){
  const index=p.steps.findIndex(unfinished);p.steps.splice(p.steps.indexOf(entry),1);p.steps.splice(index,0,entry);focus(s,entry);p.taskIds=p.steps.filter(x=>x.taskId).map(x=>x.taskId!);return entry;
 }
 
-/** A one-item read answers with its result, not with a list announcement around it. */
+/** A one-item list answers with its own result, not with a list announcement around it. */
 function singleRead(s:BankState,p:NonNullable<BankState['plan']>):string|undefined{
  if(p.steps.length!==1||p.steps[0].status!=='complete')return;
  const task=s.workflows?.tasks.find(t=>t.id===p.steps[0].taskId);
- return task&&!isWrite(task)&&task.message?task.message:undefined;
+ return task?.message||undefined;
 }
 export function assertPlanAccess(s:BankState,a:BankAction){
  const p=activePlan(s);if(!p||a.type==='plan'||['home','reset'].includes(a.type))return;

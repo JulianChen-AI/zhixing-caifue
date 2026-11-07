@@ -115,7 +115,7 @@ test('per-person times head count must match the stated total', async () => {
 test('a card described by its state is chosen by the record, and several matches are asked about', async () => {
  const fake = (body: object) => (async () => new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(body) } }] }))) as typeof fetch;
  const many = await understandIntent(initialState(), '冻结我那张受限的卡', [{ user: '从储蓄账户给他转两百', reply: '' }], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'run', functionId: 'CA06', params: { action: 'freeze', cardId: 'card-risk' }, say: '好的' }));
- assert.equal(many.action, undefined); assert.match(many.say, /受限的卡有 2 张：储蓄借记卡（尾号3609.*司法限制演示卡（尾号9012/);
+ assert.equal(many.action, undefined); assert.match(many.say, /受限的卡有 2 张：储蓄借记卡（尾号3609.*备用借记卡（尾号9012/);
  const one = await understandIntent(initialState(), '冻结我那张正常的卡', [], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'run', functionId: 'CA06', params: { action: 'freeze' }, say: '好的' }));
  assert.equal((one.action as unknown as { command: { params: { cardId: string } } }).command.params.cardId, 'card-daily');
 });

@@ -11,7 +11,7 @@ import { Chip, InvestRisk } from './desk';
 import { standingLimits } from '@/lib/workflows/limits';
 import { businessDay } from '@/lib/demo/clock';
 import { inviteText } from '@/lib/workflows/invite';
-import { DateCountdown, InviteCard, InviteList, MerchantGuideCard, NotePreview, PortfolioReviewCard, ReminderCard, TransferRiskBanner, UpperAmount } from './card-viz-more';
+import { DateCountdown, DuplicateCheckCard, GoalProjection, HoldingsCard, TransferHistoryCard, UpcomingChargesCard, InviteCard, InviteList, MerchantGuideCard, NotePreview, PortfolioReviewCard, ReminderCard, TransferRiskBanner, UpperAmount } from './card-viz-more';
 
 /** Opens a new card for the user to review; it never executes anything by itself. */
 export const FollowUp = createContext<((functionId: string, params: Record<string, unknown>) => void) | null>(null);
@@ -33,12 +33,12 @@ export function Kpis({ items }: { items: { label: string; value: string; note?: 
 }
 
 /** Part-to-whole with a legend, so identity is never carried by colour alone. */
-export function StackBar({ rows, label }: { rows: { label: string; value: number }[]; label: string }) {
+export function StackBar({ rows, label, legend = true }: { rows: { label: string; value: number }[]; label: string; legend?: boolean }) {
   const parts = segments(rows);
   if (!parts.length) return null;
   return <figure className="viz-stack" aria-label={label}>
     <div className="viz-stack-bar" aria-hidden>{parts.map(part => <span key={part.label} data-tip={`${part.label} ${yuan(part.value)} · ${(part.share * 100).toFixed(1)}%`} style={{ flexGrow: Math.max(part.share, .012), background: `var(--series-${part.slot})` }}/>)}</div>
-    {parts.length > 1 && <ul className="viz-legend">{parts.map(part => <li key={part.label}><i style={{ background: `var(--series-${part.slot})` }}/>{part.label}<b>{yuan(part.value)}</b><span>{(part.share * 100).toFixed(0)}%</span></li>)}</ul>}
+    {legend && parts.length > 1 && <ul className="viz-legend">{parts.map(part => <li key={part.label}><i style={{ background: `var(--series-${part.slot})` }}/>{part.label}<b>{yuan(part.value)}</b><span>{(part.share * 100).toFixed(0)}%</span></li>)}</ul>}
   </figure>;
 }
 
@@ -158,7 +158,7 @@ function SubscriptionRows({ rows }: { rows: Record<string, unknown>[] }) {
       {item.externalPending === true && <Chip badge={{ label: '待你在平台完成取消', tone: 'pending' }}/>}
     </span>
     <strong>{yuan(num(item.amount))}</strong>
-    {follow && item.status === 'active' && item.protected !== true && !subGroup(item) && <button className="pill-button" onClick={() => follow('SU04', { subscriptionId: item.id })}>不再使用 · 看处理路径</button>}
+    {follow && item.status === 'active' && item.protected !== true && !subGroup(item) && <button className="pill-button is-quiet" onClick={() => follow('SU04', { subscriptionId: item.id })}>不用了</button>}
   </li></Fragment>)}</ul>;
 }
 export function SubscriptionRadar({ rows, inference }: { rows: Record<string, unknown>[]; inference?: string }) {
@@ -264,17 +264,14 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
     case 'TR01': case 'TR02': return Array.isArray(value) ? <AccountsViz accounts={rows}/> : null;
     case 'TR04': case 'IN13':
       return Array.isArray(value) ? <RulesViz rows={rows} bank={bank}/> : row.amount != null ? <RulesViz rows={[row]} bank={bank}/> : null;
-    case 'TR06': return Array.isArray(value) ? <TransfersViz rows={rows}/> : null;
+    case 'TR06': return Array.isArray(value) ? <TransferHistoryCard rows={rows}/> : null;
     case 'TR08': case 'TR09': return Array.isArray(value) ? <ContactsViz rows={rows}/> : null;
     case 'TR10': return Array.isArray(value) ? <InviteList rows={rows}/> : row.invitee != null ? <InviteCard invitee={text(row.invitee)} message={text(row.text)} sent createdAt={text(row.createdAt)}/> : null;
     case 'TR11': return row.guide != null ? <MerchantGuideCard value={row}/> : null;
     case 'SU02': return row.name != null ? <SubscriptionTile sub={row}/> : null;
     case 'CA08': return row.status != null && !Array.isArray(value) ? <ProcessSteps label="补卡进度" steps={[{ label: '已申请', state: 'done' }, { label: '制卡寄送', state: row.status === 'activated' || row.tail != null ? 'done' : 'void' }, { label: '激活新卡', state: row.status === 'activated' || row.tail != null ? 'done' : 'todo' }]}/> : null;
-    case 'BI04': {
-      const signals = list(row.signals);
-      return <div className="viz-group"><Kpis items={[{ label: '需核实的线索', value: `${signals.length} 笔`, lead: true }, { label: '核对范围', value: `${list(row.transactions).length} 笔` }]}/>{signals.map(item => <p className="warn-line" key={text(item.transactionId)}><ShieldAlert aria-hidden size={15}/> {text(item.reason)}</p>)}</div>;
-    }
-    case 'BI05': return <SubscriptionRadar rows={list(row.subscriptions)} inference={text(row.inference)}/>;
+    case 'BI04': return Array.isArray(row.signals) ? <DuplicateCheckCard value={row}/> : null;
+    case 'BI05': return <SubscriptionRadar rows={list(row.subscriptions)}/>;
     case 'BI08': {
       const spending = record(row.spending), budgets = list(row.budgets);
       if (Array.isArray(row.budgets)) return budgets.length ? <div className="viz-group">{budgets.filter(item => typeof item.amount === 'number').map(item => <Meter key={text(item.id)} label={`${text(item.period) || text(item.name)} · ${text(item.category) || '全部'}`} value={num(spending.netExpenses)} max={num(item.amount)} tone={num(spending.netExpenses) > num(item.amount) ? 'risk' : 'blue'} />)}</div> : <EmptyViz title="还没有预算"/>;
@@ -284,15 +281,16 @@ export function businessViz(functionId: string, value: unknown, bank?: BankState
     case 'BI09': return typeof row.total === 'number' ? <div className="viz-group"><Kpis items={[{ label: `${num(row.periodCount)} 期累计本金（试算）`, value: yuan(row.total), lead: true }]}/><Columns label="本金累计" rows={cumulativeSteps(row.total, num(row.periodCount)).map(step => ({ key: String(step.period), tick: String(step.period), value: step.value, tip: `第 ${step.period} 期 ${yuan(step.value)}` }))}/></div> : null;
     case 'SU01': return Array.isArray(value) ? <SubscriptionRadar rows={rows}/> : null;
     case 'SU07': return <div className="viz-group"><Kpis items={[{ label: `${text(record(row.actual).period)} 实际订阅支出`, value: yuan(num(record(row.actual).netExpenses)), lead: true }, { label: '预计每月少支出', value: yuan(num(row.projectedMonthlyReduction)), note: '尚未发生' }]}/><RankBars label="订阅金额" rows={list(row.subscriptions).map(item => ({ label: text(item.name), value: num(item.amount), note: cycle(item.cycle) }))}/></div>;
-    case 'SU08': return <ChargeCalendar value={value}/>;
-    case 'IN01': case 'IN03': case 'IN04': return row.target != null ? <GoalViz goal={row}/> : null;
+    case 'SU08': return <UpcomingChargesCard value={value} today={bank ? businessDay(bank) : ''}/>;
+    case 'IN03': return row.target != null ? <div className="viz-group"><GoalViz goal={row}/>{bank && <GoalProjection goal={row} today={businessDay(bank)}/>}</div> : null;
+    case 'IN01': case 'IN04': return row.target != null ? <GoalViz goal={row}/> : null;
     case 'IN02': return row.goal ? <div className="viz-group"><Kpis items={[{ label: row.direction === 'deposit' ? '已存入目标' : '已转回账户', value: yuan(num(row.moved)), lead: true }]}/><GoalViz goal={record(row.goal)}/></div> : null;
     case 'IN05': {
       const profile = record(row.profile || row);
       if (typeof profile.level === 'number') return <SimpleScale level={profile.level} validUntil={text(profile.validUntil)}/>;
       return row.assessmentState === 'not_found' ? <EmptyViz title="还没有风险测评"/> : null;
     }
-    case 'IN10': return Array.isArray(value) ? <HoldingsViz rows={rows}/> : null;
+    case 'IN10': return Array.isArray(value) ? <HoldingsCard rows={rows}/> : null;
     case 'IN16': return Array.isArray(row.holdings) ? <PortfolioReviewCard value={row} bank={bank}/> : row.note != null ? <NotePreview note={text(row.note)}/> : null;
     case 'IN08': case 'IN09': case 'IN11': case 'IN12': return Array.isArray(value) ? <OrdersViz rows={rows}/> : row.action != null ? <OrdersViz rows={[row]}/> : null;
     case 'IN14': case 'SU03': return Array.isArray(value) ? rows.length ? <RulesViz rows={rows}/> : <EmptyViz title="还没有提醒"/> : null;
@@ -377,11 +375,11 @@ export function ReviewViz({ bank, task, receipt }: { bank: BankState; task: Flow
   if (id === 'TR03' || id === 'TR04') {
     const contact = contactsOf(bank).find(item => item.id === p.recipientId);
     if (!contact) return null;
-    return <div className="viz-group">{!receipt && <TransferRiskBanner bank={bank} task={task}/>}<MoneyFlow from={from} to={{ title: contact.name, sub: `${contact.label} · 尾号 ${contact.tail}` }} amount={amount} note={id === 'TR04' ? cycle(p.schedule) : text(p.note)}/><UpperAmount cents={cents}/>{id === 'TR03' && !receipt && budgetAfter}</div>;
+    return <div className="viz-group">{!receipt && <TransferRiskBanner bank={bank} task={task}/>}<MoneyFlow from={from} to={{ title: contact.name, sub: `${contact.label} · 尾号 ${contact.tail}` }} amount={amount} note={id === 'TR04' ? cycle(p.schedule) : text(p.note)}/><UpperAmount cents={cents}/>{id === 'TR03' && !receipt && task.status === 'review' && budgetAfter}</div>;
   }
   if (id === 'TR05' && p.action === 'create') {
     const shares = list(record(task.result).participants);
-    return <div className="viz-group"><Kpis items={[{ label: '总额', value: yuan(num(record(task.result).total)), lead: true }, { label: '人数', value: `${shares.length} 人`, note: undefined }, { label: '其他人应收', value: yuan(num(record(task.result).receivable)) }]}/><StackBar label="每人分摊" rows={shares.map(item => ({ label: text(item.name), value: num(item.amount) }))}/></div>;
+    return <div className="viz-group"><Kpis items={[{ label: '总额', value: yuan(num(record(task.result).total)), lead: true }, { label: '人数', value: `${shares.length} 人`, note: undefined }, { label: '其他人应收', value: yuan(num(record(task.result).receivable)) }]}/><StackBar label="每人分摊" legend={false} rows={shares.map(item => ({ label: text(item.name), value: num(item.amount) }))}/></div>;
   }
   if (id === 'TR05' && p.action === 'remind') return <div className="viz-tiles">{list(record(task.result).reminders).map(item => <div className="viz-tile" key={text(item.to)}><Avatar name={text(item.to)} icon={<User size={15}/>}/><div><b>{text(item.to)}</b><small>{text(item.text)}</small></div><strong>{yuan(num(item.amount))}</strong></div>)}</div>;
   if (id === 'IN02') {

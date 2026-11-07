@@ -229,7 +229,12 @@ export function queryBusiness(s:BankState,t:FlowTask):unknown{
   case 'TR10':return step(t,'T19','读取已发出的邀请及状态',()=>rows(s,'invites').map(inviteView));
   case 'BI01':return step(t,'B01','查询合成流水并披露覆盖范围',()=>readTool(s,'B01',p));
   case 'BI02':return step(t,'B03','计算确定性统计，退款冲减支出',()=>readTool(s,'B03',p));
-  case 'BI04':return step(t,'B05','根据实际关联记录核对，不直接定性',()=>({transactions:filtered(s,p).filter(r=>!p.transactionId||r.id===p.transactionId||r.originalId===p.transactionId),signals:filtered(s,p).filter(r=>r.suspectedDuplicate).map(r=>({transactionId:r.id,reason:'合成数据标记为疑似重复，需核实',verdict:'unknown'}))}));
+  case 'BI04':return step(t,'B05','根据实际关联记录核对，不直接定性',()=>{
+   const all=filtered(s,p),view=(r:Row)=>({id:r.id,date:r.date,merchant:r.merchant,amount:r.amount,category:r.category});
+   // Each flagged charge with its twin (same merchant, day and amount) and any refund booked against either of them.
+   const signals=all.filter(r=>r.suspectedDuplicate).map(r=>{const twin=all.find(x=>x.id!==r.id&&x.kind==='expense'&&x.merchant===r.merchant&&x.date===r.date&&x.amount===r.amount);const refunds=all.filter(x=>x.kind==='refund'&&(x.originalId===r.id||twin&&x.originalId===twin.id)).map(view);return {transactionId:r.id,reason:'同一商户、同一天、同一金额出现两笔',verdict:'unknown',charge:view(r),...(twin?{twin:view(twin)}:{}),refunds};});
+   return {transactions:all.filter(r=>!p.transactionId||r.id===p.transactionId||r.originalId===p.transactionId),signals};
+  });
   case 'BI05':return step(t,'D01','周期记录候选共享，无 App 活跃度数据',()=>({subscriptions:rows(s,'subscriptions'),inference:'周期扣费只说明候选；是否闲置需要用户确认'}));
   case 'BI06':{
    const result=step(t,'B08','基础报告由确定性统计生成',()=>({...monthlyReport(s,p,aggregate(s,p)),narrative:p.narrative?'本版仅按真实统计生成简述，不引用对话或虚构经历':undefined,peerComparison:p.peerComparison?'未接入匿名群体数据，未生成分位':undefined}));

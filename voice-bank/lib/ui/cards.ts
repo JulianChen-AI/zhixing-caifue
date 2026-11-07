@@ -32,7 +32,7 @@ export function cardHead(bank: BankState, task: FlowTask): CardHeadView {
   if (status === 'authenticate') return { title: `验证身份 · ${['CA06', 'CA07'].includes(id) ? cardAction(task) : name}`, icon: 'lock', badge: { label: '待验证', tone: 'info' } };
   if (status === 'review') {
     if (id === 'TR03') return { title: '转账确认页', icon: 'shield', badge: WAIT_MANUAL };
-    if (id === 'TR05' && params.action === 'create') return { title: 'AA 分摊计算', icon: 'users', badge: { label: '确定性计算', tone: 'calc' } };
+    if (id === 'TR05' && params.action === 'create') return { title: 'AA 分摊计算', icon: 'users', badge: { label: '待确认', tone: 'wait' } };
     if (id === 'TR05' && params.action === 'remind') return { title: 'AA 提醒确认', icon: 'users', badge: WAIT_MANUAL };
     if (id === 'SU04') return { title: `确认：解除${subscriptionName(bank, task)}的银行代扣授权`, icon: 'shield', badge: WAIT_MANUAL };
     if (id === 'CA06' || id === 'CA07') return { title: `卡片管理 · ${cardAction(task)}确认`, icon: 'card', badge: WAIT_MANUAL };

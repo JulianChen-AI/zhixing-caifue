@@ -49,9 +49,9 @@ export function AssessmentPair({ bank, productId }: { bank: BankState; productId
   if (profile && product) return <InvestRisk bank={bank} task={{ functionId: 'IN08', params: { productId: product.id } }}/>;
   return <section className="invest-risk" aria-label="风险匹配">
     <div className="risk-pair">
-      <div><small>你的风险测评</small><b>—</b><span>还没有有效的正式测评；口头说的等级不算</span></div>
-      {product ? <div><small>{String(product.name)}</small><b>R{String(product.risk)}</b><span>非存款 · 不保本</span></div> : <div><small>产品风险</small><b>R1–R5</b><span>测评后按等级匹配</span></div>}
-      <div><small>机构规则匹配结果</small><Chip badge={{ label: '需先测评', tone: 'wait' }}/><span>确定性规则 · 非模型判断</span></div>
+      <div><small>你的风险测评</small><b>—</b><span>还没有测评</span></div>
+      {product ? <div><small>{String(product.name)}</small><b>R{String(product.risk)}</b><span>{String(product.type || '')}</span></div> : <div><small>产品风险</small><b>R1–R5</b><span>测评后按等级匹配</span></div>}
+      <div><small>机构规则匹配结果</small><Chip badge={{ label: '需先测评', tone: 'wait' }}/></div>
     </div>
   </section>;
 }

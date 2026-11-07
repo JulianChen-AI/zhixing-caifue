@@ -146,7 +146,7 @@ function MonthlyReport({value}:{value:unknown}){
   <Kpis items={[{label:'净支出',value:amount('netExpenses'),lead:true},{label:'退款',value:amount('refunds')},{label:'笔数',value:typeof summary.count==='number'?String(summary.count):'—'}]}/>
   <p className={`viz-trend ${typeof delta==='number'?delta>0?'is-up':delta<0?'is-down':'':''}`}>{trend}</p>
   <div style={{margin:'12px 0'}}><CategoryBreakdown value={Array.isArray(report.categoryBreakdown)?report.categoryBreakdown:[]}/></div>
-  <details style={{fontSize:12}}><summary style={{cursor:'pointer',color:'#59687e'}}>查看月报小结</summary><ul style={{paddingLeft:18,lineHeight:1.6}}>{insights.map((item,index)=><li key={index}>{String(item.text)}</li>)}</ul></details>
+  {insights.length>0&&<ul className="vx-insights" aria-label="月报小结">{insights.map((item,index)=><li key={index}>{String(item.text)}</li>)}</ul>}
  </section>;
 }
 function ProductList({value}:{value:unknown}){
@@ -197,10 +197,12 @@ export function BusinessResult({functionId,value,bank}:{functionId:string;value:
  return <div className="viz-result"><GuideSteps value={value}/><WorkflowResult value={value}/></div>;
 }
 
+const FLOW_DRAWN:Record<string,string[]>={TR03:['amount','recipientId','accountId'],TR04:['amount','recipientId','accountId'],IN02:['amount','goalId','accountId','direction'],IN08:['amount','productId','accountId'],IN09:['amount','holdingId','accountId'],IN13:['amount','productId','accountId']};
 export function WorkflowSummary({bank,task,compact=false}:{bank:BankState;task:FlowTask;compact?:boolean}) {
- const entries=reviewEntries(bank,task);
+ // Amount, payee, account and product are already drawn by the money flow above; only the remaining facts are listed.
+ const drawn=FLOW_DRAWN[task.functionId],entries=reviewEntries(bank,task).filter(entry=>!drawn?.includes(entry.key));
  if(!entries.length)return null;
- const amount=isWrite(task)?entries.find(entry=>entry.key==='amount'):undefined;
+ const amount=isWrite(task)&&!drawn?entries.find(entry=>entry.key==='amount'):undefined;
  return <section className={`flow-review ${compact?'compact-review':''}`} aria-label="执行前核对卡">{amount&&<div className="review-amount"><span>{amount.label}</span><strong>{amount.value}</strong></div>}<dl className="flow-result-fields">{entries.filter(entry=>entry!==amount).map(entry=><div key={entry.key}><dt>{entry.label}</dt><dd>{entry.key==='action'&&entry.value==='assess'?'开始测评':entry.value}</dd></div>)}</dl></section>;
 }
 
@@ -235,6 +237,7 @@ export function TaskCancel({bank,task,busy,onAction}:{bank:BankState;task:FlowTa
  const others=(bank.plan&&!['complete','cancelled'].includes(bank.plan.status)?bank.plan.steps.filter(step=>step.taskId!==task.id&&!['complete','cancelled'].includes(step.status)).length:0);
  const one=()=>void onAction({type:'workflow',command:{operation:'cancel',taskId:task.id,source:'card'}});
  const choices=others?[{label:'只取消这一项',run:one,primary:true},{label:`结束整份清单（还有${others}项）`,run:()=>void onAction({type:'plan',command:{operation:'cancel',source:'card'}})}]:[{label:'放弃办理',run:one,primary:true}];
+ if(!others&&['review','authenticate'].includes(task.status))return null;
  const who=taskIdentity(bank,task);
  return <CancelTask busy={busy} ask={['review','authenticate'].includes(task.status)||others>0} summary={`“${who.title}${who.detail?`（${who.detail}）`:''}”`} choices={choices}/>;
 }
@@ -316,7 +319,7 @@ function WorkflowPanelState({bank,busy,onAction,serial=false,catalog=false,onClo
     <InvestRisk bank={bank} task={task}/>
     <InvestDisclosure bank={bank} task={task} acknowledged={riskAck} onAcknowledge={setRiskAck}/>
     <div className="card-actions"><button className="text-button" disabled={busy} onClick={()=>setPane('edit')}>修改信息</button>{task.result!=null&&!(task.functionId==='TR05'&&task.params.action==='create')&&<button className="text-button" onClick={()=>setPane('preview')}>查看预览</button>}<button className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button><button className="primary-button" disabled={busy||dirty||task.functionId==='IN08'&&!riskAck} onClick={()=>void command({operation:'confirm',taskId:task.id,token:task.reviewToken!})}>{task.functionId==='TR05'&&task.params.action==='create'?'手动确认名单与分摊':needsAuth(task)?'手动确认并认证':'手动确认'}</button></div>
-   </>:task.status==='authenticate'?<><ReviewViz bank={bank} task={task}/><WorkflowSummary bank={bank} task={task} compact/><form onSubmit={event=>{event.preventDefault();event.currentTarget.querySelector('input')?.blur();void command({operation:'authenticate',taskId:task.id,token:task.verificationId!,code});}}><label className="flow-field">验证码<input aria-label="验证码" inputMode="numeric" autoComplete="off" maxLength={6} value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,''))}/></label><p className="auth-note">验证码 123456</p><div className="card-actions"><button className="primary-button" disabled={busy||code.length!==6}>验证并办理</button></div></form><div className="serial-actions"><button type="button" className="text-button" disabled={busy} onClick={()=>void command({operation:'amend',taskId:task.id,params:{}})}>返回核对</button><button type="button" className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button></div></>:<>
+   </>:task.status==='authenticate'?<><ReviewViz bank={bank} task={task}/><WorkflowSummary bank={bank} task={task} compact/><form onSubmit={event=>{event.preventDefault();event.currentTarget.querySelector('input')?.blur();void command({operation:'authenticate',taskId:task.id,token:task.verificationId!,code});}}><label className="flow-field">验证码<input aria-label="验证码" inputMode="numeric" autoComplete="off" maxLength={6} value={code} onChange={event=>setCode(event.target.value.replace(/\D/g,''))}/></label><p className="auth-note">验证码 <button type="button" className="code-fill" onClick={()=>setCode('123456')}>123456</button></p><div className="card-actions"><button className="primary-button" disabled={busy||code.length!==6}>验证并办理</button></div></form><div className="serial-actions"><button type="button" className="text-button" disabled={busy} onClick={()=>void command({operation:'amend',taskId:task.id,params:{}})}>返回核对</button><button type="button" className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button></div></>:<>
     {description&&!fraudStop&&(task.result==null||/待|尚未|申请|商户/.test(description))&&<p className="card-description">{description}</p>}
     {task.result!=null&&<WorkflowOutcome bank={bank} task={task} busy={busy} onRun={(id,params)=>void run(id,params)}/>}
     {fraudStop?<FraudStop task={task} busy={busy} onAction={onAction}/>:suitabilityBlock?<SuitabilityStop bank={bank} task={task} busy={busy} onAction={onAction} onEdit={()=>setPane('edit')}/>:task.status==='blocked'?<div className="serial-actions"><button className="secondary-button" disabled={busy} onClick={()=>setPane('edit')}>修改信息</button><button className="secondary-button" disabled={busy} onClick={()=>void command({operation:'resume',taskId:task.id})}>重试</button><button className="text-button" disabled={busy} onClick={()=>void command({operation:'cancel',taskId:task.id})}>取消办理</button></div>:<div className="card-actions">{editable&&<button className="text-button" disabled={busy} onClick={()=>setPane('edit')}>调整查询</button>}<button className="primary-button" disabled={busy} onClick={()=>void onAction({type:'home'})}>完成</button></div>}

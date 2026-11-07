@@ -67,14 +67,14 @@ export function Timeline({ points, label }: { points: Point[]; label: string }) 
 }
 
 /** Cost against value on the same scale, with the difference spelled out. */
-function CostValue({ cost, value }: { cost: number; value: number }) {
+export function CostValue({ cost, value }: { cost: number; value: number }) {
   const top = Math.max(cost, value, 1), diff = value - cost;
   const bar = (label: string, amount: number, cls: string) => <div className="vx-cv-row"><span>{label}</span><span className="vx-cv-track"><i className={cls} style={{ width: `${Math.max(amount / top * 100, 1.5)}%` }}/></span><b>{yuan(amount)}</b></div>;
   return <div className="vx-cv" role="img" aria-label={`成本 ${yuan(cost)}，市值 ${yuan(value)}，${diff > 0 ? '浮盈' : diff < 0 ? '浮亏' : '持平'} ${yuan(Math.abs(diff))}`}>
     {bar('投入成本', cost, 'is-cost')}{bar('当前市值', value, diff < 0 ? 'is-down' : 'is-value')}
   </div>;
 }
-function GainChip({ profit, rate }: { profit: number; rate: number | null }) {
+export function GainChip({ profit, rate }: { profit: number; rate: number | null }) {
   const tone = profit > 0 ? 'up' : profit < 0 ? 'down' : 'flat';
   return <span className={`vx-gain is-${tone}`}>{profit > 0 ? <TrendingUp aria-hidden size={14}/> : profit < 0 ? <TrendingDown aria-hidden size={14}/> : null}{profit === 0 ? '不赚不亏' : `${profit > 0 ? '+' : '-'}${yuan(Math.abs(profit))}`}{rate != null && profit !== 0 ? ` · ${(rate * 100).toFixed(2)}%` : ''}</span>;
 }
@@ -233,3 +233,74 @@ export function NotePreview({ note }: { note: string }) {
   return <blockquote className="vx-note-card"><NotebookPen aria-hidden size={16}/>{note}</blockquote>;
 }
 
+
+/* ---------- Transfer history (TR06) ---------- */
+
+export function TransferHistoryCard({ rows }: { rows: Record<string, unknown>[] }) {
+  if (!rows.length) return <EmptyViz title="这个范围里没有转账"/>;
+  const total = rows.reduce((sum, row) => sum + num(row.amount), 0), byWho = new Map<string, number>();
+  for (const row of rows) byWho.set(text(row.recipient) || '收款人', (byWho.get(text(row.recipient) || '收款人') || 0) + num(row.amount));
+  const top = [...byWho].sort((a, b) => b[1] - a[1]).slice(0, 4), largest = Math.max(1, ...top.map(([, v]) => v));
+  return <div className="viz-group">
+    <Kpis items={[{ label: '转出合计', value: yuan(total), lead: true }, { label: '笔数', value: `${rows.length} 笔` }, { label: '收款人', value: `${byWho.size} 位` }]}/>
+    {byWho.size > 1 && <ul className="vx-bars" aria-label="按收款人">{top.map(([who, value]) => <li key={who}><span>{who}</span><i style={{ width: `${value / largest * 100}%` }}/><b>{yuan(value)}</b></li>)}</ul>}
+    <ul className="vx-ledger">{rows.slice(0, 8).map((row, index) => <li key={text(row.id) || index}><time>{text(row.createdAt).slice(5, 10).replace('-', '/')}</time><div><b>{text(row.recipient) || '转账'}</b>{text(row.note) && <small>{text(row.note)}</small>}</div><strong>{yuan(num(row.amount))}</strong></li>)}</ul>
+    {rows.length > 8 && <small className="vx-sub">另有 {rows.length - 8} 笔较早的转账</small>}
+  </div>;
+}
+
+/* ---------- Duplicate charge check (BI04) ---------- */
+
+export function DuplicateCheckCard({ value }: { value: unknown }) {
+  const signals = list(record(value).signals);
+  if (!signals.length) return <EmptyViz title="没有发现重复扣款"/>;
+  return <div className="viz-group">{signals.map(signal => {
+    const charge = record(signal.charge), twin = record(signal.twin), refunds = list(signal.refunds);
+    const line = (row: Record<string, unknown>, tag: string, tone: 'muted' | 'risk' | 'ok') => <li><Chip badge={{ label: tag, tone }}/><span>{text(row.date).slice(5).replace('-', '/')}</span><b>{text(row.merchant)}</b><strong className={tone === 'ok' ? 'is-in' : ''}>{tone === 'ok' ? '+' : ''}{yuan(num(row.amount))}</strong></li>;
+    return <section className="vx-panel" key={text(signal.transactionId)}>
+      <header className="vx-panel-head"><b>{text(charge.merchant)}</b><Chip badge={{ label: '疑似重复扣款', tone: 'risk' }}/></header>
+      <ul className="vx-dup">{twin.id != null && line(twin, '第一笔', 'muted')}{line(charge, '第二笔', 'risk')}{refunds.map(refund => <Fragment key={text(refund.id)}>{line(refund, '已退款', 'ok')}</Fragment>)}</ul>
+      <small className="vx-sub">{text(signal.reason)}{refunds.length ? `，已退回 ${yuan(refunds.reduce((sum, r) => sum + num(r.amount), 0))}` : '，还没有退款'}</small>
+    </section>;
+  })}</div>;
+}
+
+/* ---------- Upcoming charges (SU08) ---------- */
+
+export function UpcomingChargesCard({ value, today }: { value: unknown; today: string }) {
+  const row = record(value), events = list(row.calendar).map(item => ({ date: text(item.date), name: text(item.name), amount: num(item.amount), status: text(item.status) })).sort((a, b) => a.date.localeCompare(b.date));
+  if (!events.length) return <EmptyViz title="近期没有已知扣款"/>;
+  const planned = events.reduce((sum, item) => sum + item.amount, 0);
+  return <div className="viz-group">
+    <Kpis items={[{ label: '近期计划支出', value: yuan(planned), lead: true }, { label: '可用余额', value: yuan(num(row.available)) }, { label: '笔数', value: `${events.length} 笔` }]}/>
+    <Timeline label="接下来" points={[{ date: today, label: '今天', tone: 'today' }, ...events.slice(0, 5).map(item => ({ date: item.date, label: item.name, value: item.amount, tone: 'buy' as const }))]}/>
+    <ul className="vx-ledger">{events.map(item => <li key={item.date + item.name}><time>{item.date.slice(5).replace('-', '/')}</time><div><b>{item.name}</b>{item.status && item.status !== '未发生' && <small>{item.status}</small>}</div><strong>{yuan(item.amount)}</strong></li>)}</ul>
+  </div>;
+}
+
+/* ---------- Goal projection (IN03) ---------- */
+
+export function GoalProjection({ goal, today }: { goal: Record<string, unknown>; today: string }) {
+  const plan = record(goal.projection), deadline = text(goal.deadline).slice(0, 10);
+  if (!plan.available) return plan.reason ? <p className="vx-note-line">{text(plan.reason)}</p> : null;
+  if (!num(plan.months)) return null;
+  const reach = `${text(plan.reachBy)}-01`, late = deadline && reach > deadline;
+  return <div className="viz-group">
+    <div className={`vx-forecast ${late ? 'is-late' : 'is-ok'}`}><b>约 {num(plan.months)} 个月后攒够（{text(plan.reachBy).replace('-', '年')}月）</b><small>按{text(plan.basis)} {yuan(num(plan.monthly))}{deadline ? (late ? '，赶不上截止日，需要每月多存一些' : '，能在截止日前完成') : ''}</small></div>
+    {deadline && <Timeline label="进度预估" points={[{ date: today, label: '今天', tone: 'today' }, { date: reach, label: '预计攒够', tone: 'buy' }, { date: deadline, label: '截止', tone: 'event' }]}/>}
+  </div>;
+}
+
+/* ---------- Holdings (IN10) ---------- */
+
+export function HoldingsCard({ rows }: { rows: Record<string, unknown>[] }) {
+  if (!rows.length) return <EmptyViz title="当前没有持仓"/>;
+  const total = rows.reduce((sum, item) => sum + num(item.value), 0), profit = rows.reduce((sum, item) => sum + num(item.profit), 0);
+  return <div className="viz-group">
+    {rows.length > 1 && <Kpis items={[{ label: '持仓市值', value: yuan(total), lead: true }, { label: '累计收益', value: `${profit > 0 ? '+' : ''}${yuan(profit)}` }]}/>}
+    {rows.map(item => <section className="vx-panel" key={text(item.id)}>
+      <header className="vx-panel-head"><b>{text(item.name)}</b><GainChip profit={num(item.profit)} rate={num(item.cost) ? num(item.profit) / num(item.cost) : null}/></header>
+      <CostValue cost={num(item.cost)} value={num(item.value)}/>
+    </section>)}
+  </div>;
+}
