@@ -57,7 +57,7 @@ test('IM: a read-only query returns its result', async () => {
  assert.match(r.body.reply!, /^日常账户余额 ¥/);
 });
 
-test('IM: a transfer can be drafted and confirmed, but stops at authentication with an App link', async () => {
+test('IM: a transfer can be drafted but not confirmed or authenticated in chat; the reply points to the App card', async () => {
  const { deps, sessions } = world({
   '给室友张三转200，用日常账户': { intent: 'run', functionId: 'TR03', params: { recipientId: 'zhang-roommate', accountId: 'daily', amount: 200 } },
   '确认': { intent: 'confirm' },
@@ -65,13 +65,12 @@ test('IM: a transfer can be drafted and confirmed, but stops at authentication w
  const draft = await post(deps, msg('给室友张三转200，用日常账户'));
  assert.equal(draft.body.status, 'review', draft.body.reply);
  const confirmed = await post(deps, msg('确认'));
- assert.equal(confirmed.body.status, 'authenticate', confirmed.body.reply);
- assert.match(confirmed.body.reply!, /IM 里不能认证/);
- assert.equal(confirmed.body.appUrl, 'http://127.0.0.1:5173/');
+ assert.match(confirmed.body.reply!, /卡片上核对后点“确认”/);
  // A code sent in chat is refused and never reaches the engine.
  const code = await post(deps, msg('验证码123456'));
  assert.match(code.body.reply!, /不能认证/);
  const s = sessions.get('im:wecom:u-1')!;
+ assert.equal(s.workflows!.tasks.find(t => t.id === s.workflows!.currentTaskId)!.status, 'review');
  assert.equal(s.receipts.length, 0);
  assert.equal(s.accounts.find(a => a.id === 'daily')!.balance, initialState().accounts.find(a => a.id === 'daily')!.balance);
 });

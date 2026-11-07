@@ -308,7 +308,7 @@ test('both models approving a spoken selection cannot invent an answer in an emp
 });
 
 test('a pending questionnaire cannot turn an explicit product explanation into completing or submitting that questionnaire',async()=>{
- const s=start(),before=structuredClone(s),utterance='只比较演示现金基金和演示债券基金，不申购。';
+ const s=start(),before=structuredClone(s),utterance='只比较现金基金和债券基金，不申购。';
  const v=await reviewReply(s,{...input(s),utterance,reply:'现金基金风险等级1，债券基金风险等级3，只做比较不办理。'},provider,undefined,fake({decision:'repair',repairType:'action',reason:'未完成风险测评提交，需补全并提交问卷',action:{operation:'resume',taskId:currentWorkflow(s)!.id}}));
  assert.equal(v.decision,'repair');assert.equal(v.action,undefined);assert.equal(v.repairScope,'explanation');assert.deepEqual(s,before);
 });
@@ -316,14 +316,14 @@ test('a pending questionnaire cannot turn an explicit product explanation into c
 test('pure explanation review receives product facts without Checklist commands, and cannot execute a proposed action',async()=>{
  const s=start(),before=structuredClone(s),requests:any[]=[];
  const request:typeof fetch=async(_url,options)=>{requests.push(JSON.parse(String(options!.body)));return Response.json({choices:[{message:{content:JSON.stringify({decision:'repair',repairType:'action',reason:'needs submitting',action:{operation:'confirm',taskId:currentWorkflow(s)!.id}})}}]});};
- const v=await reviewReply(s,{...input(s),utterance:'只比较演示现金基金和演示债券基金，不申购。'},provider,undefined,request);
+ const v=await reviewReply(s,{...input(s),utterance:'只比较现金基金和债券基金，不申购。'},provider,undefined,request);
  const payload=JSON.parse(requests[0].messages[1].content);assert.equal(payload.actual,undefined);assert.equal(payload.facts,undefined);assert.equal(payload.explanation.products.find((p:any)=>p.id==='fund-bond').risk,3);
  for(const key of ['nextQuestion','confirmationRequest','acceptedParams','amendRequest'])assert.ok(!JSON.stringify(payload).includes(key));
  assert.equal(v.action,undefined);assert.equal(v.repairScope,'explanation');assert.deepEqual(s,before);
 });
 
 test('an approving reviewer cannot replace a two-product comparison with shared features or a questionnaire',async()=>{
- const s=start(),utterance='只比较演示现金基金和演示债券基金，不申购。',approved=fake({decision:'accept',reason:''});
+ const s=start(),utterance='只比较现金基金和债券基金，不申购。',approved=fake({decision:'accept',reason:''});
  for(const reply of ['两款都是演示基金，均预计T+1工作日赎回。','现金基金低风险、债券基金中风险。请继续回答风险测评第三题。']){
   const v=await reviewReply(s,{...input(s),utterance,reply},provider,undefined,approved);assert.equal(v.decision,'repair');assert.equal(v.repairScope,'explanation');assert.equal(v.action,undefined);
  }
@@ -339,7 +339,7 @@ test('explanation corrections with a handoff callback use a fresh read-only path
 test('one invalid reviewer response can be retried read-only without changing saved facts',async()=>{
  const s=start(),before=JSON.stringify(s);let calls=0;
  const request:typeof fetch=async()=>{calls++;return Response.json({choices:[{message:{content:calls===1?'not-json':JSON.stringify({decision:'accept',reason:'x'.repeat(900)})}}]});};
- const v=await reviewReply(s,{...input(s),utterance:'只比较演示现金基金和演示债券基金，不申购。',reply:'现金基金为货币类，债券基金为债券类。'},provider,undefined,request);assert.equal(calls,2);assert.equal(v.decision,'accept');assert.equal(v.reviewerAttempts,2);assert.equal(v.message.length,600);assert.equal(JSON.stringify(s),before);
+ const v=await reviewReply(s,{...input(s),utterance:'只比较现金基金和债券基金，不申购。',reply:'现金基金为货币类，债券基金为债券类。'},provider,undefined,request);assert.equal(calls,2);assert.equal(v.decision,'accept');assert.equal(v.reviewerAttempts,2);assert.equal(v.message.length,600);assert.equal(JSON.stringify(s),before);
 });
 
 test('explanation repair uses its own task scope and rejects business tools without invoking the backend',async()=>{

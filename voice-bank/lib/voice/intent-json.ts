@@ -14,6 +14,7 @@ import { amountFromText } from '../checklists/routing.ts';
 import { parseBillingQuery, SPOKEN_MONTH } from '../workflows/billing-query.ts';
 import { birthdayPlan } from '../plans/birthday.ts';
 import { spokenYuan } from '../bank/amount-words.ts';
+import { VOICE_REFUSED } from '../workflows/risk.ts';
 import { bankToolResult } from '../bank/realtime-tools.ts';
 import catalog from '../workflows/catalog-data.json' with { type: 'json' };
 
@@ -156,6 +157,8 @@ function validate(s: BankState, intent: Intent | null, utterance: string, heard 
  // Authorization is never the model's call: only the literal acknowledgement of the current card counts.
  if (intent.intent === 'confirm') {
   const command = explicitWorkflowConfirmation(s, utterance);
+  // Transfers are confirmed on the card only: the spoken “确认” is answered, not executed or treated as an error.
+  if (command && ['TR03', 'TR04'].includes(String(wf?.tasks.find(t => t.id === command.taskId)?.functionId))) return { dropped: ['confirm:card_only'], say: VOICE_REFUSED };
   return command ? { action: { type: 'workflow', command: { ...command, source: 'voice', utterance } } as BankAction, dropped, say } : { dropped: ['confirm_without_literal_ack'], say: '请核对卡片后明确说“确认”。' };
  }
  if (intent.intent === 'open_saved') return { action: { type: 'plan', command: { operation: 'open_saved', source: 'card', utterance } }, dropped, say };

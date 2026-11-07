@@ -11,7 +11,8 @@ const act=(s:BankState,a:BankAction,id:string=crypto.randomUUID())=>reduceBank(s
 const plan=(s:BankState,c:Omit<PlanCommand,'source'>&{source?:'voice'|'card'},id:string=crypto.randomUUID())=>act(s,{type:'plan',command:{source:'voice',...c}},id);
 const create=(text:string,s=initialState())=>plan(s,{operation:'create',utterance:text});
 const flow=(s:BankState)=>s.workflows!.tasks.find(t=>t.id===currentPlanStep(s)?.taskId)!;
-function confirm(s:BankState){const t=flow(s);return act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'确认',turnId:crypto.randomUUID()}});}
+// Transfers are confirmed on the card only; other writes may be confirmed by voice in a later turn.
+function confirm(s:BankState){const t=flow(s);return act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,...(['TR03','TR04'].includes(t.functionId)?{source:'card' as const}:{source:'voice' as const,utterance:'确认',turnId:crypto.randomUUID()})}});}
 // Transfers of ¥5,000 or more need the card button; a spoken “确认” is refused (lib/workflows/risk.ts).
 function confirmByCard(s:BankState){const t=flow(s);return act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'card'}});}
 function authenticate(s:BankState,id:string=crypto.randomUUID()){const t=flow(s);return act(s,{type:'workflow',command:{operation:'authenticate',taskId:t.id,token:t.verificationId!,code:'123456',source:'card'}},id);}
@@ -133,16 +134,18 @@ test('public facts report outer dependencies, inner task IDs and explicit curren
 test('text replies fill only the current step and confirmations do not authorize future steps',()=>{
  let s=create('先从日常账户给室友转账，然后查余额');
  s=act(s,planTextAction(s,'500元')!);assert.equal(flow(s).params.amount,500);
- s=act(s,planTextAction(s,'确认')!);assert.equal(flow(s).status,'authenticate');assert.equal(s.workflows!.tasks.find(t=>t.id===s.plan!.steps[1].taskId)!.status,'queued');
+ assert.throws(()=>act(s,planTextAction(s,'确认')!),/卡片上核对后点“确认”/);s=confirm(s);assert.equal(flow(s).status,'authenticate');assert.equal(s.workflows!.tasks.find(t=>t.id===s.plan!.steps[1].taskId)!.status,'queued');
 });
-test('one spoken confirmation cannot authorize the next step or a newly amended summary',()=>{
+test('spoken confirmation never confirms a transfer step; each step and each amended summary needs the card',()=>{
  const utterance='先从日常账户给室友转500元，然后从储蓄账户给李四转300元';
- let s=plan(initialState(),{operation:'create',utterance,turnId:'request-turn'});let t=flow(s);
- assert.throws(()=>act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'确认',turnId:'request-turn'}}));
- s=act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'确认',turnId:'confirm-first'}});s=authenticate(s);t=flow(s);
- assert.throws(()=>act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'确认',turnId:'confirm-first'}}));
- s=act(s,{type:'workflow',command:{operation:'amend',taskId:t.id,params:{amount:200},source:'voice',utterance:'改成200元',turnId:'edit-turn'}});t=flow(s);
- assert.throws(()=>act(s,{type:'workflow',command:{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'确认',turnId:'edit-turn'}}));
+ let s=plan(initialState(),{operation:'create',utterance,turnId:'request-turn'});
+ const voice=(state:BankState,turnId:string)=>act(state,{type:'workflow',command:{operation:'confirm',taskId:flow(state).id,token:flow(state).reviewToken!,source:'voice',utterance:'确认',turnId}});
+ // The plan refuses a confirmation from the request turn; the transfer itself refuses any spoken confirmation.
+ for(const turnId of ['request-turn','confirm-first'])assert.throws(()=>voice(s,turnId));
+ assert.throws(()=>voice(s,crypto.randomUUID()),/卡片上核对后点“确认”/);assert.equal(flow(s).status,'review');
+ s=authenticate(confirm(s));assert.equal(s.receipts.length,1);
+ s=act(s,{type:'workflow',command:{operation:'amend',taskId:flow(s).id,params:{amount:200},source:'voice',utterance:'改成200元',turnId:'edit-turn'}});
+ assert.equal(flow(s).status,'review');assert.throws(()=>voice(s,crypto.randomUUID()),/卡片上核对后点“确认”/);
  s=confirm(s);assert.equal(flow(s).status,'authenticate');assert.equal(s.receipts.length,1);
 });
 test('ambiguous proportions, contradictory proposed purposes and negated transfers fail closed',()=>{
@@ -151,7 +154,7 @@ test('ambiguous proportions, contradictory proposed purposes and negated transfe
 });
 test('accepted investment orders pause dependencies until actual sandbox settlement',()=>{
  const start=initialState();start.workflows!.riskProfile={level:1,validUntil:'2027-12-31',answers:[1,1,1]};
- let s=plan(start,{operation:'create',utterance:'先从日常账户申购演示现金基金100元，然后查余额',steps:[{quote:'先从日常账户申购演示现金基金100元',functionId:'IN08',params:{productId:'fund-cash',accountId:'daily',amount:100}},{quote:'查余额',functionId:'TR02'}]});
+ let s=plan(start,{operation:'create',utterance:'先从日常账户申购现金基金100元，然后查余额',steps:[{quote:'先从日常账户申购现金基金100元',functionId:'IN08',params:{productId:'fund-cash',accountId:'daily',amount:100}},{quote:'查余额',functionId:'TR02'}]});
  s=authenticate(confirm(s));assert.equal(s.plan!.status,'blocked');assert.equal(s.plan!.steps[0].status,'external');assert.equal(s.workflows!.tasks.find(t=>t.id===s.plan!.steps[1].taskId)!.status,'queued');assert.equal(s.workflows!.records.orders[0].status,'pending');
  s=plan(s,{operation:'resume',planId:s.plan!.id});assert.equal(s.workflows!.tasks.find(t=>t.id===s.plan!.steps[1].taskId)!.status,'queued');
  s=act(s,{type:'workflow',command:{operation:'settle',source:'card'}});assert.equal(s.workflows!.records.orders[0].status,'settled');assert.equal(s.plan!.status,'complete');
@@ -196,15 +199,14 @@ test('restating a derived amount while changing a note retains its balance bindi
  s.accounts[0].balance=900000;s=confirm(s);assert.equal(flow(s).params.amount,3000);assert.equal(flow(s).status,'review');assert.equal(flow(s).params.note,'饭钱');
 });
 
-test('a previously used confirmation turn cannot authorize a third step or a later edit',()=>{
+test('a card confirmation binds one step and one summary: a stale token cannot confirm a later step or an edit',()=>{
  let s=plan(initialState(),{operation:'create',utterance:'先从日常账户给室友转500元，然后从储蓄账户给李四转300元，然后从日常账户给室友转200元',turnId:'create-turn'});
- const voiceConfirm=(state:BankState,turnId:string)=>act(state,{type:'workflow',command:{operation:'confirm',taskId:flow(state).id,token:flow(state).reviewToken!,source:'voice',utterance:'确认',turnId}});
+ const card=(state:BankState,token:string)=>act(state,{type:'workflow',command:{operation:'confirm',taskId:flow(state).id,token,source:'card'}});
  s=plan(s,{operation:'amend',planId:s.plan!.id,stepId:currentPlanStep(s)!.id,params:{amount:400},utterance:'改成400元',turnId:'edit-first'});
- s=voiceConfirm(s,'confirm-1');const auth=flow(s).verificationId;s=voiceConfirm(s,'confirm-1');assert.equal(flow(s).verificationId,auth);
- s=authenticate(s);s=voiceConfirm(s,'confirm-2');s=authenticate(s);s=JSON.parse(JSON.stringify(s));
- for(const oldTurn of ['confirm-1','create-turn','edit-first'])assert.throws(()=>voiceConfirm(s,oldTurn),oldTurn);assert.equal(s.receipts.length,2);
- s=voiceConfirm(s,'confirm-3');s=plan(s,{operation:'amend',planId:s.plan!.id,stepId:currentPlanStep(s)!.id,params:{amount:100},utterance:'改成100元',turnId:'edit-3'});
- assert.throws(()=>voiceConfirm(s,'confirm-3'));assert.equal(flow(s).status,'review');
+ const first=flow(s).reviewToken!;s=card(s,first);s=authenticate(s);
+ assert.throws(()=>card(s,first));s=confirm(s);s=authenticate(s);assert.equal(s.receipts.length,2);
+ const third=flow(s).reviewToken!;s=plan(s,{operation:'amend',planId:s.plan!.id,stepId:currentPlanStep(s)!.id,params:{amount:100},utterance:'改成100元',turnId:'edit-3'});
+ assert.throws(()=>card(s,third));assert.equal(flow(s).status,'review');assert.equal(s.receipts.length,2);
 });
 
 test('a now unpayable proportion revokes authorization, persists the stop and can recover',()=>{

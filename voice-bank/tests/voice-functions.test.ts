@@ -343,7 +343,7 @@ test('AA total above 5000 yuan and the sixth same-day request are blocked withou
 
 test('voice runs for investment, billing, subscription, and card functions return their matching cards', () => {
   const cases: [string, Params, string][] = [
-    ['IN07', { productIds: ['fund-cash', 'fund-bond'] }, '比较演示现金基金和演示债券基金'],
+    ['IN07', { productIds: ['fund-cash', 'fund-bond'] }, '比较现金基金和债券基金'],
     ['BI02', { period: '2026-10' }, '查看2026年10月收支统计'],
     ['SU01', {}, '查看订阅清单'],
     ['CA01', {}, '查看银行卡列表'],

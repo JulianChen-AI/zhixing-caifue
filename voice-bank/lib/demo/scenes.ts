@@ -68,7 +68,7 @@ export function buildScene(sceneId:string,baseState:BankState):BankState {
   if(stage===3)r.transactions.push(...[['周扬',7000],['许然',5000]].map(([name,amount],i)=>txn('aa-final-'+i,'2027-10-27',Number(amount),'income',String(name),'AA收款')));
  } else if(id==='S03'){
   setBalance(300000);r.transactions=[txn('internship','2028-10-01',300000,'income','实习收入','收入')];r.budgets=[row('rent-budget',{name:'房租预算',amount:120000}),row('living-budget',{name:'生活预算',amount:100000})];
-  r.products=[row('product-a',{name:'模拟产品A',risk:2,feeRate:0,price:1,type:'模拟产品',liquidity:'模拟处理，非即时到账',processingTime:'沙箱手动结算'})];
+  r.products=[row('product-a',{name:'稳健产品A',risk:2,feeRate:0,price:1,type:'固收',liquidity:'T+1 工作日到账',processingTime:'沙箱手动结算'})];
   s.workflows!.riskProfile={level:3,answers:[3,3,3],validUntil:'2029-10-25T04:00:00.000Z'};r.questionnaires=[row('synthetic-risk',{level:3,answers:[3,3,3],createdAt:'2028-10-24T04:00:00.000Z',label:'演示用合成测评'})];
  } else if(id==='S04'){
   setBalance(150000);r.cards.push(row('card-cloud',{name:'另一张模拟卡',tail:'3610',accountId:'daily',status:'active',restriction:'none',limit:500000,issuer:'模拟银行'}));r.transactions=['04','05','06'].map(month=>({...txn('cloud-'+month,`2030-${month}-03`,1200,'expense','云空间','订阅'),cardId:'card-cloud'}));
@@ -83,7 +83,7 @@ export function buildScene(sceneId:string,baseState:BankState):BankState {
   setBalance(800000);
   s.contacts=[{id:'RENT-7742',accountRef:'RENT-7742',name:'李明',label:'房东（用户备注）',bank:'模拟银行',tail:'7742',color:'blue',previouslyUsed:true}];
   r.goals=[row('EMERGENCY-01',{name:'应急金',target:1000000,balance:0,status:'active',notice:'目标额10,000元为工程设定'})];
-  r.products=[row('product-a',{name:'模拟产品A',risk:2,feeRate:0,price:1,type:'模拟产品',liquidity:'模拟处理，非即时到账',processingTime:'沙箱手动结算'})];
+  r.products=[row('product-a',{name:'稳健产品A',risk:2,feeRate:0,price:1,type:'固收',liquidity:'T+1 工作日到账',processingTime:'沙箱手动结算'})];
   s.workflows!.riskProfile={level:3,answers:[3,3,3],validUntil:'2034-07-25T04:00:00.000Z'};
   r.questionnaires=[row('synthetic-risk',{level:3,answers:[3,3,3],createdAt:'2033-07-24T04:00:00.000Z',label:'演示用合成测评'})];
   r.transactions=[txn('salary','2033-07-01',800000,'income','模拟工资','收入')];

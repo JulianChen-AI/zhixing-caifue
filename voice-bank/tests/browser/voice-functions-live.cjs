@@ -70,7 +70,7 @@ const readTurns = [
     assert.equal(task?.status, 'complete'); assert.ok(Array.isArray(task?.result)); assert.ok(task.result.some(x => x.id === 'zhang-roommate' && x.label === '室友'));
     assert.equal(state.view, 'workflow'); assert.equal(dom.workflowCardVisible, true); assert.equal(businessHashAfter, businessHashBefore);
   } },
-  { input: '比较演示现金基金和演示债券基金这两款产品，只读比较', id: 'IN07', operation: 'run', params: p => productIds.every(id => p.productIds?.includes(id)), check: ({ state, task, dom, businessHashBefore, businessHashAfter }) => {
+  { input: '比较现金基金和债券基金这两款产品，只读比较', id: 'IN07', operation: 'run', params: p => productIds.every(id => p.productIds?.includes(id)), check: ({ state, task, dom, businessHashBefore, businessHashAfter }) => {
     assert.equal(task?.status, 'complete'); assert.equal(task?.functionId, 'IN07'); assert.deepEqual(task.result?.products?.map(x => x.id).sort(), [...productIds].sort());
     assert.equal(dom.workflowCardVisible, true); assert.equal(businessHashAfter, businessHashBefore);
   } },

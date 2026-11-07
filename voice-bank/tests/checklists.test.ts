@@ -11,6 +11,8 @@ import type { BankAction, BankState, Intent } from '../lib/bank/types.ts';
 const act = (s: BankState,a: BankAction,id: string=crypto.randomUUID())=>reduceBank(s,a,id);
 const say = (s: BankState,text: string,proposal?: Intent)=>act(s,{type:'route',decision:routeRequest(text,s,proposal)});
 const ready = ()=>say(initialState(),'给室友张三转五十元，用日常账户');
+// Speech starts and fills a transfer; the card button confirms it.
+const spokenConfirmRefused = (s: BankState)=>{ assert.throws(()=>say(s,'确认转账'),/卡片上核对后点“确认”/); return act(s,{type:'confirm'}); };
 
 test('four source snapshots retain hashes and valid rule line references',()=>{
   const manifest=JSON.parse(fs.readFileSync(new URL('../docs/checklists/sources/manifest.json',import.meta.url),'utf8'));
@@ -125,7 +127,7 @@ test('currency-only replies supplement the active transfer instead of starting a
   let s=say(initialState(),'我要转账');const id=s.task!.id;s=say(s,'500元');assert.equal(s.task!.amount,50000);assert.equal(s.task!.id,id);assert.equal(s.task!.amountNeedsConfirmation,false);
   s=say(s,'室友那个');assert.equal(s.task!.recipientId,'zhang-roommate');s=say(s,'我有哪些账户');assert.equal(s.view,'balance');assert.equal(s.task!.id,id);assert.match(s.lastReply,/8021/);assert.match(s.lastReply,/3609/);
   s=say(s,'用第二个');assert.equal(s.task!.accountId,'savings');assert.equal(s.task!.amount,50000);assert.equal(s.view,'transfer');
-  s=say(s,'确认转账');assert.equal(s.task!.step,'authenticate');assert.equal(s.receipts.length,0);
+  s=spokenConfirmRefused(s);assert.equal(s.task!.step,'authenticate');assert.equal(s.receipts.length,0);
   s=act(s,{type:'authenticate',code:'123456',verificationId:s.task!.verificationId!});assert.equal(s.receipts.length,1);assert.equal(s.receipts[0].amount,50000);assert.equal(s.checklist!.outcome,'proceed');
 });
 test('account queries preserve authorization and tail selection is not parsed as money',()=>{
@@ -138,11 +140,11 @@ test('ordinals depend on the visible list and cannot select an unseen account',(
 });
 test('yes cannot skip missing data, perform authentication or override a risk stop',()=>{
   let s=say(initialState(),'我要转账');s=say(s,'确认');assert.equal(s.task!.step,'recipient');assert.equal(s.task!.verificationId,null);
-  s=say(ready(),'确认转账');const id=s.task!.verificationId;s=say(s,'确认');assert.equal(s.task!.verificationId,id);assert.equal(s.receipts.length,0);
+  s=spokenConfirmRefused(ready());const id=s.task!.verificationId;s=say(s,'确认');assert.equal(s.task!.verificationId,id);assert.equal(s.receipts.length,0);
   const risky=say(ready(),'这笔是刷单保证金');const after=say(risky,'确认转账');assert.equal(after.task!.verificationId,null);assert.equal(after.receipts.length,0);assert.equal(after.checklist!.outcome,'blocked');
 });
 test('changing a draft after spoken confirmation revokes the old authentication',()=>{
-  let s=say(ready(),'确认转账');const id=s.task!.verificationId!;s=say(s,'30元');assert.equal(s.task!.amount,3000);assert.equal(s.task!.verificationId,null);assert.throws(()=>act(s,{type:'authenticate',code:'123456',verificationId:id}));
+  let s=spokenConfirmRefused(ready());const id=s.task!.verificationId!;s=say(s,'30元');assert.equal(s.task!.amount,3000);assert.equal(s.task!.verificationId,null);assert.throws(()=>act(s,{type:'authenticate',code:'123456',verificationId:id}));
 });
 test('relative and malformed quantities cannot become partial Chinese amounts',()=>{
   for(const text of ['改成一半','转五十点五元','转1.234元']){assert.equal(amountFromText(text).amount,null);assert.equal(amountFromText(text).uncertain,true);}

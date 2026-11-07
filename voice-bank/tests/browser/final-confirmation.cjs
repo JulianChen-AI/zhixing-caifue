@@ -13,7 +13,7 @@ fs.mkdirSync(out,{recursive:true});
   const current=s=>s.workflows.tasks.find(t=>t.id===s.workflows.currentTaskId);
   const tool=(args,utterance)=>post({tool:{name:'bank_function',arguments:args,utterance,turnId:crypto.randomUUID()}});
   const card=command=>post({action:{type:'workflow',command}});
-  const bond=async()=>{let s=await card({operation:'run',functionId:'IN05',params:{answers:[3,3,3]}});s=await card({operation:'confirm',taskId:current(s).id,token:current(s).reviewToken});return tool({operation:'run',functionId:'IN08',params:{accountId:'daily',productId:'fund-bond',amount:100}},'从日常账户申购演示债券基金100元');};
+  const bond=async()=>{let s=await card({operation:'run',functionId:'IN05',params:{answers:[3,3,3]}});s=await card({operation:'confirm',taskId:current(s).id,token:current(s).reviewToken});return tool({operation:'run',functionId:'IN08',params:{accountId:'daily',productId:'fund-bond',amount:100}},'从日常账户申购债券基金100元');};
   const auth=async()=>{await page.getByLabel('功能演示验证码',{exact:true}).fill('123456');await page.getByRole('button',{name:'验证并办理',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.workflow-card .card-top span')?.textContent==='办理结果');};
   try{
    if(scenario==='semantic-review-card'){

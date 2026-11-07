@@ -234,11 +234,12 @@ test('malformed arguments never execute and do not corrupt the next provider tra
  assert.equal(JSON.parse(model.seen[1].at(-1)!.content!).code,'invalid_tool_arguments');
 });
 
-test('an explicit current confirmation executes without requiring the model to propose a tool',async()=>{
+test('a spoken transfer confirmation is refused: the transfer stays on its card for the button',async()=>{
  const start=reduceBank(initialState(),{type:'workflow',command:{source:'card',operation:'run',functionId:'TR03',params:{recipientId:'zhang-roommate',accountId:'daily',amount:500}}},crypto.randomUUID());
  const bank=sandbox(start),model=scripted([{content:'已确认转账，去认证。'}]);
  const result=await runDelegation({utterance:'确认转账'},{...bank,complete:model.complete,reviewCompletion:async()=>({content:'已确认转账'})},signal());
- assert.equal(result.status,'needs_user');assert.equal(result.stopReason,'awaiting_authentication');assert.equal(model.seen.length,0);assert.equal(bank.state().workflows!.tasks[0].status,'authenticate');assert.equal(bank.state().receipts.length,0);
+ // Transfers are confirmed on the card only; speech cannot move one to authentication.
+ assert.equal(result.status==='done',false);assert.equal(bank.state().workflows!.tasks[0].status,'review');assert.equal(bank.state().receipts.length,0);
 });
 
 test('a prose-only promise must continue until the requested transfer reaches a real checklist boundary',async()=>{
@@ -278,12 +279,12 @@ test('a supplied recipient must be saved before asking for the next missing fiel
  assert.equal(model.seen.length,1,'explicitly supplied fields reach the existing draft even when the model only acknowledges them');
 });
 
-test('confirmation yields at page authentication and cannot execute or skip subsequent queued tasks',async()=>{
+test('a model-proposed transfer confirmation is refused and cannot execute or skip subsequent queued tasks',async()=>{
  const start=reduceBank(initialState(),{type:'plan',command:{operation:'create',source:'card',utterance:'先从日常账户给室友张三转500元，然后查看我的订阅'}},crypto.randomUUID());
  const bank=sandbox(start),id=start.workflows!.currentTaskId!,token=start.workflows!.tasks.find(t=>t.id===id)!.reviewToken!;
- const model=scripted([{tool_calls:[call('confirm','bank_function',{operation:'confirm',taskId:id,token})]},{content:'两项都办好了。'}]);
+ const model=scripted([{tool_calls:[call('confirm','bank_function',{operation:'confirm',taskId:id,token})]},{content:'两项都办好了。'},{content:'请在卡片上点确认。'},{content:'请在卡片上点确认。'}]);
  const result=await runDelegation({utterance:'确认转账',turnId:'auth-boundary'},{...bank,complete:model.complete},signal());
- assert.equal(result.stopReason,'awaiting_authentication');assert.equal(result.status,'needs_user');assert.match(result.summary,/认证/);
+ assert.equal(result.status==='done',false);assert.equal(bank.state().workflows!.tasks.find(t=>t.id===id)!.status,'review');
  assert.equal(bank.state().receipts.length,0);assert.equal(bank.state().plan!.steps.find(s=>s.functionId==='SU01')!.status,'pending');
 });
 

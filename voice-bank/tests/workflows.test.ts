@@ -73,7 +73,7 @@ test('card selection and fund product replies amend the existing checklist inste
  s=act(s,workflowTextAction(s,'日常卡')!);assert.equal(currentWorkflow(s)!.id,id);assert.equal(currentWorkflow(s)!.params.cardId,'card-daily');assert.equal(currentWorkflow(s)!.status,'review');
  assert.throws(()=>workflowTextAction(s,'确认解冻'));s=act(s,workflowTextAction(s,'确认冻结')!);assert.equal(currentWorkflow(s)!.status,'authenticate');
  const assessed=initialState();assessed.workflows!.riskProfile={level:3,answers:[3,3,3],validUntil:'2099-01-01T00:00:00.000Z'};
- let fund=run(assessed,'IN08');const fundId=currentWorkflow(fund)!.id;fund=act(fund,workflowTextAction(fund,'演示债券基金')!);assert.equal(currentWorkflow(fund)!.id,fundId);assert.equal(currentWorkflow(fund)!.params.productId,'fund-bond');assert.ok(currentWorkflow(fund)!.missing.includes('amount'));
+ let fund=run(assessed,'IN08');const fundId=currentWorkflow(fund)!.id;fund=act(fund,workflowTextAction(fund,'债券基金')!);assert.equal(currentWorkflow(fund)!.id,fundId);assert.equal(currentWorkflow(fund)!.params.productId,'fund-bond');assert.ok(currentWorkflow(fund)!.missing.includes('amount'));
 });
 
 test('four-layer catalog covers 57 unique functions and 91 unique logical tools; every reference resolves',()=>{
@@ -111,11 +111,11 @@ test('unchanged voice amendments and repeated confirmation preserve workflow aut
   let s=run(initialState(),id,params);const taskId=currentWorkflow(s)!.id,token=currentWorkflow(s)!.reviewToken!;
   s=act(s,{operation:'amend',taskId,params:{amount:100},source:'voice',utterance:'100元'});
   assert.equal(currentWorkflow(s)!.reviewToken,token);
-  s=act(s,{operation:'confirm',taskId,token,source:'voice',utterance:'确认'});const auth=currentWorkflow(s)!.verificationId!;
+  s=act(s,{operation:'confirm',taskId,token,...(id==='TR03'?{source:'card' as const}:{source:'voice' as const,utterance:'确认'})});const auth=currentWorkflow(s)!.verificationId!;
   for(const utterance of ['改成100美元','改成余额三分之一'])assert.throws(()=>act(s,{operation:'amend',taskId,params:{amount:100},source:'voice',utterance}));
   s=act(s,{operation:'amend',taskId,params:{amount:100},source:'voice',utterance:'还是100元'});
   assert.equal(currentWorkflow(s)!.status,'authenticate');assert.equal(currentWorkflow(s)!.verificationId,auth);
-  s=act(s,{operation:'confirm',taskId,token,source:'voice',utterance:'确认'});assert.equal(currentWorkflow(s)!.verificationId,auth);
+  s=act(s,{operation:'confirm',taskId,token,...(id==='TR03'?{source:'card' as const}:{source:'voice' as const,utterance:'确认'})});assert.equal(currentWorkflow(s)!.verificationId,auth);
   s=act(s,{operation:'resume',taskId});assert.equal(currentWorkflow(s)!.verificationId,auth);
   s=act(s,{operation:'amend',taskId,params:{}});assert.equal(currentWorkflow(s)!.status,'review');assert.equal(currentWorkflow(s)!.verificationId,null);
   assert.equal(s.receipts.length,0);assert.equal(s.accounts[0].balance,1286500);
@@ -191,7 +191,8 @@ test('semantic drafting preserves collected fields and requires confirmation of 
  s=act(s,{operation:'amend',taskId:t.id,params:{amount:300},source:'voice',utterance:'少转两百吧'});t=currentWorkflow(s)!;
  assert.equal(t.params.amount,300);assert.equal(t.params.recipientId,'zhang-roommate');assert.equal(t.params.accountId,'daily');assert.equal(t.params.note,'聚餐分摊');assert.notEqual(t.reviewToken,old);
  assert.throws(()=>act(s,{operation:'confirm',taskId:t.id,token:old,source:'voice',utterance:'按卡片上的办吧'}));
- s=act(s,{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'信息没错，就按这份办理'});t=currentWorkflow(s)!;
+ assert.throws(()=>act(s,{operation:'confirm',taskId:t.id,token:t.reviewToken!,source:'voice',utterance:'信息没错，就按这份办理'}),/卡片上核对后点“确认”/);
+ s=act(s,{operation:'confirm',taskId:t.id,token:t.reviewToken!});t=currentWorkflow(s)!;
  assert.equal(t.status,'authenticate');assert.equal(s.receipts.length,0);assert.equal(s.accounts[0].balance,1286500);
  const auth=t.verificationId!;s=act(s,{operation:'amend',taskId:t.id,params:{amount:200},source:'voice',utterance:'再少转一百'});
  assert.equal(currentWorkflow(s)!.status,'review');assert.throws(()=>act(s,{operation:'authenticate',taskId:t.id,token:auth,code:'123456'}));

@@ -33,23 +33,29 @@ test('risk score: amount, first payee, night and repeated payments to one person
  assert.deepEqual(transferRisk(s, { recipientId: 'li-friend', amount: 40000 }).reasons, ['24小时内已多次转给同一人']);
 });
 
-test('same “转 500”: a usual payee by day may be confirmed by voice', () => {
- let s = draft(state(DAY), 'zhang-roommate'), t = currentWorkflow(s)!;
- assert.equal(t.status, 'review', t.message);
- assert.doesNotMatch(t.message, /语音说“确认”不算数/);
- s = flow(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken!, source: 'voice', utterance: '确认' });
- assert.equal(currentWorkflow(s)!.status, 'authenticate', 'page authentication still follows');
+test('every transfer is confirmed on the card: voice and the realtime confirm intent are refused, by day or night', () => {
+ for (const [clock, payee, contacts] of [[DAY, 'zhang-roommate', false], [NIGHT, 'wang-new', true]] as const) {
+  let s = draft(state(clock, contacts), payee), t = currentWorkflow(s)!;
+  assert.equal(t.status, 'review', t.message);
+  assert.match(t.message, /核对无误请点卡片上的“确认”/);
+  assert.throws(() => flow(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken!, source: 'voice', utterance: '确认' }), /卡片上核对后点“确认”/);
+  assert.throws(() => act(s, { type: 'intent', intent: { kind: 'confirm_transfer' } }), /卡片上核对后点“确认”/);
+  s = flow(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken! });
+  assert.equal(currentWorkflow(s)!.status, 'authenticate', 'the card button works; authentication still follows');
+  assert.equal(s.receipts.length, 0);
+ }
 });
 
-test('same “转 500”: a new payee at night needs the card button; voice is refused with the reason', () => {
- let s = draft(state(NIGHT, true), 'wang-new'), t = currentWorkflow(s)!;
- assert.equal(t.status, 'review', t.message);
- assert.match(t.message, /^这笔转账需要你在卡片上点“确认”，语音说“确认”不算数（原因：第一次给这个收款人转账、深夜/);
- assert.throws(() => flow(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken!, source: 'voice', utterance: '确认' }), /语音确认不算数/);
- // The legacy realtime path (a model tool's confirm_transfer) is voice too.
- assert.throws(() => act(s, { type: 'intent', intent: { kind: 'confirm_transfer' } }), /语音确认不算数/);
- s = flow(s, { operation: 'confirm', taskId: t.id, token: t.reviewToken! });
- t = currentWorkflow(s)!;
- assert.equal(t.status, 'authenticate', 'the card button works and authentication is still required');
- assert.equal(s.receipts.length, 0);
+test('elevated risk opens the review with the reasons to check; a usual daytime transfer has none', () => {
+ assert.doesNotMatch(currentWorkflow(draft(state(DAY), 'zhang-roommate'))!.message, /请特别核对/);
+ assert.match(currentWorkflow(draft(state(NIGHT, true), 'wang-new'))!.message, /^请特别核对：第一次给这个收款人转账、深夜/);
+});
+
+test('a spoken “确认” on a transfer card is answered with the card hint, not executed or raised as an error', async () => {
+ const { understandIntent } = await import('../lib/voice/intent-json.ts');
+ const s = draft(state(DAY), 'zhang-roommate');
+ const fake = (async () => new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ intent: 'confirm' }) } }] }))) as typeof fetch;
+ const r = await understandIntent(s, '确认', [], { base: 'x', planner: 'm' }, new AbortController().signal, fake);
+ assert.equal(r.action, undefined);
+ assert.equal(r.say, '转账请在卡片上核对后点“确认”。');
 });

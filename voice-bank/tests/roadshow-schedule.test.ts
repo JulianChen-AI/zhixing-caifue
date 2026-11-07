@@ -13,7 +13,9 @@ const goal=(s:BankState)=>s.workflows!.records.goals[0];
 function deposit(){
  let s=say(scene('S07'),{operation:'run',functionId:'TR03',params:{recipientId:'RENT-7742',amount:2000,note:'租房押金',archive:'租住'}},'给房东李明转2000租房押金，凭证归档到租住');
  let t=currentWorkflow(s)!;assert.equal(t.status,'review',t.message);
- s=say(s,{operation:'confirm',taskId:t.id,token:t.reviewToken},'账户信息核对过了，金额2000，确认提交');t=currentWorkflow(s)!;
+ // Transfers are confirmed on the card; the spoken confirmation is refused.
+ assert.throws(()=>say(s,{operation:'confirm',taskId:t.id,token:t.reviewToken},'账户信息核对过了，金额2000，确认提交'),/卡片上核对后点“确认”/);
+ s=card(s,{operation:'confirm',taskId:t.id,token:t.reviewToken});t=currentWorkflow(s)!;
  return card(s,{operation:'authenticate',taskId:t.id,token:t.verificationId,code:'123456'});
 }
 

@@ -73,11 +73,11 @@ function validate(s: BankState) {
   const run = transferChecklist(s, 'balance.sufficient')!;
   if (run.outcome !== 'proceed') throw new BankError(run.question || '请先完成前序检查。');
 }
-function transferSummary(s:BankState,cardOnly=false){
+function transferSummary(s:BankState){
   const t=requireTask(s),c=contactsOf(s).find(c=>c.id===t.recipientId)!,a=s.accounts.find(a=>a.id===t.accountId)!;
   const fresh=c.previouslyUsed?'':'这是新收款人，请核对姓名、账户信息、金额和用途；备注或姓名一致都不能代替账户核验。新收款人按延迟到账处理，到账前可以撤销。';
   // The amount is read back in capitals too, so a misheard 300 / 3000 shows before confirmation.
-  return fresh+'准备从'+a.name+'给'+c.label+c.name+'转 '+money(t.amount!)+' 元（'+upperAmount(t.amount!)+'）。'+(cardOnly?'核对无误请点卡片上的“确认”':'核对无误可以说“确认转账”')+'，之后只需在卡片完成演示认证。';
+  return fresh+'准备从'+a.name+'给'+c.label+c.name+'转 '+money(t.amount!)+' 元（'+upperAmount(t.amount!)+'）。'+'核对无误请点卡片上的“确认”，然后输入验证码。';
 }
 function prepare(s: BankState) {
   const t = requireTask(s); t.confirmedRevision = null; t.verificationId = null;
@@ -94,7 +94,7 @@ function prepare(s: BankState) {
   else {
     // Elevated risk opens the review with why the card button is required; nothing else changes.
     const risk = transferRisk(s, t);
-    s.lastReply = (risk.elevated ? elevatedNotice(risk) : '') + transferSummary(s, risk.elevated);
+    s.lastReply = (risk.elevated ? elevatedNotice(risk) : '') + transferSummary(s);
   }
 }
 function confirmTransfer(s: BankState) {
@@ -103,7 +103,7 @@ function confirmTransfer(s: BankState) {
 }
 function applyIntent(s: BankState, intent: Intent) {
   // confirm_transfer only comes from speech (routing or a model tool); the card button dispatches { type: 'confirm' }.
-  if (intent.kind === 'confirm_transfer') { const t = requireTask(s), risk = transferRisk(s, t); if (risk.elevated) throw new BankError(VOICE_REFUSED(risk)); confirmTransfer(s); return; }
+  if (intent.kind === 'confirm_transfer') { requireTask(s); throw new BankError(VOICE_REFUSED); }
   if (intent.kind === 'confirm_amount') { const t=requireTask(s); if (!t.amountNeedsConfirmation || t.amount == null) throw new BankError('当前没有待确认的金额。'); t.amountNeedsConfirmation=false; resolveFields(s,['amount']); prepare(s); return; }
   if (intent.kind === 'cancel') {
     if (s.task?.step === 'complete') { s.lastReply = '这笔模拟转账已完成，无法通过取消对话撤回。你可以查看回执。'; return; }

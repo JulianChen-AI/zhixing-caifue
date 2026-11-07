@@ -36,7 +36,7 @@ test('X02 the badminton description and an ordinal both resolve only against the
 test('X03 X04 X05 only one confirmed transfer debits the account once',()=>{
  let s=ask();s=say(s,{operation:'amend',taskId:currentWorkflow(s)!.id,params:{recipientId:'C02'}},'打羽毛球那个');
  assert.equal(balance(s),114000);assert.equal(s.receipts.length,0);
- const review=currentWorkflow(s)!;s=say(s,{operation:'confirm',taskId:review.id,token:review.reviewToken},'对，确认转120');
+ const review=currentWorkflow(s)!;assert.throws(()=>say(s,{operation:'confirm',taskId:review.id,token:review.reviewToken},'对，确认转120'),/卡片上核对后点“确认”/);s=card(s,{operation:'confirm',taskId:review.id,token:review.reviewToken});
  const auth=currentWorkflow(s)!;assert.equal(auth.status,'authenticate');
  const requestId=crypto.randomUUID();s=card(s,{operation:'authenticate',taskId:auth.id,token:auth.verificationId,code:'123456'},requestId);
  assert.equal(currentWorkflow(s)!.status,'complete');assert.equal(balance(s),102000);assert.equal(s.receipts.length,1);assert.equal(s.receipts[0].recipientId,'C02');assert.match(currentWorkflow(s)!.message,/羽毛球社张三/);

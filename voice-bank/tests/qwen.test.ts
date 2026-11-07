@@ -38,13 +38,16 @@ test('refreshing committed facts after interruption does not cancel a newer resp
  const added=h.sent.slice(before);assert.equal(added.length,1);assert.equal(added[0].type,'session.update');assert.ok(added[0].session.instructions.includes('不是用户授权'));assert.ok(!added.some(e=>e.type==='response.cancel'||e.type==='conversation.item.create'));
 });
 const apply=(s:ReturnType<typeof initialState>,args:RealtimeToolArguments,utterance:string)=>reduceBank(s,{type:'route',decision:realtimeToolDecision(args,s,utterance)},crypto.randomUUID());
+// Transfers are confirmed on the card only: the model's confirm_transfer is refused, the card button confirms.
+const refused=(s:ReturnType<typeof initialState>,args:RealtimeToolArguments,text:string)=>{const r=apply(s,args,text);assert.match(r.lastReply,/卡片上核对后点“确认”/);assert.notEqual(r.task!.step,'authenticate');};
+const confirmCard=(s:ReturnType<typeof initialState>)=>reduceBank(s,{type:'confirm'},crypto.randomUUID());
 const ready=()=>apply(initialState(),{operation:'update_transfer',amount:500,recipientId:'zhang-roommate',accountId:'daily'},'从日常账户给室友转500元');
 test('a semantic amount correction preserves transfer selections and cannot reuse the old confirmation',()=>{
  const initial=ready(),old=initial.task!.reviewToken!;let s=apply(initial,{operation:'update_transfer',amount:300},'少转两百吧');
  assert.equal(s.task!.amount,30000);assert.equal(s.task!.recipientId,'zhang-roommate');assert.equal(s.task!.accountId,'daily');assert.notEqual(s.task!.reviewToken,old);assert.equal(s.receipts.length,0);
  assert.ok(s.routing!.evidence.some(e=>e.field==='amount'&&e.source==='model-proposal'));
  const contradictory=apply(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken!},'确认转500元');assert.equal(contradictory.task!.verificationId,null);
- s=apply(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken!},'按卡片上的办吧');assert.equal(s.task!.step,'authenticate');assert.equal(s.receipts.length,0);
+ refused(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken!},'按卡片上的办吧');s=confirmCard(s);assert.equal(s.task!.step,'authenticate');assert.equal(s.receipts.length,0);
 });
 function harness(work:()=>Promise<unknown>=async()=>({status:'ok'}),literalCommandFor?:(text:string)=>WorkflowToolArguments|undefined){
  const sent:any[]=[],transcripts:any[]=[],tools:any[]=[],busy:boolean[]=[],issues:string[]=[];let interrupts=0;
@@ -249,10 +252,10 @@ test('a response done event cannot remove the timeout while its bank request is 
 test('VAD splitting an acknowledgement before any model reply preserves both actual speech segments',async()=>{
  const h=harness();await h.q.handle({type:'input_audio_buffer.speech_started',item_id:'first'});await h.q.handle({type:'input_audio_buffer.speech_stopped',item_id:'first'});
  await h.q.handle({type:'input_audio_buffer.speech_started',item_id:'tail'});
- await h.q.handle({type:'conversation.item.input_audio_transcription.completed',item_id:'first',transcript:'确认申购当前这笔演示债券基金一百元。'});
+ await h.q.handle({type:'conversation.item.input_audio_transcription.completed',item_id:'first',transcript:'确认申购当前这笔债券基金一百元。'});
  await h.q.handle({type:'input_audio_buffer.speech_stopped',item_id:'tail'});await h.q.handle({type:'conversation.item.input_audio_transcription.completed',item_id:'tail',transcript:'当前摘要继续。'});
  await h.q.handle({type:'response.created',response:{id:'r'}});await h.q.handle({...call('split'),response_id:'r'});await tick();
- assert.equal(h.tools.length,1);assert.equal(h.tools[0].context.turnId,'tail');assert.equal(h.tools[0].context.utterance,'确认申购当前这笔演示债券基金一百元。\n当前摘要继续。');
+ assert.equal(h.tools.length,1);assert.equal(h.tools[0].context.turnId,'tail');assert.equal(h.tools[0].context.utterance,'确认申购当前这笔债券基金一百元。\n当前摘要继续。');
 });
 
 test('split acknowledgement never borrows confirmation across replies, page updates, negations or edits',async()=>{
@@ -357,7 +360,7 @@ test('account listing preserves task and authorization; selecting a displayed or
 test('confirm requires a current summary token, actual acknowledgement and the same checklist',()=>{
  let s=ready();const token=s.task!.reviewToken!;assert.ok(token);
  const forged=apply(s,{operation:'confirm_transfer',confirmationToken:crypto.randomUUID()},'确认转账');assert.equal(forged.task!.verificationId,null);
- s=apply(s,{operation:'confirm_transfer',confirmationToken:token},'好的，就这样转吧');assert.equal(s.task!.step,'authenticate');assert.equal(s.receipts.length,0);
+ refused(s,{operation:'confirm_transfer',confirmationToken:token},'好的，就这样转吧');s=confirmCard(s);assert.equal(s.task!.step,'authenticate');assert.equal(s.receipts.length,0);
  const id=s.task!.verificationId!;s=reduceBank(s,{type:'authenticate',code:'123456',verificationId:id},crypto.randomUUID());assert.equal(s.receipts.length,1);assert.equal(s.receipts[0].amount,50000);
 });
 test('edits revoke summary tokens, confirmation and authentication',()=>{
@@ -368,7 +371,7 @@ test('risk signals remain blocking and unimplemented workflows cannot invent res
  s=apply(s,{operation:'select_workflow',workflowId:'SD-S05'},'取消会员');assert.equal(s.routing!.outcome,'unsupported');assert.equal(s.receipts.length,0);
 });
 test('compact tool output omits audit, transcript, verification token and codes',()=>{
- let s=ready();s=apply(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken},'确认转账');const out=bankToolResult(s);assert.equal('audit'in out,false);assert.equal('verificationId'in out.task!,false);assert.equal('code'in out.task!,false);
+ let s=ready();refused(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken},'确认转账');s=confirmCard(s);const out=bankToolResult(s);assert.equal('audit'in out,false);assert.equal('verificationId'in out.task!,false);assert.equal('code'in out.task!,false);
 });
 
 test('Omni can ask several natural questions before a tool; final fields are grounded in recent actual user turns',()=>{
@@ -390,7 +393,7 @@ test('a new automatic response after a completed user interruption is not mistak
 });
 test('all monetary facts returned to Omni use explicit yuan units',()=>{
  let s=ready();s=apply(s,{operation:'list_accounts'},'我有哪些账户');const out=bankToolResult(s);assert.equal(out.amountUnit,'yuan');assert.equal(out.accounts![1].balance,30000);assert.equal(out.task!.amount,500);
- s=apply(s,{operation:'update_transfer',accountId:'daily'},'用日常账户');s=apply(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken},'确认转账');s=reduceBank(s,{type:'authenticate',code:'123456',verificationId:s.task!.verificationId!},crypto.randomUUID());assert.equal(bankToolResult(s).receipt!.amount,500);
+ s=apply(s,{operation:'update_transfer',accountId:'daily'},'用日常账户');refused(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken},'确认转账');s=confirmCard(s);s=reduceBank(s,{type:'authenticate',code:'123456',verificationId:s.task!.verificationId!},crypto.randomUUID());assert.equal(bankToolResult(s).receipt!.amount,500);
 });
 
 test('changing 500 to 300 preserves recipient and account chosen on cards despite stale ambiguous history',()=>{
@@ -425,7 +428,7 @@ test('checklist progress only asks missing fields and amount corrections revoke 
  let progress=bankToolResult(s).transferProgress!;
  assert.equal(progress.collected.recipient,'同学李四');assert.deepEqual(progress.missingFields,['amount','account']);
  s=apply(s,{operation:'update_transfer',amount:500,accountId:'daily'},'用日常账户转500元');
- const old=s.task!.reviewToken!;s=apply(s,{operation:'confirm_transfer',confirmationToken:old},'确认转账');const oldAuth=s.task!.verificationId!;
+ const old=s.task!.reviewToken!;refused(s,{operation:'confirm_transfer',confirmationToken:old},'确认转账');s=confirmCard(s);const oldAuth=s.task!.verificationId!;
  s=apply(s,{operation:'update_transfer',amount:300},'不对，300');progress=bankToolResult(s).transferProgress!;
  assert.equal(s.task!.recipientId,'li-friend');assert.equal(s.task!.accountId,'daily');assert.equal(s.task!.amount,30000);
  assert.deepEqual(progress.missingFields,[]);assert.equal(progress.nextAction,'review_current_summary');
@@ -449,20 +452,20 @@ test('repeated unchanged fields or confirmation do not restart a completed confi
  let s=ready();const token=s.task!.reviewToken!;
  s=apply(s,{operation:'update_transfer',amount:500,accountId:'daily',recipientId:'zhang-roommate'},'还是从日常账户给室友转500元');
  assert.equal(s.task!.reviewToken,token);
- s=apply(s,{operation:'confirm_transfer',confirmationToken:token},'确认');const auth=s.task!.verificationId!;
+ refused(s,{operation:'confirm_transfer',confirmationToken:token},'确认');s=confirmCard(s);const auth=s.task!.verificationId!;
  s=apply(s,{operation:'update_transfer',amount:500},'500');
  assert.equal(s.task!.step,'authenticate');assert.equal(s.task!.verificationId,auth);
  s=apply(s,{operation:'confirm_transfer',confirmationToken:token},'确认');
  assert.equal(s.task!.step,'authenticate');assert.equal(s.task!.verificationId,auth);assert.match(s.lastReply,/已经确认/);
  s=apply(s,{operation:'update_transfer',amount:300},'改成300元');
  assert.equal(s.task!.step,'review');assert.equal(s.task!.verificationId,null);assert.notEqual(s.task!.reviewToken,token);
- let card=ready();card=apply(card,{operation:'confirm_transfer',confirmationToken:card.task!.reviewToken},'确认');
+ let card=confirmCard(ready());
  card=reduceBank(card,{type:'edit',amount:card.task!.amount!},crypto.randomUUID());
  assert.equal(card.task!.step,'review');assert.equal(card.task!.verificationId,null); // Explicit card back/edit still returns to review.
 });
 
 test('retaining collected fields cannot retain authorization when current balance no longer permits the transfer',()=>{
- let s=ready();s=apply(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken},'确认');const auth=s.task!.verificationId!;
+ let s=ready();refused(s,{operation:'confirm_transfer',confirmationToken:s.task!.reviewToken},'确认');s=confirmCard(s);const auth=s.task!.verificationId!;
  s.accounts[0].balance=10000; // Another completed operation consumed the balance.
  s=apply(s,{operation:'update_transfer',amount:500},'500');
  assert.equal(s.task!.recipientId,'zhang-roommate');assert.equal(s.task!.accountId,'daily');

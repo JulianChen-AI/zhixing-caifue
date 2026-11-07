@@ -1,6 +1,5 @@
-// Transfer risk for the confirmation channel. It only ever adds a requirement: with elevated risk a spoken “确认” no
-// longer counts and the user must press the card's confirm button. Low risk removes nothing — review, confirmation and page
-// authentication all stay. Thresholds are conservative because users most dislike being interrupted.
+// Transfer risk. Every transfer is confirmed on the card (speech only starts and fills it, per the adopted transfer flow);
+// elevated risk adds a highlighted reason to check before pressing it. It never removes review, confirmation or authentication.
 import type { BankState } from '../bank/types.ts';
 import { contactsOf } from '../bank/recipients.ts';
 import { businessNow } from '../demo/clock.ts';
@@ -40,5 +39,6 @@ export function transferRisk(s: BankState, draft: Draft): TransferRisk {
 }
 
 /** The sentence that opens the review card when the card button is required. */
-export const elevatedNotice = (risk: TransferRisk) => `这笔转账需要你在卡片上点“确认”，语音说“确认”不算数（原因：${risk.reasons.join('、')}）。`;
-export const VOICE_REFUSED = (risk: TransferRisk) => `这笔转账风险较高（${risk.reasons.join('、')}），语音确认不算数，请核对卡片后点“确认”按钮。`;
+export const elevatedNotice = (risk: TransferRisk) => `请特别核对：${risk.reasons.join('、')}。`;
+/** Speech starts and fills a transfer; only the card's confirm button confirms it. */
+export const VOICE_REFUSED = '转账请在卡片上核对后点“确认”。';

@@ -79,23 +79,23 @@ test('a platform subscription the user was guided to cancel is marked pending in
 });
 
 test('a prerequisite inserted for a blocked card keeps that card in the checklist', () => {
-  const s = say(initialState(), 'IN08', '用日常账户买500元演示债券基金', { productId: 'fund-bond', accountId: 'daily', amount: 500 });
+  const s = say(initialState(), 'IN08', '用日常账户买500元债券基金', { productId: 'fund-bond', accountId: 'daily', amount: 500 });
   const steps = s.plan!.steps.map(step => step.functionId);
   assert.ok(steps.includes('IN05') && steps.includes('IN08'), steps.join(','));
 });
 
 test('a purchase stops at suitability before asking the amount', () => {
-  const none = say(initialState(), 'IN08', '我测评是保守型，帮我买演示债券基金', { productId: 'fund-bond' });
+  const none = say(initialState(), 'IN08', '我测评是保守型，帮我买债券基金', { productId: 'fund-bond' });
   const buy = none.workflows!.tasks.find(t => t.functionId === 'IN08')!;
   assert.equal(buy.status, 'blocked');
   assert.deepEqual(buy.missing, []);
   assert.match(buy.message, /口头说的测评结果不能代替正式测评/);
   assert.equal(currentWorkflow(none)!.functionId, 'IN05');
   const low = initialState(); low.workflows!.riskProfile = { level: 2, answers: [2, 2, 2], validUntil: '2099-01-01T00:00:00.000Z' };
-  const mismatch = currentWorkflow(say(low, 'IN08', '帮我买演示债券基金', { productId: 'fund-bond' }))!;
+  const mismatch = currentWorkflow(say(low, 'IN08', '帮我买债券基金', { productId: 'fund-bond' }))!;
   assert.equal(mismatch.status, 'blocked');
-  assert.match(mismatch.message, /C2.*R3.*不能购买.*演示现金基金/);
-  const fits = currentWorkflow(say(low, 'IN08', '帮我买演示现金基金', { productId: 'fund-cash' }))!;
+  assert.match(mismatch.message, /C2.*R3.*不能购买.*现金基金/);
+  const fits = currentWorkflow(say(low, 'IN08', '帮我买现金基金', { productId: 'fund-cash' }))!;
   assert.equal(fits.status, 'collecting');
   assert.ok(fits.missing.includes('amount'));
 });

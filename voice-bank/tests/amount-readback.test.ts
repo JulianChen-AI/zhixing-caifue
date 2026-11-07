@@ -35,15 +35,14 @@ test('no conflict, mixed forms and relative changes do not interrupt', async () 
  assert.ok((await understandIntent(initialState(), '往旅行目标存三千', [], { base: 'x', planner: 'm' }, new AbortController().signal, fake({ intent: 'run', functionId: 'IN02', params: { direction: 'deposit', goalId: 'goal-travel', amount: 300 } }))).action);
 });
 
-test('the transfer review reads the amount back in capitals, and says “press the card” when voice does not count', () => {
+test('the transfer review reads the amount back in capitals and asks for the card button', () => {
  const run = (s: ReturnType<typeof initialState>, amount: number, recipientId = 'li-friend') => reduceBank(s, { type: 'workflow', command: { source: 'card', operation: 'run', functionId: 'TR03', params: { recipientId, accountId: 'daily', amount } } }, crypto.randomUUID());
  const day = initialState(); day.demoClock = '2026-10-25T04:00:00.000Z';
  const usual = currentWorkflow(run(day, 3000))!.message;
  assert.match(usual, /转 3,000(?:\.00)? 元（叁仟元整）/);
- assert.match(usual, /可以说“确认转账”/);
+ assert.match(usual, /核对无误请点卡片上的“确认”/);
  const night = initialState(); night.demoClock = '2026-10-25T15:30:00.000Z';
  night.contacts = [...CONTACTS, { id: 'wang-new', name: '王五', label: '新同学', bank: '模拟银行', tail: '5521', color: 'blue', previouslyUsed: false }];
  const card = currentWorkflow(run(night, 500, 'wang-new'))!.message;
- assert.match(card, /（伍佰元整）。核对无误请点卡片上的“确认”/);
- assert.doesNotMatch(card, /可以说“确认转账”/);
+ assert.match(card, /^请特别核对：.*（伍佰元整）。核对无误请点卡片上的“确认”/);
 });

@@ -55,7 +55,7 @@ test('追加聚餐只生成独立预算，核对后不扣款不占用',()=>{
  s=plan(s,{operation:'resume',taskId:entry.id});s=confirm(s);assert.equal(s.accounts[0].balance,800000);assert.equal(s.accounts[0].held,undefined);assert.equal(s.workflows!.records.budgets[0].amount,40000);
 });
 test('每项认证前余额不变，账户或产品修改撤销原认证',()=>{
- let s=scene();s.accounts.push({id:'other',name:'备用账户',tail:'1122',balance:800000});s.workflows!.records.products.push({...s.workflows!.records.products[0],id:'product-b',name:'模拟产品B'});
+ let s=scene();s.accounts.push({id:'other',name:'备用账户',tail:'1122',balance:800000});s.workflows!.records.products.push({...s.workflows!.records.products[0],id:'product-b',name:'稳健产品B'});
  s=plan(open(s),{operation:'resume'});let t=currentWorkflow(s)!,balance=s.accounts[0].balance;
  s=card(s,{operation:'confirm',taskId:t.id,token:t.reviewToken});t=currentWorkflow(s)!;assert.equal(s.accounts[0].balance,balance);
  const old=t.verificationId;s=card(s,{operation:'amend',taskId:t.id,params:{accountId:'other'}});t=currentWorkflow(s)!;assert.notEqual(t.verificationId,old);assert.throws(()=>card(s,{operation:'authenticate',taskId:t.id,token:old,code:'123456'}));assert.equal(s.accounts[0].balance,balance);

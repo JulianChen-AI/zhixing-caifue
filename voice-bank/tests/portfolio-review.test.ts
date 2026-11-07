@@ -31,8 +31,8 @@ test('portfolio review: gain and loss in cents, settled buys counted, pending bu
  const s = initialState(), h = records(s).holdings[0];
  h.value = 23000;
  records(s).orders.push(
-  { id: 'order-settled', action: 'subscribe', productId: 'fund-cash', name: '演示现金基金', accountId: 'savings', amount: 3000, status: 'settled', createdAt: '2026-10-01T02:00:00.000Z', settledAt: '2026-10-02T02:00:00.000Z' },
-  { id: 'order-pending', action: 'subscribe', productId: 'fund-bond', name: '演示债券基金', accountId: 'daily', amount: 5000, status: 'pending', createdAt: '2026-10-03T02:00:00.000Z' },
+  { id: 'order-settled', action: 'subscribe', productId: 'fund-cash', name: '现金基金', accountId: 'savings', amount: 3000, status: 'settled', createdAt: '2026-10-01T02:00:00.000Z', settledAt: '2026-10-02T02:00:00.000Z' },
+  { id: 'order-pending', action: 'subscribe', productId: 'fund-bond', name: '债券基金', accountId: 'daily', amount: 5000, status: 'pending', createdAt: '2026-10-03T02:00:00.000Z' },
  );
  h.cost = 23000;
  h.value = 22310;
@@ -106,6 +106,6 @@ test('product detail and comparison carry the underlying assets', () => {
 
 test('offline routing sends a review request to IN16 and an underlying question to IN06', () => {
  assert.equal(offlineWorkflow('帮我复盘一下我的理财')?.functionId, 'IN16');
- const s = initialState(), q = offlineWorkflow('演示债券基金底层是什么', s);
+ const s = initialState(), q = offlineWorkflow('债券基金底层是什么', s);
  assert.deepEqual([q?.functionId, q?.params?.productId], ['IN06', 'fund-bond']);
 });

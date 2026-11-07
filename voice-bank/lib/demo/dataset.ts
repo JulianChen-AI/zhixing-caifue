@@ -136,14 +136,14 @@ export function demoDataset(anchor = DEFAULT_ANCHOR): DemoDataset {
         { id: 'sub-loan', name: '助学贷款还款', channel: 'bank', amount: 50000, cycle: 'monthly', nextChargeAt: loanNext, status: 'active', protected: true, confirmed: true },
       ],
       products: [
-        { id: 'fund-cash', name: '演示现金基金', risk: 1, feeRate: 0, price: 1, type: '货币', liquidity: '沙箱手动推进结算；赎回预计T+1工作日（不含节假日校验），并非即时到账', synthetic: true,
+        { id: 'fund-cash', name: '现金基金', risk: 1, feeRate: 0, price: 1, type: '货币', liquidity: '沙箱手动推进结算；赎回预计T+1工作日（不含节假日校验），并非即时到账', synthetic: true,
           underlying: [{ asset: '银行存款', share: 55 }, { asset: '同业存单', share: 30 }, { asset: '剩余期限一年内的国债和政策性金融债', share: 15 }], underlyingSource: '合成数据，不是真实产品披露' },
-        { id: 'fund-bond', name: '演示债券基金', risk: 3, feeRate: 0, price: 1, type: '债券', liquidity: '沙箱手动推进结算；赎回预计T+1工作日（不含节假日校验），并非即时到账', synthetic: true,
+        { id: 'fund-bond', name: '债券基金', risk: 3, feeRate: 0, price: 1, type: '债券', liquidity: '沙箱手动推进结算；赎回预计T+1工作日（不含节假日校验），并非即时到账', synthetic: true,
           underlying: [{ asset: '国债和政策性金融债（利率债）', share: 50 }, { asset: 'AA+及以上信用债', share: 40 }, { asset: '现金及银行存款', share: 10 }], underlyingSource: '合成数据，不是真实产品披露' },
       ],
       goals: [{ id: 'goal-travel', name: '旅行目标', target: 300000, balance: 0, deadline: '2027-06-01', status: 'active' }],
       // Two earlier buys make up the holding's cost, so a portfolio review has dates and amounts to look back on.
-      holdings: [{ id: 'holding-cash', productId: 'fund-cash', name: '演示现金基金', value: 20000, cost: 20000, accountId: 'savings', purchases: [{ date: addDays(anchor, -120), amount: 15000 }, { date: addDays(anchor, -45), amount: 5000 }] }],
+      holdings: [{ id: 'holding-cash', productId: 'fund-cash', name: '现金基金', value: 20000, cost: 20000, accountId: 'savings', purchases: [{ date: addDays(anchor, -120), amount: 15000 }, { date: addDays(anchor, -45), amount: 5000 }] }],
       cards: [
         { id: 'card-daily', name: '日常借记卡', tail: '8021', accountId: 'daily', status: 'active', restriction: 'none', limit: 500000, issuer: '本行沙箱' },
         { id: 'card-risk', name: '储蓄借记卡', tail: '3609', accountId: 'savings', status: 'restricted', restriction: 'risk', limit: 1000000, issuer: '本行沙箱' },

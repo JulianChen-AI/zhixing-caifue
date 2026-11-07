@@ -88,7 +88,7 @@ L2：执行          L3：生成 verificationId，进入待认证
 | 转账状态机、令牌作废、认证门 | `tests/engine.test.ts`、`tests/roadshow-transfer.test.ts` |
 | 字段依据、语音确认判定 | `tests/voice-functions.test.ts`、`tests/recipient-choice.test.ts` |
 | 57 项功能的确认与认证分级 | `tests/workflows.test.ts` |
-| 转账确认分级（风险升高须点卡片） | `tests/transfer-risk.test.ts` |
+| 转账只在卡片上确认、风险原因提示 | `tests/transfer-risk.test.ts` |
 | IM 签名、IM 不能认证 | `tests/im.test.ts` |
 | 多步计划轮次隔离、确认不外溢 | `tests/plans.test.ts`、`tests/roadshow-acceptance.test.ts` |
 | 委托模式的调用上限、参数拒绝、结果不明不报成功、以用户原话为依据 | `tests/delegation.test.ts`（同轮重试拒绝在路由中实现，暂无单元测试） |
@@ -123,7 +123,7 @@ L2：执行          L3：生成 verificationId，进入待认证
 | R18 | 无 `Origin` 头的请求不做来源比对 | 低 | `checkOrigin` 只在带 `Origin` 时比对（`lib/bank/server.ts:17`）；浏览器跨站请求带不上 `SameSite=Strict` Cookie，非浏览器客户端只能操作自己的会话 | 生产环境对写接口强制要求 `Origin` 或 CSRF 令牌 |
 | R19 | 未做真人验收与渗透测试 | 中 | 有合成音轨与真实模型的自动化记录；真人麦克风、手机回声、跨网质量与安全测试未进行 | 上线前完成真人语音验收、第三方渗透测试与模型红队测试 |
 | R20 | IM 会话未与 App 登录身份绑定 | 中 | IM 按渠道用户各建会话，认证必须回 App；但 IM 用户与 App 用户的绑定、解绑与撤销尚未实现，演示中靠本机模拟页共用浏览器会话 | 上线前做账号绑定（App 内发起、短时有效、可撤销），并对 IM 回复做脱敏 |
-| R21 | 低风险转账仍可语音确认 | 中 | 采用稿转账 v2.7 P0-4 要求熟人小额也须在确认页手动点击；代码只在风险升高时禁用语音确认 | 已登记为待决定的规则冲突，未私自修改 |
+| R21 | 转账确认通道 | 已处理 | 2026-11-06 起按采用稿要求，所有转账只能在卡片上点击确认，语音确认一律不生效 | — |
 
 ### 3.1 红队实测（2026-11-06，`evals/task-completion/redteam.json`）
 

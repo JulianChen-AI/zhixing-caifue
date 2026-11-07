@@ -220,7 +220,7 @@ export function TransferRiskBanner({ bank, task }: { bank: BankState; task: Flow
   if (!['TR03'].includes(task.functionId) || task.status !== 'review') return null;
   const amount = Math.round(Number(task.params.amount) * 100) || 0;
   const risk = transferRisk(bank, { recipientId: typeof task.params.recipientId === 'string' ? task.params.recipientId : null, amount: amount || null });
-  return risk.elevated ? <div className="vx-risk" role="note"><ShieldAlert aria-hidden size={18}/><div><b>这笔需要点卡片上的“确认”，语音确认不算数</b><div className="vx-badges">{risk.reasons.map(reason => <Chip key={reason} badge={{ label: reason, tone: 'risk' }}/>)}</div></div></div> : null;
+  return risk.elevated ? <div className="vx-risk" role="note"><ShieldAlert aria-hidden size={18}/><div><b>请特别核对</b><div className="vx-badges">{risk.reasons.map(reason => <Chip key={reason} badge={{ label: reason, tone: 'risk' }}/>)}</div></div></div> : null;
 }
 /** The amount in financial capitals, read back under the money flow. */
 export function UpperAmount({ cents }: { cents: number }) {

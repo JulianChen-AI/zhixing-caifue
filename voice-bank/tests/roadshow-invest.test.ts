@@ -40,7 +40,7 @@ test('held money cannot be spent twice, is released on cancel and leaves only at
 test('T11 an expired synthetic assessment stops a purchase; T13 a plan is authorised without an immediate debit',()=>{
  let s=scene('S03');
  s=card(s,{operation:'run',functionId:'IN13',params:{action:'create',productId:'product-a',amount:200,schedule:'每月10日'}});let t=currentWorkflow(s)!;
- assert.match(t.message,/每月10日从日常账户投200元到模拟产品A。这只是授权规则，现在不会扣款/);
+ assert.match(t.message,/每月10日从日常账户投200元到稳健产品A。这只是授权规则，现在不会扣款/);
  s=card(s,{operation:'confirm',taskId:t.id,token:t.reviewToken});t=currentWorkflow(s)!;s=card(s,{operation:'authenticate',taskId:t.id,token:t.verificationId,code:'123456'});
  assert.equal(currentWorkflow(s)!.status,'complete');assert.equal(s.workflows!.records.orders.length,0);assert.equal(s.accounts[0].balance,300000);assert.equal(s.accounts[0].held,undefined);
  s=reduceBank(s,{type:'advance_clock',to:'2029-11-01T04:00:00.000Z'},crypto.randomUUID());

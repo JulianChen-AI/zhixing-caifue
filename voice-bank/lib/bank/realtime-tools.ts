@@ -1,3 +1,4 @@
+import { VOICE_REFUSED } from '../workflows/risk.ts';
 import { z } from 'zod';
 import { CONTACTS, type Contact, type BankState, type Intent } from './types.ts';
 import { POLICY_VERSION, workflowById } from '../checklists/catalog.ts';
@@ -76,8 +77,8 @@ export function realtimeToolDecision(args:RealtimeToolArguments,state:BankState,
       return decision(undefined,[],'这笔信息已经确认，请直接在卡片完成演示认证，不需要重复确认。');
     if(!active||!(state.view==='transfer'||state.view==='workflow'&&state.workflows?.tasks.find(x=>x.id===state.workflows?.currentTaskId)?.functionId==='TR03')||t!.step!=='review'||!t!.reviewToken||args.confirmationToken!==t!.reviewToken||!affirm||state.routing?.unresolved.length)
       return decision(undefined,['intent'],'请先核对当前完整转账摘要，再明确确认；旧摘要或仅确认金额不能授权整笔转账。');
-    evidence.push({field:'confirmation',value:t!.id,quote:raw,source:'utterance'});
-    return decision({kind:'confirm_transfer'});
+    // Speech never confirms a transfer; the reply points to the card button and nothing changes.
+    return decision(undefined,[],VOICE_REFUSED);
   }
   const unresolved:string[]=[];
   if(/不要改|别改|不改|不要换|别换/.test(raw))return decision(undefined,['intent'],'请先明确要保留还是修改当前内容。');
